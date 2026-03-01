@@ -44,7 +44,7 @@ const ScrolledMobileNav: React.FC<ScrolledMobileNavProps> = ({
         }`}
         style={{
           backgroundColor: spoolbearTheme.colors.header,
-          borderColor: 'rgba(0,0,0,0.08)',
+          borderColor: "rgba(0,0,0,0.08)",
         }}
       >
         <div className="px-4 pt-3 pb-4 space-y-1">
@@ -58,14 +58,13 @@ const ScrolledMobileNav: React.FC<ScrolledMobileNavProps> = ({
           ))}
 
           {/* Compact Mobile Auth Links with SpoolBear styling */}
-          <div
+          {/* <div
             className="border-t pt-3 mt-3"
             style={{ borderColor: 'rgba(0,0,0,0.08)' }}
           >
             {user ? (
               <>
                 <div className="flex items-center space-x-3 px-4 py-3 mb-2">
-                  {/* User Avatar with SpoolBear styling */}
                   <div
                     className="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden"
                     style={{
@@ -100,7 +99,6 @@ const ScrolledMobileNav: React.FC<ScrolledMobileNavProps> = ({
                   </div>
                 </div>
                 
-                {/* Profile Link */}
                 <Link
                   href="/profile"
                   className="block px-3 py-2 rounded-md font-medium transition-all duration-200 text-sm uppercase tracking-wider"
@@ -120,7 +118,6 @@ const ScrolledMobileNav: React.FC<ScrolledMobileNavProps> = ({
                   Profile
                 </Link>
 
-                {/* Sign Out Button */}
                 <button
                   onClick={handleLogout}
                   className="block w-full text-left px-3 py-2 rounded-md font-medium transition-all duration-200 text-sm uppercase tracking-wider"
@@ -181,7 +178,7 @@ const ScrolledMobileNav: React.FC<ScrolledMobileNavProps> = ({
                 </Link>
               </>
             )}
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

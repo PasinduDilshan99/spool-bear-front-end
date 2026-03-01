@@ -381,7 +381,7 @@ const ScrolledDesktopNav: React.FC<ScrolledDesktopNavProps> = ({
       </div>
 
       {/* Compact User Auth Section - Desktop with SpoolBear styling */}
-      <div className="hidden md:flex items-center space-x-3">
+      {/* <div className="hidden md:flex items-center space-x-3">
         {user ? (
           <UserDropdown
             user={user}
@@ -434,7 +434,7 @@ const ScrolledDesktopNav: React.FC<ScrolledDesktopNavProps> = ({
             </Link>
           </div>
         )}
-      </div>
+      </div> */}
     </>
   );
 };

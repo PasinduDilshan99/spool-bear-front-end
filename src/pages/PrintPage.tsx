@@ -146,7 +146,7 @@ const PrintPage = () => {
   // Features
   const features = [
     { icon: <Printer className="w-6 h-6" />, title: "Professional Printing", description: "Industrial-grade printers for perfect results" },
-    { icon: <Package className="w-6 h-6" />, title: "Wide Material Range", description: "PLA, ABS, PETG, Resin, and more" },
+    { icon: <Package className="w-6 h-6" />, title: "Wide Material Range", description: "PLA, ABS, PETG" },
     { icon: <Clock className="w-6 h-6" />, title: "Fast Turnaround", description: "Most prints ready in 24-48 hours" },
     { icon: <Shield className="w-6 h-6" />, title: "Quality Guarantee", description: "100% satisfaction or money back" },
   ];
@@ -376,8 +376,7 @@ const PrintPage = () => {
           </div>
         </section>
 
-        {/* Supported File Formats */}
-        <section className="py-16 md:py-20 bg-white/30 backdrop-blur-sm rounded-3xl px-6 md:px-10">
+        {/* <section className="py-16 md:py-20 bg-white/30 backdrop-blur-sm rounded-3xl px-6 md:px-10">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl md:text-4xl font-black mb-6" style={{ color: spoolbearTheme.colors.text }}>
@@ -416,7 +415,6 @@ const PrintPage = () => {
                 />
               </div>
               
-              {/* Floating badge */}
               <div className="absolute -bottom-4 -left-4 bg-white/90 backdrop-blur-sm rounded-xl p-4 shadow-xl flex items-center gap-3">
                 <Download className="w-6 h-6" style={{ color: spoolbearTheme.colors.accent }} />
                 <div>
@@ -426,7 +424,7 @@ const PrintPage = () => {
               </div>
             </div>
           </div>
-        </section>
+        </section> */}
 
         {/* Materials Section */}
         <section className="py-16 md:py-20">
@@ -440,10 +438,10 @@ const PrintPage = () => {
               { name: "ABS", desc: "Strong, heat resistant", color: "#f97316" },
               { name: "PETG", desc: "Durable, food safe", color: "#3b82f6" },
               { name: "TPU", desc: "Flexible, rubber-like", color: "#a855f7" },
-              { name: "Resin", desc: "High detail, smooth finish", color: "#ec4899" },
-              { name: "Nylon", desc: "Strong, wear resistant", color: "#6b7280" },
-              { name: "Polycarbonate", desc: "Impact resistant", color: "#eab308" },
-              { name: "Carbon Fiber", desc: "Lightweight, rigid", color: "#101113" },
+              // { name: "Resin", desc: "High detail, smooth finish", color: "#ec4899" },
+              // { name: "Nylon", desc: "Strong, wear resistant", color: "#6b7280" },
+              // { name: "Polycarbonate", desc: "Impact resistant", color: "#eab308" },
+              // { name: "Carbon Fiber", desc: "Lightweight, rigid", color: "#101113" },
             ].map((material, index) => (
               <div
                 key={index}
@@ -461,7 +459,7 @@ const PrintPage = () => {
         </section>
 
         {/* FAQ Section */}
-        <section className="py-16 md:py-20">
+        {/* <section className="py-16 md:py-20">
           <h2 className="text-3xl md:text-4xl font-black text-center mb-12" style={{ color: spoolbearTheme.colors.text }}>
             Frequently Asked <span style={{ color: spoolbearTheme.colors.accent }}>Questions</span>
           </h2>
@@ -499,7 +497,7 @@ const PrintPage = () => {
               </div>
             ))}
           </div>
-        </section>
+        </section> */}
 
         {/* Contact CTA */}
         <section className="py-16 md:py-20">
@@ -533,7 +531,7 @@ const PrintPage = () => {
                   Upload Now
                 </button>
                 <Link
-                  href="/contact"
+                  href="/contact-us"
                   className="px-8 py-4 border-2 border-white text-white font-bold rounded-lg hover:bg-white/10 transition-colors"
                 >
                   Contact Us

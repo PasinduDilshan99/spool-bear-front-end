@@ -101,9 +101,9 @@ function AnimatedCounter({ target, suffix = "" }: { target: string; suffix?: str
 const AboutUsPage = () => {
   // Company stats
   const stats = [
-    { value: "5000+", label: "Prints Completed", icon: <Printer className="w-6 h-6" /> },
-    { value: "1000+", label: "Happy Clients", icon: <Users className="w-6 h-6" /> },
-    { value: "50+", label: "Materials Available", icon: <Package className="w-6 h-6" /> },
+    { value: "100+", label: "Prints Completed", icon: <Printer className="w-6 h-6" /> },
+    { value: "20+", label: "Happy Clients", icon: <Users className="w-6 h-6" /> },
+    { value: "4", label: "Materials Available", icon: <Package className="w-6 h-6" /> },
     { value: "24/7", label: "Customer Support", icon: <Clock className="w-6 h-6" /> },
   ];
 
@@ -324,7 +324,7 @@ const AboutUsPage = () => {
                     animation: heroReveal.visible ? "aboutReveal 0.6s 0.32s ease-out both" : "none",
                     opacity: heroReveal.visible ? undefined : 0,
                   }}>
-                  <Link href="/products"
+                  <Link href="/shop"
                     className="relative overflow-hidden inline-flex items-center gap-2 px-8 py-4 text-white font-black uppercase tracking-[0.08em] text-sm rounded-2xl transition-all duration-300"
                     style={{ backgroundColor: spoolbearTheme.colors.accent, boxShadow: "0 6px 24px rgba(255,80,0,0.35)" }}
                     onMouseEnter={(e) => {
@@ -346,7 +346,7 @@ const AboutUsPage = () => {
                     <ArrowRight className="relative z-10 w-5 h-5" />
                   </Link>
                   
-                  <Link href="/contact"
+                  <Link href="/contact-us"
                     className="inline-flex items-center gap-2 px-8 py-4 font-black uppercase tracking-[0.08em] text-sm rounded-2xl border-2 transition-all duration-300"
                     style={{
                       borderColor: `${spoolbearTheme.colors.text}30`,
@@ -683,7 +683,7 @@ const AboutUsPage = () => {
         </section>
 
         {/* Testimonials Section */}
-        <section ref={testimonialsReveal.ref} className="py-20 md:py-28">
+        {/* <section ref={testimonialsReveal.ref} className="py-20 md:py-28">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: "1400px" }}>
             <div className="text-center max-w-3xl mx-auto mb-16">
               <h2 className="text-3xl md:text-4xl font-black mb-4" style={{ color: spoolbearTheme.colors.text }}>
@@ -744,7 +744,7 @@ const AboutUsPage = () => {
               ))}
             </div>
           </div>
-        </section>
+        </section> */}
 
         {/* Contact CTA Section */}
         <section className="py-20 md:py-28">
@@ -787,7 +787,7 @@ const AboutUsPage = () => {
         </section>
 
         {/* Contact Info Section */}
-        <section className="py-20 md:py-28 bg-white/30 backdrop-blur-sm">
+        {/* <section className="py-20 md:py-28 bg-white/30 backdrop-blur-sm">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8" style={{ maxWidth: "1400px" }}>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[
@@ -807,7 +807,7 @@ const AboutUsPage = () => {
               ))}
             </div>
           </div>
-        </section>
+        </section> */}
       </div>
     </>
   );
