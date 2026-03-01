@@ -1,7 +1,8 @@
 import ComingSoon from "@/components/common-components/ComingSoon";
+import PrintPage from "@/pages/PrintPage";
 
 const page = () => {
-  return <ComingSoon />;
+  return <PrintPage />;
 };
 
 export default page;
