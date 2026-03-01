@@ -1,8 +1,9 @@
 // app/products/page.tsx
 import React, { Suspense } from "react";
 import { Loader2 } from "lucide-react";
+import ProductsPage from "@/pages/ProductsPage";
 
-export default function ProductsPage() {
+export default function ShopPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-[#e4e7ec] flex items-center justify-center">
