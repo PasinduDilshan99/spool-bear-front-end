@@ -582,7 +582,7 @@ const DesignPage = () => {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20 md:py-28">
+      {/* <section className="py-20 md:py-28">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-4xl font-black text-center mb-12" style={{ color: spoolbearTheme.colors.text }}>
             Frequently Asked <span style={{ color: spoolbearTheme.colors.accent }}>Questions</span>
@@ -622,7 +622,7 @@ const DesignPage = () => {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Final CTA */}
       <section className="py-16 md:py-20">
@@ -659,7 +659,7 @@ const DesignPage = () => {
                   <Send className="w-4 h-4" />
                 </button>
                 <Link
-                  href="/contact"
+                  href="/contact-us"
                   className="px-8 py-4 border-2 border-white text-white font-bold rounded-lg hover:bg-white/10 transition-colors"
                 >
                   Contact Us

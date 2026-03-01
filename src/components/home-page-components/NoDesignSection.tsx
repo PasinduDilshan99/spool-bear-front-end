@@ -74,7 +74,7 @@ const NoDesignSection: React.FC<NoDesignSectionProps> = ({
                 // Special styling for the last paragraph (model ready for printing)
                 if (index === 3) {
                   return (
-                    <p key={index} className="text-lg md:text-xl text-[#101113] font-medium">
+                    <p key={index} className="text-xl md:text-2xl text-[#101113] font-medium">
                       {paragraph}
                     </p>
                   );
@@ -82,15 +82,15 @@ const NoDesignSection: React.FC<NoDesignSectionProps> = ({
                 // Special styling for the review paragraph
                 if (index === 2) {
                   return (
-                    <p key={index} className="text-lg md:text-xl text-[#2b2e33]">
-                      <span className="font-bold text-[#ff5000]">✨ </span>
+                    <p key={index} className="text-xl md:text-2xl text-[#2b2e33]">
+                      {/* <span className="font-bold text-[#ff5000]"> </span> */}
                       {paragraph}
                     </p>
                   );
                 }
                 // Regular paragraphs
                 return (
-                  <p key={index} className="text-lg md:text-xl text-[#2b2e33] leading-relaxed">
+                  <p key={index} className="text-xl md:text-2xl text-[#2b2e33] leading-relaxed">
                     {paragraph}
                   </p>
                 );
@@ -115,16 +115,16 @@ const NoDesignSection: React.FC<NoDesignSectionProps> = ({
                 <span className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
               </Link>
               
-              <Link
+              {/* <Link
                 href="/how-it-works"
                 className="group px-8 py-4 bg-transparent text-[#101113] font-bold text-lg rounded-full border-2 border-[#2b2e33] hover:bg-[#101113] hover:text-white hover:border-[#101113] transition-all duration-300"
               >
                 Learn More
-              </Link>
+              </Link> */}
             </div>
 
             {/* Trust Indicators */}
-            <div className="mt-10 flex items-center gap-6">
+            {/* <div className="mt-10 flex items-center gap-6">
               <div className="flex -space-x-3">
                 {[1, 2, 3, 4].map((i) => (
                   <div key={i} className="w-10 h-10 rounded-full bg-[#ff5000]/20 border-2 border-white flex items-center justify-center">
@@ -142,7 +142,7 @@ const NoDesignSection: React.FC<NoDesignSectionProps> = ({
                 </div>
                 <p className="text-sm text-[#2b2e33]">Trusted by 1000+ creators</p>
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Right Content - Image with Bear Character */}
@@ -154,7 +154,7 @@ const NoDesignSection: React.FC<NoDesignSectionProps> = ({
               
               {/* Bear Worker Image */}
               <div className="relative z-10">
-                <div className="relative w-full max-w-lg mx-auto">
+                <div className="relative w-full max-w-md mx-auto">
                   {/* Bear Character */}
                   <div className="relative aspect-square">
                     <Image

@@ -14,11 +14,8 @@ export async function POST(request: NextRequest) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        cookie: request.headers.get("cookie") || "",
       },
-      credentials: "include",
       body: JSON.stringify(body),
-      cache: "no-store",
     });
 
     if (!response.ok) {

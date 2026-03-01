@@ -91,13 +91,13 @@ function StepCard({ step, index, total, visible }: {
           }}
         >
           {/* Inner icon wrapper */}
-          <div className="relative w-32 h-32">
+          <div className="relative w-50 h-50">
             <Image
               src={step.icon.src}
               alt={step.icon.alt}
               fill
               className="object-contain"
-              sizes="128px"
+              sizes="400px"
               priority={index === 0}
             />
           </div>
@@ -336,7 +336,7 @@ const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
           </div>
 
           {/* ── Bottom CTA ── */}
-          <div className="text-center mt-20 lg:mt-28"
+          {/* <div className="text-center mt-20 lg:mt-28"
             style={{ animation: visible ? "hiwReveal 0.7s 0.95s ease-out both" : "none", opacity: visible ? undefined : 0 }}>
             <button
               className="relative overflow-hidden inline-flex items-center gap-3 px-10 py-5 font-black uppercase tracking-[0.08em] text-base text-white transition-all duration-300"
@@ -354,7 +354,6 @@ const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
                 e.currentTarget.style.boxShadow = "0 8px 32px rgba(255,80,0,0.40)";
               }}
             >
-              {/* Shimmer overlay */}
               <span className="absolute top-0 bottom-0 w-20 pointer-events-none"
                 style={{
                   background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent)",
@@ -369,7 +368,7 @@ const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
             <p className="text-[15px] font-semibold mt-4" style={{ color: "#2b2e33" }}>
               From design to delivery in 3 simple steps
             </p>
-          </div>
+          </div> */}
 
         </div>
       </section>

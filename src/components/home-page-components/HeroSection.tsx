@@ -16,9 +16,6 @@ interface HeroSectionProps {
   className?: string;
 }
 
-/* ══════════════════════════════════════════
-   FLOATING PARTICLE
-══════════════════════════════════════════ */
 interface Particle {
   id: number;
   x: number;
@@ -30,21 +27,17 @@ interface Particle {
 }
 
 function FloatingParticles() {
-  const [particles, setParticles] = useState<Particle[]>([]);
-
-  useEffect(() => {
-    setParticles(
-      Array.from({ length: 18 }, (_, i) => ({
-        id: i,
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        size: 2 + Math.random() * 4,
-        duration: 6 + Math.random() * 10,
-        delay: Math.random() * 8,
-        opacity: 0.15 + Math.random() * 0.35,
-      })),
-    );
-  }, []);
+  const [particles] = useState<Particle[]>(() => 
+    Array.from({ length: 18 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: 2 + Math.random() * 4,
+      duration: 6 + Math.random() * 10,
+      delay: Math.random() * 8,
+      opacity: 0.15 + Math.random() * 0.35,
+    }))
+  );
 
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -255,13 +248,13 @@ function AnimatedStat({
    HERO SECTION
 ══════════════════════════════════════════ */
 const HeroSection: React.FC<HeroSectionProps> = ({
-  title = "Functional. Durable.",
-  accentText = "3D-printed.",
-  subtitle = "Premium filaments and resins for your next creation",
+  title = "Turning digital designs into",
+  accentText = "real-world solutions.",
+  // subtitle = "Premium filaments and resins for your next creation",
   primaryCtaText = "Shop Now",
   primaryCtaLink = "/shop",
   secondaryCtaText = "Learn More",
-  secondaryCtaLink = "/about",
+  secondaryCtaLink = "/about-us",
   imagePath = "/images/3D_Printer(Home).png",
   imageAlt = "3D Printer",
   className = "",
@@ -499,13 +492,13 @@ const HeroSection: React.FC<HeroSectionProps> = ({
 
               {/* Headline */}
               <h1
-                className="hero-item-2 font-black leading-[1.04]"
+                className="hero-item-2 font-black leading-[1.09]"
                 style={{ letterSpacing: "-0.03em" }}
               >
                 <span
                   className="block"
                   style={{
-                    fontSize: "clamp(34px, 4vw, 58px)",
+                    fontSize: "clamp(34px, 4vw, 48px)",
                     color: "#101113",
                   }}
                 >
@@ -532,7 +525,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
               </h1>
 
               {/* Subtitle */}
-              <p
+              {/* <p
                 className="hero-item-3 mt-5 font-medium leading-relaxed"
                 style={{
                   fontSize: "clamp(15px, 1.4vw, 19px)",
@@ -543,7 +536,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                 }}
               >
                 {subtitle}
-              </p>
+              </p> */}
 
               {/* CTA buttons */}
               <div className="hero-item-4 mt-8 flex flex-wrap gap-4 justify-center lg:justify-start">
@@ -644,12 +637,12 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                   className="h-8 w-[1.5px] self-center hidden lg:block"
                   style={{ background: "rgba(0,0,0,0.12)" }}
                 />
-                <AnimatedStat to={12000} suffix="+" label="Models" />
+                <AnimatedStat to={12} suffix="+" label="Models" />
                 <div
                   className="h-8 w-[1.5px] self-center"
                   style={{ background: "rgba(0,0,0,0.12)" }}
                 />
-                <AnimatedStat to={230} suffix="+" label="Materials" />
+                <AnimatedStat to={4} suffix="+" label="Materials" />
                 <div
                   className="h-8 w-[1.5px] self-center"
                   style={{ background: "rgba(0,0,0,0.12)" }}

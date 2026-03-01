@@ -304,7 +304,7 @@ const ProductsPage = () => {
     if (filters.sortBy !== "newest") params.set("sort", filters.sortBy);
     
     const queryString = params.toString();
-    router.push(queryString ? `?${queryString}` : "/products", { scroll: false });
+    router.push(queryString ? `?${queryString}` : "/shop", { scroll: false });
   }, [filters, applyFilters, router]);
 
   // Handle filter changes

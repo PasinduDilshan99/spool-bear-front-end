@@ -53,7 +53,7 @@ const MobileNav: React.FC<MobileNavProps> = ({
           ))}
 
           {/* Mobile Auth Links */}
-          <div
+          {/* <div
             className="border-t pt-4 mt-4"
             style={{ borderColor: 'rgba(0,0,0,0.08)' }}
           >
@@ -156,7 +156,7 @@ const MobileNav: React.FC<MobileNavProps> = ({
                 </Link>
               </>
             )}
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
