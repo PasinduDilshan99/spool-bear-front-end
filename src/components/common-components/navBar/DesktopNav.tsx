@@ -169,7 +169,7 @@ const DesktopNav: React.FC<DesktopNavProps> = ({
       </div>
 
       {/* User Auth Section - Desktop */}
-      {/* <div className="hidden md:flex items-center space-x-4">
+      <div className="hidden md:flex items-center space-x-4">
         {user ? (
           <UserDropdown
             user={user}
@@ -222,7 +222,7 @@ const DesktopNav: React.FC<DesktopNavProps> = ({
             </Link>
           </div>
         )}
-      </div> */}
+      </div>
     </>
   );
 };

@@ -1,21 +1,21 @@
 // utils/backEndConstant.ts
 // Development
+const PROTOCOL = "http";
+const DOMAIN = "localhost";
+const PORT = "8080";
+const CONTEXT_ROOT = "spool-bear";
+const VERSION = "/v0";
+const API = "/api";
+export const BASE_PATH = `${PROTOCOL}://${DOMAIN}:${PORT}/${CONTEXT_ROOT}`;
+
+// Staging (commented out)
 // const PROTOCOL = "http";
-// const DOMAIN = "localhost";
-// const PORT = "8081";
+// const DOMAIN = "staging-api.spoolbear.com";
+// const PORT = "443";
 // const CONTEXT_ROOT = "3d";
 // const VERSION = "/v0";
 // const API = "/api";
-// export const BASE_PATH = `${PROTOCOL}://${DOMAIN}:${PORT}/${CONTEXT_ROOT}`;
-
-// Staging (commented out)
-const PROTOCOL = "http";
-const DOMAIN = "staging-api.spoolbear.com";
-const PORT = "443";
-const CONTEXT_ROOT = "3d";
-const VERSION = "/v0";
-const API = "/api";
-export const BASE_PATH = `${PROTOCOL}://${DOMAIN}/${CONTEXT_ROOT}`;
+// export const BASE_PATH = `${PROTOCOL}://${DOMAIN}/${CONTEXT_ROOT}`;
 
 // Production (commented out)
 // const PROTOCOL = "https";
