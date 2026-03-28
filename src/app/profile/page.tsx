@@ -1,7 +1,5 @@
-import ComingSoon from "@/components/common-components/ComingSoon";
+import { redirect } from "next/navigation";
 
-const page = () => {
-  return <ComingSoon />;
-};
-
-export default page;
+export default function ProfilePage() {
+  redirect("/profile/user");
+}

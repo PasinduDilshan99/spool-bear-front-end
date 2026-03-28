@@ -3,6 +3,7 @@ import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import NavBar from "@/components/common-components/navBar/NavBar";
 import Footer from "@/components/common-components/footer/Footer";
+import { CartProvider } from "@/context/CartContext";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -18,9 +19,11 @@ export default function RootLayout({
     <html lang="en">
       <body className="min-h-screen">
         <AuthProvider>
-          <NavBar />
-          {children}
-          <Footer />
+          <CartProvider>
+            <NavBar />
+            {children}
+            <Footer />
+          </CartProvider>
         </AuthProvider>
       </body>
     </html>
