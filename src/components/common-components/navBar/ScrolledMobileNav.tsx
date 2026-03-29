@@ -1,3 +1,4 @@
+// components/ScrolledMobileNav.tsx
 "use client";
 import React from "react";
 import Link from "next/link";
@@ -7,6 +8,8 @@ import { useAuth } from "@/context/AuthContext";
 import MobileMenuItem from "./MobileMenuItem";
 import Image from "next/image";
 import { spoolbearTheme } from "@/theme/spoolbear-theme";
+import { ShoppingCartIcon } from "@heroicons/react/24/outline";
+import { useCart } from "@/context/CartContext";
 
 interface ScrolledMobileNavProps {
   visibleNavBarItems: NavBarItem[];
@@ -22,6 +25,8 @@ const ScrolledMobileNav: React.FC<ScrolledMobileNavProps> = ({
   setIsScrolledMenuOpen,
 }) => {
   const { logout } = useAuth();
+  const { getCartItemCount } = useCart();
+  const itemCount = getCartItemCount();
 
   const handleClose = () => {
     setIsScrolledMenuOpen(false);
@@ -57,10 +62,46 @@ const ScrolledMobileNav: React.FC<ScrolledMobileNavProps> = ({
             />
           ))}
 
+          {/* Cart Link - Only for logged-in users (compact version for scrolled state) */}
+          {user && (
+            <Link
+              href="/cart"
+              className="flex items-center justify-between px-3 py-2 rounded-md font-medium transition-all duration-200 text-sm uppercase tracking-wider"
+              style={{
+                color: spoolbearTheme.colors.text,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor =
+                  "rgba(255, 80, 0, 0.12)";
+                e.currentTarget.style.color = spoolbearTheme.colors.accent;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "transparent";
+                e.currentTarget.style.color = spoolbearTheme.colors.text;
+              }}
+              onClick={handleClose}
+            >
+              <div className="flex items-center space-x-3">
+                <ShoppingCartIcon className="w-4 h-4" />
+                <span>My Cart</span>
+              </div>
+              {itemCount > 0 && (
+                <span
+                  className="px-1.5 py-0.5 rounded-full text-[10px] font-bold text-white"
+                  style={{
+                    backgroundColor: spoolbearTheme.colors.accent,
+                  }}
+                >
+                  {itemCount > 99 ? "99+" : itemCount}
+                </span>
+              )}
+            </Link>
+          )}
+
           {/* Compact Mobile Auth Links with SpoolBear styling */}
-          {/* <div
+          <div
             className="border-t pt-3 mt-3"
-            style={{ borderColor: 'rgba(0,0,0,0.08)' }}
+            style={{ borderColor: "rgba(0,0,0,0.08)" }}
           >
             {user ? (
               <>
@@ -90,15 +131,21 @@ const ScrolledMobileNav: React.FC<ScrolledMobileNavProps> = ({
                     )}
                   </div>
                   <div>
-                    <div style={{ color: spoolbearTheme.colors.text }} className="font-medium">
+                    <div
+                      style={{ color: spoolbearTheme.colors.text }}
+                      className="font-medium"
+                    >
                       {`${user.firstName} ${user.lastName}`}
                     </div>
-                    <div style={{ color: spoolbearTheme.colors.muted }} className="text-sm">
+                    <div
+                      style={{ color: spoolbearTheme.colors.muted }}
+                      className="text-sm"
+                    >
                       {user.email}
                     </div>
                   </div>
                 </div>
-                
+
                 <Link
                   href="/profile"
                   className="block px-3 py-2 rounded-md font-medium transition-all duration-200 text-sm uppercase tracking-wider"
@@ -106,11 +153,12 @@ const ScrolledMobileNav: React.FC<ScrolledMobileNavProps> = ({
                     color: spoolbearTheme.colors.text,
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'rgba(255, 80, 0, 0.12)';
+                    e.currentTarget.style.backgroundColor =
+                      "rgba(255, 80, 0, 0.12)";
                     e.currentTarget.style.color = spoolbearTheme.colors.accent;
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.backgroundColor = "transparent";
                     e.currentTarget.style.color = spoolbearTheme.colors.text;
                   }}
                   onClick={handleClose}
@@ -123,7 +171,8 @@ const ScrolledMobileNav: React.FC<ScrolledMobileNavProps> = ({
                   className="block w-full text-left px-3 py-2 rounded-md font-medium transition-all duration-200 text-sm uppercase tracking-wider"
                   style={{ color: "#dc2626" }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = "rgba(220, 38, 38, 0.08)";
+                    e.currentTarget.style.backgroundColor =
+                      "rgba(220, 38, 38, 0.08)";
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.backgroundColor = "transparent";
@@ -140,17 +189,20 @@ const ScrolledMobileNav: React.FC<ScrolledMobileNavProps> = ({
                   style={{
                     color: spoolbearTheme.colors.text,
                     border: `1px solid ${spoolbearTheme.colors.muted}`,
-                    backgroundColor: 'transparent',
+                    backgroundColor: "transparent",
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = spoolbearTheme.colors.accent;
-                    e.currentTarget.style.color = '#ffffff';
-                    e.currentTarget.style.borderColor = spoolbearTheme.colors.accent;
+                    e.currentTarget.style.backgroundColor =
+                      spoolbearTheme.colors.accent;
+                    e.currentTarget.style.color = "#ffffff";
+                    e.currentTarget.style.borderColor =
+                      spoolbearTheme.colors.accent;
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.backgroundColor = "transparent";
                     e.currentTarget.style.color = spoolbearTheme.colors.text;
-                    e.currentTarget.style.borderColor = spoolbearTheme.colors.muted;
+                    e.currentTarget.style.borderColor =
+                      spoolbearTheme.colors.muted;
                   }}
                   onClick={handleClose}
                 >
@@ -161,16 +213,18 @@ const ScrolledMobileNav: React.FC<ScrolledMobileNavProps> = ({
                   className="block px-3 py-2 rounded-md font-medium transition-all duration-200 text-center text-sm uppercase tracking-wider"
                   style={{
                     backgroundColor: spoolbearTheme.colors.accent,
-                    color: '#ffffff',
+                    color: "#ffffff",
                     border: `1px solid ${spoolbearTheme.colors.accent}`,
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#e64800';
-                    e.currentTarget.style.borderColor = '#e64800';
+                    e.currentTarget.style.backgroundColor = "#e64800";
+                    e.currentTarget.style.borderColor = "#e64800";
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = spoolbearTheme.colors.accent;
-                    e.currentTarget.style.borderColor = spoolbearTheme.colors.accent;
+                    e.currentTarget.style.backgroundColor =
+                      spoolbearTheme.colors.accent;
+                    e.currentTarget.style.borderColor =
+                      spoolbearTheme.colors.accent;
                   }}
                   onClick={handleClose}
                 >
@@ -178,7 +232,7 @@ const ScrolledMobileNav: React.FC<ScrolledMobileNavProps> = ({
                 </Link>
               </>
             )}
-          </div> */}
+          </div>
         </div>
       </div>
     </div>

@@ -25,3 +25,7 @@ export interface UploadImageData {
 export interface UploadImageDataResponse {
   data: UploadImageData;
 }
+
+export interface UploadFileDataResponse {
+  data: UploadImageData;
+}

@@ -1,3 +1,4 @@
+// components/DesktopNav.tsx
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
@@ -10,6 +11,8 @@ import MoreDropdown from "./MoreDropdown";
 import UserDropdown from "./UserDropdown";
 import Image from "next/image";
 import { spoolbearTheme } from "@/theme/spoolbear-theme";
+import CartIcon from "../CartIcon";
+import { LOGO_WITH_NAME } from "@/utils/constant";
 
 interface DesktopNavProps {
   visibleItems: NavBarItem[];
@@ -65,22 +68,22 @@ const DesktopNav: React.FC<DesktopNavProps> = ({
     color: spoolbearTheme.colors.text,
     fontSize: spoolbearTheme.nav.linkSize,
     fontWeight: 600,
-    letterSpacing: '0.06em',
-    textTransform: 'uppercase' as const,
-    padding: '10px 2px',
-    position: 'relative' as const,
-    transition: 'color 0.2s ease',
+    letterSpacing: "0.06em",
+    textTransform: "uppercase" as const,
+    padding: "10px 2px",
+    position: "relative" as const,
+    transition: "color 0.2s ease",
   };
 
   const activeIndicatorStyle = {
     content: '""',
-    position: 'absolute' as const,
+    position: "absolute" as const,
     left: 0,
     right: 0,
-    bottom: '2px',
-    height: '4px',
+    bottom: "2px",
+    height: "4px",
     background: spoolbearTheme.colors.accent,
-    borderRadius: '999px',
+    borderRadius: "999px",
   };
 
   return (
@@ -92,11 +95,11 @@ const DesktopNav: React.FC<DesktopNavProps> = ({
           onClick={closeAllDropdowns}
         >
           <Image
-            src="/images/logo.png"
+            src={LOGO_WITH_NAME}
             alt={companyName}
-            width={150}
-            height={50}
-            className="h-10 w-auto"
+            width={2000}
+            height={2000}
+            className="h-20 w-auto"
           />
         </Link>
       </div>
@@ -129,7 +132,9 @@ const DesktopNav: React.FC<DesktopNavProps> = ({
               className="relative font-semibold transition-colors duration-200"
               style={{
                 ...navLinkStyle,
-                color: isActive ? spoolbearTheme.colors.accent : spoolbearTheme.colors.text,
+                color: isActive
+                  ? spoolbearTheme.colors.accent
+                  : spoolbearTheme.colors.text,
               }}
               onMouseEnter={(e) => {
                 if (!isActive) {
@@ -144,9 +149,7 @@ const DesktopNav: React.FC<DesktopNavProps> = ({
               onClick={closeAllDropdowns}
             >
               {item.name}
-              {isActive && (
-                <span style={activeIndicatorStyle}></span>
-              )}
+              {isActive && <span style={activeIndicatorStyle}></span>}
             </Link>
           );
         })}
@@ -171,11 +174,17 @@ const DesktopNav: React.FC<DesktopNavProps> = ({
       {/* User Auth Section - Desktop */}
       <div className="hidden md:flex items-center space-x-4">
         {user ? (
-          <UserDropdown
-            user={user}
-            onLogout={logout}
-            onCloseAll={closeAllDropdowns}
-          />
+          <>
+            {/* Cart Icon - Only shown when user is logged in */}
+            <CartIcon onCloseAll={closeAllDropdowns} />
+
+            {/* User Dropdown */}
+            <UserDropdown
+              user={user}
+              onLogout={logout}
+              onCloseAll={closeAllDropdowns}
+            />
+          </>
         ) : (
           <div className="flex items-center space-x-2">
             <Link
@@ -184,15 +193,17 @@ const DesktopNav: React.FC<DesktopNavProps> = ({
               style={{
                 color: spoolbearTheme.colors.text,
                 border: `1px solid ${spoolbearTheme.colors.muted}`,
-                backgroundColor: 'transparent',
+                backgroundColor: "transparent",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = spoolbearTheme.colors.accent;
-                e.currentTarget.style.color = '#ffffff';
-                e.currentTarget.style.borderColor = spoolbearTheme.colors.accent;
+                e.currentTarget.style.backgroundColor =
+                  spoolbearTheme.colors.accent;
+                e.currentTarget.style.color = "#ffffff";
+                e.currentTarget.style.borderColor =
+                  spoolbearTheme.colors.accent;
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.backgroundColor = "transparent";
                 e.currentTarget.style.color = spoolbearTheme.colors.text;
                 e.currentTarget.style.borderColor = spoolbearTheme.colors.muted;
               }}
@@ -205,16 +216,18 @@ const DesktopNav: React.FC<DesktopNavProps> = ({
               className="px-3 py-1.5 rounded-md font-medium transition-all duration-200 text-xs uppercase tracking-wider"
               style={{
                 backgroundColor: spoolbearTheme.colors.accent,
-                color: '#ffffff',
+                color: "#ffffff",
                 border: `1px solid ${spoolbearTheme.colors.accent}`,
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#e64800';
-                e.currentTarget.style.borderColor = '#e64800';
+                e.currentTarget.style.backgroundColor = "#e64800";
+                e.currentTarget.style.borderColor = "#e64800";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = spoolbearTheme.colors.accent;
-                e.currentTarget.style.borderColor = spoolbearTheme.colors.accent;
+                e.currentTarget.style.backgroundColor =
+                  spoolbearTheme.colors.accent;
+                e.currentTarget.style.borderColor =
+                  spoolbearTheme.colors.accent;
               }}
               onClick={closeAllDropdowns}
             >

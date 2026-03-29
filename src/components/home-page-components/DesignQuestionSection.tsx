@@ -2,6 +2,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { CONTACT_US_PAGE_PATH, PRINT_PAGE_PATH } from "@/utils/urls";
+import { NUMBER_OF_DISPATCH, NUMBER_OF_MATERIALS } from "@/utils/constant";
 
 interface DesignQuestionSectionProps {
   className?: string;
@@ -10,7 +12,7 @@ interface DesignQuestionSectionProps {
 
 const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
   className = "",
-  imagePath = "/images/Home_Page_02_BG.png",
+  imagePath = "https://res.cloudinary.com/dkfonkmwr/image/upload/v1774767052/bx3ck5cm75ep2bmjaop6.png",
 }) => {
   const sectionRef = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
@@ -25,13 +27,13 @@ const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
           obs.disconnect();
         }
       },
-      { threshold: 0.12 }
+      { threshold: 0.1 },
     );
     obs.observe(el);
     return () => obs.disconnect();
   }, []);
 
-  const reveal = (delay: string) =>
+  const reveal = (delay: string): React.CSSProperties =>
     visible
       ? { animation: `dqsReveal 0.65s ${delay} ease-out both` }
       : { opacity: 0 };
@@ -39,7 +41,7 @@ const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
   return (
     <>
       <style global jsx>{`
-        @import url('https://fonts.googleapis.com/css2?family=Faculty+Glyphic&display=swap');
+        @import url("https://fonts.googleapis.com/css2?family=Faculty+Glyphic&display=swap");
 
         @keyframes dqsReveal {
           from {
@@ -57,7 +59,7 @@ const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
             transform: translateY(0);
           }
           50% {
-            transform: translateY(-16px);
+            transform: translateY(-14px);
           }
         }
         @keyframes dqsGlow {
@@ -109,10 +111,11 @@ const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
 
       <section
         ref={sectionRef}
-        className={`relative py-24 overflow-hidden ${className}`}
+        className={`relative overflow-hidden ${className}`}
         style={{
           background: "#ffffff",
           fontFamily: "'Faculty Glyphic', sans-serif",
+          padding: "clamp(48px, 7vw, 112px) 0",
         }}
       >
         {/* Grid texture */}
@@ -127,21 +130,21 @@ const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
 
         {/* Corner glows */}
         <div
-          className="absolute top-0 right-0 w-96 h-96 pointer-events-none"
+          className="absolute top-0 right-0 w-[40vw] h-[40vw] max-w-[520px] max-h-[520px] pointer-events-none"
           style={{
             background:
-              "radial-gradient(circle at top right, rgba(255,80,0,0.05) 0%, transparent 65%)",
+              "radial-gradient(circle at top right, rgba(255,80,0,0.06) 0%, transparent 65%)",
           }}
         />
         <div
-          className="absolute bottom-0 left-0 w-80 h-80 pointer-events-none"
+          className="absolute bottom-0 left-0 w-[35vw] h-[35vw] max-w-[440px] max-h-[440px] pointer-events-none"
           style={{
             background:
               "radial-gradient(circle at bottom left, rgba(255,80,0,0.04) 0%, transparent 65%)",
           }}
         />
 
-        {/* Filament threads at bottom */}
+        {/* Filament threads */}
         <svg
           className="absolute bottom-0 left-0 right-0 w-full pointer-events-none"
           style={{ height: "36px" }}
@@ -162,87 +165,80 @@ const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
             strokeWidth="1.5"
             strokeDasharray="5 8"
             fill="none"
-            style={{
-              animation: "dqsFilament 5s linear infinite reverse",
-            }}
+            style={{ animation: "dqsFilament 5s linear infinite reverse" }}
           />
         </svg>
 
         <div
-          className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10"
-          style={{ maxWidth: "1400px" }}
+          className="container mx-auto relative z-10"
+          style={{
+            maxWidth: "1400px",
+            padding: "0 clamp(16px, 4vw, 64px)",
+          }}
         >
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-            {/* LEFT: copy + CTAs */}
-            <div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-14 lg:gap-16 xl:gap-24 items-center">
+            {/* ══ LEFT: copy + CTAs ══════════════════════════════════════ */}
+            <div
+              className="flex flex-col items-center lg:items-start"
+              style={reveal("0s")}
+            >
               {/* Eyebrow */}
-              <div
-                className="inline-flex items-center gap-2 mb-6"
-                style={reveal("0.0s")}
-              >
+              <div className="inline-flex items-center gap-2 sm:gap-3 mb-5 sm:mb-7">
                 <div
-                  className="h-[2px] w-8 rounded-full"
-                  style={{ background: "#ff5000" }}
+                  className="h-[2px] rounded-full bg-[#FF5000]"
+                  style={{ width: "clamp(20px, 3vw, 36px)" }}
                 />
                 <span
-                  className="text-[11px] font-black uppercase tracking-[0.18em]"
-                  style={{ color: "#ff5000" }}
+                  className="font-black uppercase tracking-[0.2em] text-[#FF5000]"
+                  style={{ fontSize: "clamp(10px, 1.1vw, 12px)" }}
                 >
                   Start Creating
                 </span>
                 <div
-                  className="h-[2px] w-8 rounded-full"
-                  style={{ background: "#ff5000" }}
+                  className="h-[2px] rounded-full bg-[#FF5000]"
+                  style={{ width: "clamp(20px, 3vw, 36px)" }}
                 />
               </div>
 
               {/* Headline */}
               <h2
-                className="font-black leading-[1.04] mb-6"
-                style={reveal("0.12s")}
+                className="font-black leading-[1.08] tracking-tight text-[#101113] text-center lg:text-left mb-5 sm:mb-7"
+                style={{
+                  fontSize: "clamp(28px, 4.8vw, 58px)",
+                  letterSpacing: "-0.03em",
+                  ...reveal("0.1s"),
+                }}
               >
-                <span
-                  className="block text-[clamp(34px,4.8vw,56px)] tracking-[-0.03em]"
-                  style={{ color: "#101113" }}
-                >
-                  Turn Your Ideas
-                </span>
-                <span
-                  className="block text-[clamp(34px,4.8vw,56px)] tracking-[-0.03em]"
-                  style={{ color: "#101113" }}
-                >
-                  Into Reality with{" "}
-                  {/* Accent + underline */}
+                Turn Your Ideas Into Reality with{" "}
+                <span className="relative inline-block text-[#FF5000]">
+                  3D Printing
                   <span
-                    className="relative inline-block"
-                    style={{ color: "#ff5000" }}
-                  >
-                    3D Printing
-                    <span
-                      className="absolute bottom-0 left-0 h-[4px] rounded-full"
-                      style={{
-                        background: "rgba(255,80,0,0.25)",
-                        animation: visible
-                          ? "dqsUnderline 0.9s 0.7s ease-out both"
-                          : "none",
-                        width: 0,
-                      }}
-                    />
-                  </span>
+                    className="absolute bottom-0 left-0 h-[3px] sm:h-[4px] rounded-full"
+                    style={{
+                      background: "rgba(255,80,0,0.28)",
+                      animation: visible
+                        ? "dqsUnderline 0.9s 0.65s ease-out both"
+                        : "none",
+                      width: 0,
+                    }}
+                  />
                 </span>
               </h2>
 
               {/* Sub-question */}
-              <div style={reveal("0.22s")}>
+              <div
+                className="text-center lg:text-left mb-8 sm:mb-10"
+                style={reveal("0.2s")}
+              >
                 <p
-                  className="text-lg font-medium mb-1"
-                  style={{ color: "#2b2e33" }}
+                  className="font-medium text-[#2b2e33] mb-1"
+                  style={{ fontSize: "clamp(13px, 1.5vw, 18px)" }}
                 >
                   Start by telling us one thing:
                 </p>
                 <p
-                  className="text-xl sm:text-2xl font-black mb-10"
-                  style={{ color: "#101113" }}
+                  className="font-black text-[#101113]"
+                  style={{ fontSize: "clamp(16px, 2vw, 24px)" }}
                 >
                   Do you already have a 3D design?
                 </p>
@@ -250,18 +246,20 @@ const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
 
               {/* CTA buttons */}
               <div
-                className="flex flex-col sm:flex-row gap-4"
-                style={reveal("0.32s")}
+                className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto"
+                style={reveal("0.3s")}
               >
-                {/* Yes - Ghost button */}
+                {/* Yes — ghost */}
                 <Link
-                  href="/upload"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 font-black uppercase tracking-[0.08em] text-base transition-all duration-300"
+                  href={PRINT_PAGE_PATH}
+                  className="group relative inline-flex items-center justify-center gap-2 font-black uppercase tracking-[0.08em] text-[#101113] transition-all duration-300 overflow-hidden"
                   style={{
-                    color: "#101113",
-                    border: "2px solid rgba(0,0,0,0.20)",
-                    borderRadius: "14px",
-                    background: "rgba(255,255,255,0.60)",
+                    fontSize: "clamp(11px, 1.1vw, 14px)",
+                    padding:
+                      "clamp(12px, 1.4vw, 16px) clamp(20px, 2.5vw, 36px)",
+                    border: "2px solid rgba(0,0,0,0.18)",
+                    borderRadius: "clamp(10px, 1.2vw, 14px)",
+                    background: "rgba(255,255,255,0.6)",
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.background = "#101113";
@@ -272,17 +270,16 @@ const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
                       "0 8px 24px rgba(0,0,0,0.14)";
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background =
-                      "rgba(255,255,255,0.60)";
+                    e.currentTarget.style.background = "rgba(255,255,255,0.6)";
                     e.currentTarget.style.color = "#101113";
-                    e.currentTarget.style.borderColor = "rgba(0,0,0,0.20)";
+                    e.currentTarget.style.borderColor = "rgba(0,0,0,0.18)";
                     e.currentTarget.style.transform = "none";
                     e.currentTarget.style.boxShadow = "none";
                   }}
                 >
                   Yes, I have a design
                   <svg
-                    className="w-4 h-4"
+                    className="w-3.5 h-3.5 sm:w-4 sm:h-4"
                     fill="none"
                     stroke="currentColor"
                     strokeWidth={2.5}
@@ -296,40 +293,42 @@ const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
                   </svg>
                 </Link>
 
-                {/* No - Primary button */}
+                {/* No — primary orange */}
                 <Link
-                  href="/contact"
-                  className="relative overflow-hidden inline-flex items-center justify-center gap-2 px-8 py-4 font-black uppercase tracking-[0.08em] text-base text-white transition-all duration-300"
+                  href={CONTACT_US_PAGE_PATH}
+                  className="relative overflow-hidden inline-flex items-center justify-center gap-2 font-black uppercase tracking-[0.08em] text-white transition-all duration-300"
                   style={{
+                    fontSize: "clamp(11px, 1.1vw, 14px)",
+                    padding:
+                      "clamp(12px, 1.4vw, 16px) clamp(20px, 2.5vw, 36px)",
                     background:
-                      "linear-gradient(145deg, #ff5000 0%, #e34800 100%)",
-                    borderRadius: "14px",
-                    boxShadow: "0 6px 24px rgba(255,80,0,0.35)",
+                      "linear-gradient(145deg, #FF5000 0%, #e34800 100%)",
+                    borderRadius: "clamp(10px, 1.2vw, 14px)",
+                    boxShadow: "0 6px 24px rgba(255,80,0,0.36)",
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = "translateY(-3px)";
                     e.currentTarget.style.boxShadow =
-                      "0 12px 32px rgba(255,80,0,0.45)";
+                      "0 12px 32px rgba(255,80,0,0.46)";
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.transform = "none";
                     e.currentTarget.style.boxShadow =
-                      "0 6px 24px rgba(255,80,0,0.35)";
+                      "0 6px 24px rgba(255,80,0,0.36)";
                   }}
                 >
-                  {/* Shimmer */}
+                  {/* Shimmer sweep */}
                   <span
                     className="absolute top-0 bottom-0 w-16 pointer-events-none"
                     style={{
                       background:
                         "linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent)",
-                      animation:
-                        "dqsShimmer 2.5s 1.2s ease-in-out infinite",
+                      animation: "dqsShimmer 2.5s 1.2s ease-in-out infinite",
                     }}
                   />
                   <span className="relative z-10">No, I need help</span>
                   <svg
-                    className="relative z-10 w-4 h-4"
+                    className="relative z-10 w-3.5 h-3.5 sm:w-4 sm:h-4"
                     fill="none"
                     stroke="currentColor"
                     strokeWidth={2.5}
@@ -345,15 +344,19 @@ const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
               </div>
             </div>
 
-            {/* RIGHT: image + decorations */}
+            {/* ══ RIGHT: image + decorations ════════════════════════════ */}
             <div
-              className="relative flex items-center justify-center"
+              className="relative flex items-center justify-center order-first lg:order-last"
               style={reveal("0.15s")}
             >
               {/* Orbit rings */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <svg
-                  className="w-[500px] h-[500px] max-w-full max-h-full"
+                  className="max-w-full max-h-full"
+                  style={{
+                    width: "clamp(260px, 45vw, 520px)",
+                    height: "clamp(260px, 45vw, 520px)",
+                  }}
                   viewBox="0 0 500 500"
                   fill="none"
                   aria-hidden="true"
@@ -405,14 +408,14 @@ const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
                       cx="470"
                       cy="250"
                       r="5"
-                      fill="#ff5000"
+                      fill="#FF5000"
                       opacity="0.45"
                     />
                     <circle
                       cx="30"
                       cy="250"
                       r="3"
-                      fill="#ff5000"
+                      fill="#FF5000"
                       opacity="0.25"
                     />
                   </g>
@@ -426,36 +429,26 @@ const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
                       cx="250"
                       cy="75"
                       r="4"
-                      fill="#ff5000"
+                      fill="#FF5000"
                       opacity="0.40"
                     />
                     <circle
                       cx="425"
                       cy="250"
                       r="3"
-                      fill="#ff5000"
+                      fill="#FF5000"
                       opacity="0.25"
                     />
                   </g>
-                  {/* Centre glow */}
                   <circle cx="250" cy="250" r="95" fill="url(#dqsGlow)" />
                   <defs>
-                    <radialGradient
-                      id="dqsGlow"
-                      cx="50%"
-                      cy="50%"
-                      r="50%"
-                    >
+                    <radialGradient id="dqsGlow" cx="50%" cy="50%" r="50%">
                       <stop
                         offset="0%"
-                        stopColor="#ff5000"
+                        stopColor="#FF5000"
                         stopOpacity="0.08"
                       />
-                      <stop
-                        offset="100%"
-                        stopColor="#ff5000"
-                        stopOpacity="0"
-                      />
+                      <stop offset="100%" stopColor="#FF5000" stopOpacity="0" />
                     </radialGradient>
                   </defs>
                 </svg>
@@ -464,20 +457,23 @@ const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
               {/* Glow blob */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div
-                  className="w-72 h-72 rounded-full"
+                  className="rounded-full"
                   style={{
+                    width: "clamp(160px, 22vw, 300px)",
+                    height: "clamp(160px, 22vw, 300px)",
                     background:
-                      "radial-gradient(circle at center, rgba(255,80,0,0.10) 0%, transparent 70%)",
+                      "radial-gradient(circle, rgba(255,80,0,0.10) 0%, transparent 70%)",
                     filter: "blur(48px)",
                     animation: "dqsGlow 5s ease-in-out infinite",
                   }}
                 />
               </div>
 
-              {/* Image */}
+              {/* Main image — responsive height */}
               <div
-                className="relative h-[360px] sm:h-[460px] lg:h-[560px] w-full max-w-[540px]"
+                className="relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-full mx-auto"
                 style={{
+                  height: "clamp(240px, 40vw, 560px)",
                   animation: "dqsLevitate 7s 1s ease-in-out infinite",
                 }}
               >
@@ -487,36 +483,39 @@ const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
                   fill
                   className="object-contain"
                   priority
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 540px"
+                  sizes="(max-width: 640px) 320px, (max-width: 1024px) 50vw, 540px"
                   style={{
-                    filter:
-                      "drop-shadow(0 16px 40px rgba(0,0,0,0.08))",
+                    filter: "drop-shadow(0 16px 40px rgba(0,0,0,0.08))",
                   }}
                 />
               </div>
 
-              {/* Floating badge - top left */}
+              {/* Badge — top left (Materials) */}
               <div
-                className="absolute top-6 left-0 lg:-left-4 flex items-center gap-3 px-4 py-3 rounded-2xl pointer-events-none"
+                className="absolute flex items-center gap-2 sm:gap-3 rounded-xl sm:rounded-2xl pointer-events-none"
                 style={{
+                  top: "clamp(4px, 2vw, 24px)",
+                  left: "clamp(-8px, -1vw, -16px)",
+                  padding: "clamp(8px, 1vw, 12px) clamp(10px, 1.4vw, 16px)",
                   background: "rgba(255,255,255,0.97)",
                   boxShadow: "0 8px 28px rgba(0,0,0,0.10)",
                   border: "1.5px solid rgba(255,80,0,0.14)",
-                  animation: visible
-                    ? "dqsReveal 0.6s 0.55s ease-out both"
-                    : "none",
-                  opacity: visible ? undefined : 0,
+                  ...reveal("0.55s"),
                 }}
               >
                 <div
-                  className="w-9 h-9 rounded-xl flex items-center justify-center"
-                  style={{ background: "rgba(255,80,0,0.10)" }}
+                  className="flex items-center justify-center rounded-lg sm:rounded-xl flex-shrink-0"
+                  style={{
+                    width: "clamp(28px, 3.5vw, 38px)",
+                    height: "clamp(28px, 3.5vw, 38px)",
+                    background: "rgba(255,80,0,0.10)",
+                  }}
                 >
                   <svg
-                    width="16"
-                    height="16"
+                    width="14"
+                    height="14"
                     fill="none"
-                    stroke="#ff5000"
+                    stroke="#FF5000"
                     strokeWidth={2}
                     viewBox="0 0 24 24"
                   >
@@ -529,39 +528,49 @@ const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
                 </div>
                 <div>
                   <p
-                    className="text-[10px] font-black uppercase tracking-[0.10em]"
-                    style={{ color: "rgba(0,0,0,0.38)" }}
+                    className="font-black uppercase tracking-[0.10em]"
+                    style={{
+                      fontSize: "clamp(8px, 0.9vw, 11px)",
+                      color: "rgba(0,0,0,0.38)",
+                    }}
                   >
                     Materials
                   </p>
                   <p
-                    className="text-[13px] font-black leading-none"
-                    style={{ color: "#101113" }}
+                    className="font-black leading-none"
+                    style={{
+                      fontSize: "clamp(11px, 1.2vw, 14px)",
+                      color: "#101113",
+                    }}
                   >
-                    230+ Options
+                    {NUMBER_OF_MATERIALS}+ Options
                   </p>
                 </div>
               </div>
 
-              {/* Floating badge - bottom right */}
+              {/* Badge — bottom right (Fast Turn) */}
               <div
-                className="absolute bottom-10 right-0 lg:-right-4 flex items-center gap-3 px-4 py-3 rounded-2xl pointer-events-none"
+                className="absolute flex items-center gap-2 sm:gap-3 rounded-xl sm:rounded-2xl pointer-events-none"
                 style={{
-                  background: "#ff5000",
+                  bottom: "clamp(4px, 3vw, 40px)",
+                  right: "clamp(-8px, -1vw, -16px)",
+                  padding: "clamp(8px, 1vw, 12px) clamp(10px, 1.4vw, 16px)",
+                  background: "#FF5000",
                   boxShadow: "0 8px 26px rgba(255,80,0,0.32)",
-                  animation: visible
-                    ? "dqsReveal 0.6s 0.70s ease-out both"
-                    : "none",
-                  opacity: visible ? undefined : 0,
+                  ...reveal("0.70s"),
                 }}
               >
                 <div
-                  className="w-9 h-9 rounded-xl flex items-center justify-center"
-                  style={{ background: "rgba(255,255,255,0.18)" }}
+                  className="flex items-center justify-center rounded-lg sm:rounded-xl flex-shrink-0"
+                  style={{
+                    width: "clamp(28px, 3.5vw, 38px)",
+                    height: "clamp(28px, 3.5vw, 38px)",
+                    background: "rgba(255,255,255,0.18)",
+                  }}
                 >
                   <svg
-                    width="16"
-                    height="16"
+                    width="14"
+                    height="14"
                     fill="none"
                     stroke="#fff"
                     strokeWidth={2}
@@ -576,15 +585,19 @@ const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
                 </div>
                 <div>
                   <p
-                    className="text-[10px] font-black uppercase tracking-[0.10em]"
-                    style={{ color: "rgba(255,255,255,0.65)" }}
+                    className="font-black uppercase tracking-[0.10em]"
+                    style={{
+                      fontSize: "clamp(8px, 0.9vw, 11px)",
+                      color: "rgba(255,255,255,0.65)",
+                    }}
                   >
                     Fast Turn
                   </p>
                   <p
-                    className="text-[13px] font-black leading-none text-white"
+                    className="font-black leading-none text-white"
+                    style={{ fontSize: "clamp(11px, 1.2vw, 14px)" }}
                   >
-                    48h Dispatch
+                    {NUMBER_OF_DISPATCH}h Dispatch
                   </p>
                 </div>
               </div>

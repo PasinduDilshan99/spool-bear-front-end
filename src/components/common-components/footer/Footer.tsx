@@ -1,8 +1,9 @@
+// Footer.tsx
 "use client";
-import Link from "next/link";
 import React from "react";
 import { FooterProps } from "@/types/footer-types";
 import { footerData as defaultFooterData } from "@/data/footer-data";
+import SmoothScrollLink from "./SmoothScrollLink";
 
 const Footer: React.FC<FooterProps> = ({
   data = defaultFooterData,
@@ -48,18 +49,21 @@ const Footer: React.FC<FooterProps> = ({
                 {title}
               </p>
               {links.map((link) => (
-                <Link
+                <SmoothScrollLink
                   key={link.label}
                   href={link.href}
                   className="mb-3 block text-[17px] font-semibold no-underline transition-colors"
-                  style={{ color: "rgba(255,255,255,0.75)" }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.color = "rgba(255,255,255,0.75)")
-                  }
                 >
-                  {link.label}
-                </Link>
+                  <span
+                    style={{ color: "rgba(255,255,255,0.75)" }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.color = "rgba(255,255,255,0.75)")
+                    }
+                  >
+                    {link.label}
+                  </span>
+                </SmoothScrollLink>
               ))}
             </div>
           ))}

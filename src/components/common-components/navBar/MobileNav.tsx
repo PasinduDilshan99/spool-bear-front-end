@@ -1,3 +1,4 @@
+// components/MobileNav.tsx
 "use client";
 import React from "react";
 import Link from "next/link";
@@ -7,6 +8,8 @@ import { User } from "@/context/AuthContext";
 import { useAuth } from "@/context/AuthContext";
 import MobileMenuItem from "./MobileMenuItem";
 import { spoolbearTheme } from "@/theme/spoolbear-theme";
+import { ShoppingCartIcon } from "@heroicons/react/24/outline";
+import { useCart } from "@/context/CartContext";
 
 interface MobileNavProps {
   visibleNavBarItems: NavBarItem[];
@@ -22,6 +25,8 @@ const MobileNav: React.FC<MobileNavProps> = ({
   setIsMenuOpen,
 }) => {
   const { logout } = useAuth();
+  const { getCartItemCount } = useCart();
+  const itemCount = getCartItemCount();
 
   const handleClose = () => {
     setIsMenuOpen(false);
@@ -44,7 +49,7 @@ const MobileNav: React.FC<MobileNavProps> = ({
         }`}
         style={{
           backgroundColor: spoolbearTheme.colors.header,
-          borderColor: 'rgba(0,0,0,0.08)',
+          borderColor: "rgba(0,0,0,0.08)",
         }}
       >
         <div className="px-4 pt-4 pb-6 space-y-2">
@@ -52,10 +57,42 @@ const MobileNav: React.FC<MobileNavProps> = ({
             <MobileMenuItem key={item.id} item={item} onClose={handleClose} />
           ))}
 
+          {/* Cart Link - Only for logged-in users */}
+          {user && (
+            <Link
+              href="/cart"
+              className="flex items-center justify-between px-4 py-3 rounded-lg font-medium transition-all duration-200 border border-transparent"
+              style={{ color: spoolbearTheme.colors.text }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor =
+                  "rgba(255, 80, 0, 0.12)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "transparent";
+              }}
+              onClick={handleClose}
+            >
+              <div className="flex items-center space-x-3">
+                <ShoppingCartIcon className="w-5 h-5" />
+                <span>My Cart</span>
+              </div>
+              {itemCount > 0 && (
+                <span
+                  className="px-2 py-0.5 rounded-full text-xs font-bold text-white"
+                  style={{
+                    backgroundColor: spoolbearTheme.colors.accent,
+                  }}
+                >
+                  {itemCount > 99 ? "99+" : itemCount}
+                </span>
+              )}
+            </Link>
+          )}
+
           {/* Mobile Auth Links */}
-          {/* <div
+          <div
             className="border-t pt-4 mt-4"
-            style={{ borderColor: 'rgba(0,0,0,0.08)' }}
+            style={{ borderColor: "rgba(0,0,0,0.08)" }}
           >
             {user ? (
               <>
@@ -83,10 +120,16 @@ const MobileNav: React.FC<MobileNavProps> = ({
                     )}
                   </div>
                   <div>
-                    <div style={{ color: spoolbearTheme.colors.text }} className="font-medium">
+                    <div
+                      style={{ color: spoolbearTheme.colors.text }}
+                      className="font-medium"
+                    >
                       {`${user.firstName} ${user.lastName}`}
                     </div>
-                    <div style={{ color: spoolbearTheme.colors.muted }} className="text-sm">
+                    <div
+                      style={{ color: spoolbearTheme.colors.muted }}
+                      className="text-sm"
+                    >
                       {user.email}
                     </div>
                   </div>
@@ -96,10 +139,11 @@ const MobileNav: React.FC<MobileNavProps> = ({
                   className="block px-4 py-3 rounded-lg font-medium transition-all duration-200 border border-transparent"
                   style={{ color: spoolbearTheme.colors.text }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'rgba(255, 80, 0, 0.12)';
+                    e.currentTarget.style.backgroundColor =
+                      "rgba(255, 80, 0, 0.12)";
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.backgroundColor = "transparent";
                   }}
                   onClick={handleClose}
                 >
@@ -108,12 +152,13 @@ const MobileNav: React.FC<MobileNavProps> = ({
                 <button
                   onClick={handleLogout}
                   className="block w-full text-left px-4 py-3 rounded-lg font-medium transition-all duration-200 border border-transparent"
-                  style={{ color: '#dc2626' }}
+                  style={{ color: "#dc2626" }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'rgba(220, 38, 38, 0.08)';
+                    e.currentTarget.style.backgroundColor =
+                      "rgba(220, 38, 38, 0.08)";
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.backgroundColor = "transparent";
                   }}
                 >
                   Sign Out
@@ -127,17 +172,20 @@ const MobileNav: React.FC<MobileNavProps> = ({
                   style={{
                     color: spoolbearTheme.colors.text,
                     borderColor: spoolbearTheme.colors.muted,
-                    backgroundColor: 'transparent',
+                    backgroundColor: "transparent",
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = spoolbearTheme.colors.accent;
-                    e.currentTarget.style.color = '#ffffff';
-                    e.currentTarget.style.borderColor = spoolbearTheme.colors.accent;
+                    e.currentTarget.style.backgroundColor =
+                      spoolbearTheme.colors.accent;
+                    e.currentTarget.style.color = "#ffffff";
+                    e.currentTarget.style.borderColor =
+                      spoolbearTheme.colors.accent;
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.backgroundColor = "transparent";
                     e.currentTarget.style.color = spoolbearTheme.colors.text;
-                    e.currentTarget.style.borderColor = spoolbearTheme.colors.muted;
+                    e.currentTarget.style.borderColor =
+                      spoolbearTheme.colors.muted;
                   }}
                   onClick={handleClose}
                 >
@@ -148,7 +196,7 @@ const MobileNav: React.FC<MobileNavProps> = ({
                   className="block px-4 py-3 rounded-lg font-medium transition-all duration-200 border border-transparent text-center uppercase tracking-wider"
                   style={{
                     backgroundColor: spoolbearTheme.colors.accent,
-                    color: '#ffffff',
+                    color: "#ffffff",
                   }}
                   onClick={handleClose}
                 >
@@ -156,7 +204,7 @@ const MobileNav: React.FC<MobileNavProps> = ({
                 </Link>
               </>
             )}
-          </div> */}
+          </div>
         </div>
       </div>
     </div>

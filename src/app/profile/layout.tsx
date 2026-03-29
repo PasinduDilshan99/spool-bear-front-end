@@ -14,25 +14,22 @@ export default function ProfileLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [isClient, setIsClient] = useState(false);
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  useEffect(() => {
-    if (isClient) {
-      const uniqueCode = sessionStorage.getItem(UNIQUE_CODE_NAME);
-      if (!uniqueCode && user) {
-        router.push(LOGIN_PAGE_PATH);
-      }
+    const uniqueCode = sessionStorage.getItem(UNIQUE_CODE_NAME);
+    if (!uniqueCode && user) {
+      router.push(LOGIN_PAGE_PATH);
     }
-  }, [isClient, router, user]);
+  }, [router, user]);
 
-  if (!isClient || authLoading) {
+  if (authLoading) {
     return <ProfileLayoutLoading />;
+  }
+
+  if (!user) {
+    router.push(LOGIN_PAGE_PATH);
   }
 
   return (

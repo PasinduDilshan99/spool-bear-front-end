@@ -28,6 +28,8 @@ import {
   Activity,
   ChevronRight,
 } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { USER_PROFILE_VIEW_PRIVILEGE } from "@/utils/privileges";
 
 interface UserProfileContentProps {
   profileData?: UserProfileResponse;
@@ -40,6 +42,13 @@ export default function UserProfileContent({
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const apiService = new UserProfileAPIService();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user && !user.privileges.includes(USER_PROFILE_VIEW_PRIVILEGE)) {
+      router.push("/");
+    }
+  }, [user, router]);
 
   const uniqueCode =
     typeof window !== "undefined"
@@ -111,11 +120,11 @@ export default function UserProfileContent({
     "Not provided";
   const memberSince = new Date(userProfile.createdAt).toLocaleDateString(
     "en-US",
-    { year: "numeric", month: "short" }
+    { year: "numeric", month: "short" },
   );
   const updatedAt = new Date(userProfile.updatedAt).toLocaleDateString(
     "en-US",
-    { month: "short", day: "numeric", year: "numeric" }
+    { month: "short", day: "numeric", year: "numeric" },
   );
   const dob = userProfile.dateOfBirth
     ? new Date(userProfile.dateOfBirth).toLocaleDateString("en-US", {
@@ -168,10 +177,8 @@ export default function UserProfileContent({
       {/* ── Body ── */}
       <div className="max-w-6xl mx-auto px-4 md:px-10 py-8 md:py-10">
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-
           {/* ── LEFT: Identity Card ── */}
           <div className="xl:col-span-1 space-y-6">
-
             {/* Identity hero card */}
             <div className="bg-[#1A1A1A] rounded-2xl overflow-hidden shadow-xl relative">
               {/* Decorative grid lines */}
@@ -225,7 +232,9 @@ export default function UserProfileContent({
                     <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
                       <Mail size={13} className="text-[#FF5000]" />
                     </div>
-                    <span className="text-xs text-white/70 truncate">{userProfile.email}</span>
+                    <span className="text-xs text-white/70 truncate">
+                      {userProfile.email}
+                    </span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
@@ -250,7 +259,9 @@ export default function UserProfileContent({
                   <span className="text-[10px] text-white/40 uppercase tracking-widest font-bold">
                     Member Since
                   </span>
-                  <span className="text-xs font-bold text-white/70">{memberSince}</span>
+                  <span className="text-xs font-bold text-white/70">
+                    {memberSince}
+                  </span>
                 </div>
               </div>
             </div>
@@ -265,14 +276,18 @@ export default function UserProfileContent({
               </div>
               <div className="p-5 space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-500 font-medium">Status</span>
+                  <span className="text-xs text-gray-500 font-medium">
+                    Status
+                  </span>
                   <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
                     {userProfile.userStatus}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-500 font-medium">Verified</span>
+                  <span className="text-xs text-gray-500 font-medium">
+                    Verified
+                  </span>
                   <span className="flex items-center gap-1.5 text-xs font-bold text-[#FF5000] bg-orange-50 border border-orange-200 px-2.5 py-1 rounded-full">
                     <CheckCircle size={11} />
                     Verified
@@ -297,8 +312,16 @@ export default function UserProfileContent({
               </div>
               <div className="p-3 space-y-1">
                 {[
-                  { href: USER_PROFILE_UPDATE_PAGE_PATH, icon: Edit3, label: "Update Profile Info" },
-                  { href: PASSWORD_CHANGE_PAGE_PATH, icon: Lock, label: "Change Password" },
+                  {
+                    href: USER_PROFILE_UPDATE_PAGE_PATH,
+                    icon: Edit3,
+                    label: "Update Profile Info",
+                  },
+                  {
+                    href: PASSWORD_CHANGE_PAGE_PATH,
+                    icon: Lock,
+                    label: "Change Password",
+                  },
                 ].map(({ href, icon: Icon, label }) => (
                   <Link
                     key={href}
@@ -307,11 +330,19 @@ export default function UserProfileContent({
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-7 h-7 rounded-lg bg-orange-50 group-hover:bg-[#FF5000] flex items-center justify-center transition-colors duration-150">
-                        <Icon size={13} className="text-[#FF5000] group-hover:text-white transition-colors duration-150" />
+                        <Icon
+                          size={13}
+                          className="text-[#FF5000] group-hover:text-white transition-colors duration-150"
+                        />
                       </div>
-                      <span className="text-sm font-medium text-gray-700">{label}</span>
+                      <span className="text-sm font-medium text-gray-700">
+                        {label}
+                      </span>
                     </div>
-                    <ChevronRight size={14} className="text-gray-300 group-hover:text-[#FF5000] transition-colors duration-150" />
+                    <ChevronRight
+                      size={14}
+                      className="text-gray-300 group-hover:text-[#FF5000] transition-colors duration-150"
+                    />
                   </Link>
                 ))}
               </div>
@@ -320,7 +351,6 @@ export default function UserProfileContent({
 
           {/* ── RIGHT: Detail sections ── */}
           <div className="xl:col-span-2 space-y-6">
-
             {/* Personal Information */}
             <Section
               icon={<User size={16} className="text-[#FF5000]" />}
@@ -329,10 +359,22 @@ export default function UserProfileContent({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Field label="Full Name" value={fullName} mono={false} />
                 <Field label="Username" value={userProfile.username} mono />
-                <Field label="Email Address" value={userProfile.email} mono={false} />
+                <Field
+                  label="Email Address"
+                  value={userProfile.email}
+                  mono={false}
+                />
                 <Field label="Date of Birth" value={dob} mono={false} />
-                <Field label="Gender" value={userProfile.gender || "Not specified"} mono={false} />
-                <Field label="Nationality" value={userProfile.countryName || "Not specified"} mono={false} />
+                <Field
+                  label="Gender"
+                  value={userProfile.gender || "Not specified"}
+                  mono={false}
+                />
+                <Field
+                  label="Nationality"
+                  value={userProfile.countryName || "Not specified"}
+                  mono={false}
+                />
               </div>
             </Section>
 
@@ -342,7 +384,11 @@ export default function UserProfileContent({
               title="Contact Information"
             >
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Field label="Primary Mobile" value={userProfile.mobileNumber || "Not provided"} mono />
+                <Field
+                  label="Primary Mobile"
+                  value={userProfile.mobileNumber || "Not provided"}
+                  mono
+                />
                 <Field label="Email" value={userProfile.email} mono={false} />
               </div>
             </Section>
@@ -361,19 +407,45 @@ export default function UserProfileContent({
                   <p className="text-[10px] font-bold tracking-widest text-white/40 uppercase mb-1">
                     Full Address
                   </p>
-                  <p className="text-sm text-white/80 leading-relaxed">{fullAddress}</p>
+                  <p className="text-sm text-white/80 leading-relaxed">
+                    {fullAddress}
+                  </p>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <Field label="City" value={userProfile.city || "—"} mono={false} small />
-                <Field label="District" value={userProfile.district || "—"} mono={false} small />
-                <Field label="Province" value={userProfile.province || "—"} mono={false} small />
-                <Field label="Country" value={userProfile.countryName || "—"} mono={false} small />
+                <Field
+                  label="City"
+                  value={userProfile.city || "—"}
+                  mono={false}
+                  small
+                />
+                <Field
+                  label="District"
+                  value={userProfile.district || "—"}
+                  mono={false}
+                  small
+                />
+                <Field
+                  label="Province"
+                  value={userProfile.province || "—"}
+                  mono={false}
+                  small
+                />
+                <Field
+                  label="Country"
+                  value={userProfile.countryName || "—"}
+                  mono={false}
+                  small
+                />
               </div>
 
               <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <Field label="Postal Code" value={userProfile.postalCode || "Not provided"} mono />
+                <Field
+                  label="Postal Code"
+                  value={userProfile.postalCode || "Not provided"}
+                  mono
+                />
                 <div className="bg-gray-50 border border-gray-100 rounded-xl p-4 flex items-center justify-between">
                   <span className="text-[10px] font-bold tracking-widest text-gray-400 uppercase">
                     Verified Status
@@ -392,7 +464,11 @@ export default function UserProfileContent({
               title="Identification"
             >
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Field label="National ID (NIC)" value={userProfile.nic || "Not provided"} mono />
+                <Field
+                  label="National ID (NIC)"
+                  value={userProfile.nic || "Not provided"}
+                  mono
+                />
               </div>
             </Section>
           </div>
@@ -420,7 +496,9 @@ function Section({
         <div className="w-8 h-8 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center">
           {icon}
         </div>
-        <h2 className="text-sm font-bold text-gray-900 tracking-tight">{title}</h2>
+        <h2 className="text-sm font-bold text-gray-900 tracking-tight">
+          {title}
+        </h2>
       </div>
       <div className="p-6">{children}</div>
     </div>

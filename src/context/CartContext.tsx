@@ -50,7 +50,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Fetch cart when cartId is available
   useEffect(() => {
     if (cartId) {
       fetchCart();

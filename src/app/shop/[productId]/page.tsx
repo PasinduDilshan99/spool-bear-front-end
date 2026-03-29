@@ -1,9 +1,17 @@
-import React from 'react'
+import ProductDetailsPage from "@/pages/ProductDetailsPage";
+import { SHOP_DETAILS_PAGE_TITLE } from "@/utils/headerTitle";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: SHOP_DETAILS_PAGE_TITLE,
+};
 
 const page = () => {
   return (
-    <div>page</div>
-  )
-}
+    <div>
+      <ProductDetailsPage />
+    </div>
+  );
+};
 
-export default page
+export default page;

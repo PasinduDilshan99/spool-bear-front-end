@@ -1,19 +1,17 @@
-"use client";
 import UserProfileContent from "@/components/profile-components/UserProfileContent";
-import { useAuth } from "@/context/AuthContext";
-import { USER_PROFILE_VIEW_PRIVILEGE } from "@/utils/privileges";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { USER_PROFILE_PAGE_TITLE } from "@/utils/headerTitle";
+import { Metadata } from "next";
 
-export default function UserProfilePage() {
-  const { user } = useAuth();
-  const router = useRouter();
+export const metadata: Metadata = {
+  title: USER_PROFILE_PAGE_TITLE,
+};
 
-  useEffect(() => {
-    if (user && !user.privileges.includes(USER_PROFILE_VIEW_PRIVILEGE)) {
-      router.push("/");
-    }
-  }, [user, router]);
+const page = () => {
+  return (
+    <div>
+      <UserProfileContent />
+    </div>
+  );
+};
 
-  return <UserProfileContent />;
-}
+export default page;

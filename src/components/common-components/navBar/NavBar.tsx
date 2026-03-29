@@ -151,14 +151,14 @@ const NavBar = () => {
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className="inline-flex items-center justify-center p-2 rounded-lg transition-all duration-300"
-                style={{ color: "#075985" }}
+                style={{ color: "#FF5000" }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.color = "#0ea5e9";
+                  e.currentTarget.style.color = "#FF6B33";
                   e.currentTarget.style.backgroundColor =
-                    "rgba(14, 165, 233, 0.08)";
+                    "rgba(255, 80, 0, 0.08)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.color = "#075985";
+                  e.currentTarget.style.color = "#FF5000";
                   e.currentTarget.style.backgroundColor = "transparent";
                 }}
               >
@@ -210,7 +210,7 @@ const NavBar = () => {
         }}
       >
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-14">
+          <div className="flex justify-between h-16">
             {/* Scrolled Desktop Navigation */}
             <ScrolledDesktopNav
               {...navBarProps}
@@ -223,14 +223,14 @@ const NavBar = () => {
               <button
                 onClick={() => setIsScrolledMenuOpen(!isScrolledMenuOpen)}
                 className="inline-flex items-center justify-center p-1.5 rounded-md transition-all duration-300"
-                style={{ color: "#075985" }}
+                style={{ color: "#FF5000" }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.color = "#0ea5e9";
+                  e.currentTarget.style.color = "#FF6B33";
                   e.currentTarget.style.backgroundColor =
-                    "rgba(14, 165, 233, 0.08)";
+                    "rgba(255, 80, 0, 0.08)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.color = "#075985";
+                  e.currentTarget.style.color = "#FF5000";
                   e.currentTarget.style.backgroundColor = "transparent";
                 }}
               >

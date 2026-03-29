@@ -1,9 +1,10 @@
 import { Suspense } from "react";
 import { Metadata } from "next";
 import BlogPage from "@/pages/BlogPage";
+import { BLOGS_PAGE_TITLE } from "@/utils/headerTitle";
 
 export const metadata: Metadata = {
-  title: "Blogs | SpoolBear",
+  title: BLOGS_PAGE_TITLE,
 };
 
 const Page = () => {

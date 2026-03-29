@@ -1,29 +1,9 @@
+export const SHOP_PAGE_PATH = "/shop";
 export const ABOUT_US_PAGE_PATH = "/about-us";
-export const CONTACT_US_PAGE_PATH = "/about-us";
-
-export const ACTIVITIES_PAGE_PATH = "/activities";
-export const ACTIVITIES_CATEGORY_TYPE_PATH = "/activities?category=";
-export const ACTIVITIES_SEASON_PATH = "activities?season=";
-
-export const SRI_LANKAN_TOUR_PAGE_PATH = "/sri-lankan-tours";
-export const SRI_LANKAN_TOUR_TYPE_PATH = "/sri-lankan-tours?tourType=";
-export const SRI_LANKAN_TOUR_CATEGORY_PATH = "/sri-lankan-tours?tourCategory=";
-
-export const DESTINATIONS_PAGE_PATH = "/destinations";
-export const DESTINATIONS_CATEGORY_PATH = "/destinations?category=";
-
-export const PACKAGE_DETAILS_PAGE_PATH = "/packages";
-export const PACKAGE_TYPE_PATH = "/packages?packageType=";
-export const PACKAGE_COMPARE_PAGE_PATH =
-  "/packages/packages-compare?tour-name=";
-
-export const SEASON_DETAILS_PAGE_PATH = "/seasons";
-
-export const VEHICLE_DETAILS_PAGE_PATH = "/vehicles";
-export const VEHICLE_SPECIFICATION_DETAILS_PATH = "/vehicles/specification";
-export const VEHICLE_TYPE_DETAILS_PATH = "/vehicles/types";
-
-export const SEASON_PAGE_PATH = "/seasons";
+export const CONTACT_US_PAGE_PATH = "/contact-us";
+export const PRINT_PAGE_PATH = "/print";
+export const DESIGN_PAGE_PATH = "/design";
+export const BLOG_PAGE_PATH = "/blogs";
 
 export const TERMS_AND_CONDITIONS_PAGE_PATH = "/terms-and-conditions";
 export const PRIVACY_POLICY_PAGE_PATH = "/privacy-policy";
@@ -47,3 +27,4 @@ export const USER_PROFILE_CANCELLED_TOURS_PAGE_PATH =
   "/profile/cancelled-tours";
 
 export const EMPLOYEE_PAGE_PATH = "/employee";
+

@@ -38,6 +38,8 @@ const WISH_LIST = "/wish-list";
 const BROWSER_HISTORY = "/browser-history";
 const OTHERS = "/others";
 const REVIEWS = "/reviews";
+const ORDERS = "/orders";
+const CONTACT_US = "/contact-us";
 
 // Auth endpoints
 export const LOGIN = `${BASE_PATH}${API}${VERSION}${AUTH}/login`;
@@ -93,6 +95,7 @@ export const ADD_BLOG_COMMENT_DATA = `${BASE_PATH}${API}${VERSION}${BLOG}/add-co
 
 // PRODUCTS
 export const GET_ACTIVE_PRODUCTS_BY_GIVEN_FILTER_PARAMS_DATA = `${BASE_PATH}${API}${VERSION}${PRODUCTS}/active-products`;
+export const GET_PRODUCT_DETAILS_BY_ID_DATA = `${BASE_PATH}${API}${VERSION}${PRODUCTS}/product-details`;
 
 // Browser History
 export const ADD_BROWSER_HISTORY_REQUEST_DATA = `${BASE_PATH}${API}${VERSION}${BROWSER_HISTORY}/add`;
@@ -104,3 +107,12 @@ export const UPLOAD_IMAGE_TO_CLOUDINARY =
 
 // Reviews
 export const GET_USER_REVIEWS_DATA = `${BASE_PATH}${API}${VERSION}${REVIEWS}/reviews-by-user`;
+
+// Orders
+export const GET_ORDERS_DETAILS_BY_USER_ID_DATA = `${BASE_PATH}${API}${VERSION}${ORDERS}/orders-by-user`;
+export const ADD_PRINTING_ORDER_DATA = `${BASE_PATH}${API}${VERSION}${ORDERS}/add-printing-order`;
+export const ADD_DESIGN_ORDER_DATA = `${BASE_PATH}${API}${VERSION}${ORDERS}/add-design-order`;
+
+// Orders
+export const ADD_INQUIRY_DATA = `${BASE_PATH}${API}${VERSION}${CONTACT_US}/inquiry`;
+
