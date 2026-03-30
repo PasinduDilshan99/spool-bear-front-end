@@ -63,9 +63,9 @@ const ContactPage = () => {
         <Divider />
 
         {/* 4 — FAQ */}
-        <ContactFAQ />
+        {/* <ContactFAQ />
 
-        <Divider />
+        <Divider /> */}
 
         {/* 5 — CTA */}
         <ContactCTA />

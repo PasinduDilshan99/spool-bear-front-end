@@ -8,17 +8,21 @@ import { ShoppingCart, Truck, Shield, CreditCard, ArrowRight } from "lucide-reac
 interface CartSummaryProps {
   items: CartItem[];
   total: number;
+  selectedCount: number;
   itemCount: number;
   onCheckout: () => void;
   onContinueShopping: () => void;
+  hasSelectedItems: boolean;
 }
 
 export function CartSummary({
   items,
   total,
+  selectedCount,
   itemCount,
   onCheckout,
   onContinueShopping,
+  hasSelectedItems,
 }: CartSummaryProps) {
   const subtotal = total;
   const shipping = subtotal > 100 ? 0 : 10;
@@ -39,9 +43,17 @@ export function CartSummary({
           </h3>
         </div>
 
+        {selectedCount > 0 && (
+          <div className="mb-3 p-3 bg-orange-50 rounded-lg">
+            <p className="text-sm text-[#FF5000] font-medium">
+              {selectedCount} item{selectedCount !== 1 ? "s" : ""} selected for order
+            </p>
+          </div>
+        )}
+
         <div className="space-y-3 mb-4">
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Subtotal ({itemCount} items)</span>
+            <span className="text-gray-600">Subtotal ({selectedCount} items)</span>
             <span className="font-semibold text-[#101113]">${subtotal.toFixed(2)}</span>
           </div>
           <div className="flex justify-between text-sm">
@@ -72,7 +84,12 @@ export function CartSummary({
 
         <button
           onClick={onCheckout}
-          className="w-full bg-[#FF5000] text-white rounded-xl font-bold py-3 px-4 mb-3 hover:bg-[#CC4000] transition-all duration-200 flex items-center justify-center gap-2 group"
+          disabled={!hasSelectedItems}
+          className={`w-full rounded-xl font-bold py-3 px-4 mb-3 transition-all duration-200 flex items-center justify-center gap-2 group ${
+            hasSelectedItems
+              ? "bg-[#FF5000] text-white hover:bg-[#CC4000]"
+              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+          }`}
         >
           <span>Proceed to Order</span>
           <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />

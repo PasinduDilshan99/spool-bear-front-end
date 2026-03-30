@@ -258,7 +258,7 @@ const ContactInfoCards: React.FC = () => {
                   >
                     <Icon
                       size={18}
-                      className="text-[#FF5000] group-hover:text-white transition-colors duration-300"
+                      className="text-[#FF5000] group-hover:text-gray-700 transition-colors duration-300"
                     />
                   </div>
 

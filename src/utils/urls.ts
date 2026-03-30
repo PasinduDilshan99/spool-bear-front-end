@@ -5,6 +5,8 @@ export const PRINT_PAGE_PATH = "/print";
 export const DESIGN_PAGE_PATH = "/design";
 export const BLOG_PAGE_PATH = "/blogs";
 export const ORDER_PAGE_PATH = "/orders";
+export const CART_PAGE_PATH = "/cart";
+export const FAQ_PAGE_PATH = "/faq";
 
 export const TERMS_AND_CONDITIONS_PAGE_PATH = "/terms-and-conditions";
 export const PRIVACY_POLICY_PAGE_PATH = "/privacy-policy";

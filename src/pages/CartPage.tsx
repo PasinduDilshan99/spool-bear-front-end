@@ -1,7 +1,7 @@
 // app/cart/page.tsx
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
@@ -27,16 +27,51 @@ const CartPage = () => {
     clearCart,
     getCartTotal,
     getCartItemCount,
+    cartId,
   } = useCart();
 
   const [isClearingCart, setIsClearingCart] = useState(false);
   const [showClearCartModal, setShowClearCartModal] = useState(false);
+  const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
+  const [selectAll, setSelectAll] = useState(false);
 
   useEffect(() => {
     if (user) {
       fetchCart();
     }
   }, [user, fetchCart]);
+
+  // Update select all when cart items or selected items change
+  useEffect(() => {
+    if (cartItems.length > 0 && selectedItems.size === cartItems.length) {
+      setSelectAll(true);
+    } else {
+      setSelectAll(false);
+    }
+  }, [selectedItems, cartItems]);
+
+  const handleSelectItem = useCallback((cartItemId: number, selected: boolean) => {
+    setSelectedItems(prev => {
+      const newSet = new Set(prev);
+      if (selected) {
+        newSet.add(cartItemId);
+      } else {
+        newSet.delete(cartItemId);
+      }
+      return newSet;
+    });
+  }, []);
+
+  const handleSelectAll = useCallback(() => {
+    if (selectAll) {
+      // Deselect all
+      setSelectedItems(new Set());
+    } else {
+      // Select all
+      setSelectedItems(new Set(cartItems.map(item => item.cartItemId)));
+    }
+    setSelectAll(!selectAll);
+  }, [selectAll, cartItems]);
 
   const handleQuantityChange = async (
     cartItemId: number,
@@ -53,6 +88,12 @@ const CartPage = () => {
   const handleRemoveItem = async (cartItemId: number, productId: number) => {
     try {
       await removeProductAllItemsFromCart(cartItemId, productId);
+      // Remove from selected items if it was selected
+      setSelectedItems(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(cartItemId);
+        return newSet;
+      });
     } catch (err) {
       console.error("Failed to remove item:", err);
     }
@@ -62,6 +103,7 @@ const CartPage = () => {
     setIsClearingCart(true);
     try {
       await clearCart();
+      setSelectedItems(new Set());
       setShowClearCartModal(false);
     } catch (err) {
       console.error("Failed to clear cart:", err);
@@ -70,13 +112,48 @@ const CartPage = () => {
     }
   };
 
-  const handleCheckout = () => {
-    router.push(ORDER_PAGE_PATH);
-  };
+  const handleProceedToOrder = useCallback(() => {
+    if (selectedItems.size === 0) {
+      alert("Please select at least one item to proceed");
+      return;
+    }
 
-  const handleContinueShopping = () => {
+    const selectedProducts = cartItems
+      .filter(item => selectedItems.has(item.cartItemId))
+      .map(item => ({
+        cartItemId: item.cartItemId,
+        cartId: cartId!,
+        productId: item.productId,
+        price: item.price,
+        quantity: item.quantity,
+        colorId: item.color || 0,
+      }));
+
+    const totalAmount = selectedProducts.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
+
+    // Store selected items in session storage to pass to order page
+    sessionStorage.setItem('selectedOrderItems', JSON.stringify({
+      products: selectedProducts,
+      totalAmount,
+    }));
+
+    router.push(ORDER_PAGE_PATH);
+  }, [selectedItems, cartItems, cartId, router]);
+
+  const handleCheckout = useCallback(() => {
+    if (selectedItems.size === 0) {
+      alert("Please select at least one item to proceed");
+      return;
+    }
+    handleProceedToOrder();
+  }, [selectedItems, handleProceedToOrder]);
+
+  const handleContinueShopping = useCallback(() => {
     router.push(SHOP_PAGE_PATH);
-  };
+  }, [router]);
 
   if (isLoading) {
     return <CartSkeleton />;
@@ -92,6 +169,10 @@ const CartPage = () => {
 
   const total = getCartTotal();
   const itemCount = getCartItemCount();
+  const selectedTotal = cartItems
+    .filter(item => selectedItems.has(item.cartItemId))
+    .reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const selectedCount = selectedItems.size;
 
   return (
     <>
@@ -155,12 +236,26 @@ const CartPage = () => {
                   className="flex items-center gap-2 px-4 py-2 rounded-xl border border-red-200 text-red-600 hover:bg-red-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Trash2 size={16} />
-                  <span className="font-medium text-sm">
-                    Clear Cart
-                  </span>
+                  <span className="font-medium text-sm">Clear Cart</span>
                 </button>
               )}
             </div>
+          </div>
+
+          {/* Select All Section */}
+          <div className="mb-4 flex items-center justify-between bg-white rounded-xl p-4 border border-gray-100">
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={selectAll}
+                onChange={handleSelectAll}
+                className="w-5 h-5 text-[#FF5000] border-gray-300 rounded focus:ring-[#FF5000] focus:ring-2 cursor-pointer"
+              />
+              <span className="font-medium text-[#101113]">Select All Items</span>
+            </label>
+            <p className="text-sm text-gray-500">
+              {selectedCount} item{selectedCount !== 1 ? "s" : ""} selected
+            </p>
           </div>
 
           {/* Main content */}
@@ -171,6 +266,8 @@ const CartPage = () => {
                 <CartItemCard
                   key={item.cartItemId}
                   item={item}
+                  isSelected={selectedItems.has(item.cartItemId)}
+                  onSelect={handleSelectItem}
                   onQuantityChange={handleQuantityChange}
                   onRemove={handleRemoveItem}
                 />
@@ -182,10 +279,12 @@ const CartPage = () => {
               <div className="sticky top-8">
                 <CartSummary
                   items={cartItems}
-                  total={total}
+                  total={selectedTotal}
+                  selectedCount={selectedCount}
                   itemCount={itemCount}
                   onCheckout={handleCheckout}
                   onContinueShopping={handleContinueShopping}
+                  hasSelectedItems={selectedItems.size > 0}
                 />
               </div>
             </div>

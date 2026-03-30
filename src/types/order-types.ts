@@ -117,5 +117,5 @@ export interface OrderProducts {
   productId: number;
   price: number;
   quantity: number;
-  colorId: number;
+  colorId: string;
 }

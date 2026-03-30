@@ -4,11 +4,13 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { CartItem } from "@/types/cart-types";
-import { Trash2, Minus, Plus, Package, Layers, Palette } from "lucide-react";
+import { Trash2, Minus, Plus, Package } from "lucide-react";
 import { DECREASE_BY_ONE, INCREASE_BY_ONE } from "@/utils/constant";
 
 interface CartItemCardProps {
   item: CartItem;
+  isSelected: boolean;
+  onSelect: (cartItemId: number, selected: boolean) => void;
   onQuantityChange: (
     cartItemId: number,
     newQuantity: number,
@@ -19,6 +21,8 @@ interface CartItemCardProps {
 
 export function CartItemCard({
   item,
+  isSelected,
+  onSelect,
   onQuantityChange,
   onRemove,
 }: CartItemCardProps) {
@@ -56,11 +60,28 @@ export function CartItemCard({
     }
   };
 
+  const handleSelectChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onSelect(item.cartItemId, e.target.checked);
+  };
+
   const primaryImage = item.images?.[0]?.url;
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200">
+    <div className={`bg-white rounded-2xl border overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 ${
+      isSelected ? "border-[#FF5000] ring-2 ring-[#FF5000] ring-opacity-50" : "border-gray-100"
+    }`}>
       <div className="flex flex-col sm:flex-row gap-4 p-4">
+        {/* Selection Checkbox */}
+        <div className="flex-shrink-0 flex items-center justify-center">
+          <input
+            type="checkbox"
+            id={`select-${item.cartItemId}`}
+            checked={isSelected}
+            onChange={handleSelectChange}
+            className="w-5 h-5 text-[#FF5000] border-gray-300 rounded focus:ring-[#FF5000] focus:ring-2 cursor-pointer"
+          />
+        </div>
+
         {/* Product Image */}
         <div className="relative w-full sm:w-32 h-32 flex-shrink-0">
           <div className="w-full h-full rounded-xl overflow-hidden bg-gray-100 border border-gray-200">

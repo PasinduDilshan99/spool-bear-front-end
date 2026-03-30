@@ -26,3 +26,5 @@ export const SIGN_UP_PAGE_TITLE = `Sign Up | ${COMPANY_NAME}`;
 export const TERMS_AND_CONDITIONS_PAGE_TITLE = `Terms & Conditions | ${COMPANY_NAME}`;
 export const PRIVACY_POLICY_PAGE_TITLE = `Privacy Policy | ${COMPANY_NAME}`;
 export const CART_PAGE_TITLE = `Cart | ${COMPANY_NAME}`;
+export const ORDER_DETAILS_PAGE_TITLE = `Order Details | ${COMPANY_NAME}`;
+export const FAQ_PAGE_TITLE = `FAQ | ${COMPANY_NAME}`;
