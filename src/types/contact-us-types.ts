@@ -2,6 +2,7 @@
 export interface InsertInquiryRequest {
   name: string;
   email: string;
+  contactNumber:string;
   subject?: string;
   message: string;
 }

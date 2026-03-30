@@ -86,6 +86,7 @@ export const GET_USER_REVIEWS_DATA_FE = `${API}${REVIEWS}/reviews-by-user`;
 export const GET_ORDERS_DETAILS_BY_USER_ID_DATA_FE = `${API}${ORDERS}/orders-by-user`;
 export const ADD_PRINTING_ORDER_DATA_FE = `${API}${ORDERS}/add-printing-order`;
 export const ADD_DESIGN_ORDER_DATA_FE = `${API}${ORDERS}/add-design-order`;
+export const ADD_PRODUCT_ORDER_DATA_FE = `${API}${ORDERS}/add-product-order`;
 
 // Orders
 export const ADD_INQUIRY_DATA_FE = `${API}${CONTACT_US}/inquiry`;

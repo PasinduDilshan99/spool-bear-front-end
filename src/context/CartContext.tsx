@@ -3,7 +3,7 @@
 
 import { cartService } from "@/service/cartService";
 import { CartItem } from "@/types/cart-types";
-import { CART_NAME } from "@/utils/constant";
+import { CART_NAME, DECREASE_BY_ONE, INCREASE_BY_ONE } from "@/utils/constant";
 import Cookies from "js-cookie";
 import React, {
   createContext,
@@ -12,6 +12,7 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
+import { useAuth } from "./AuthContext";
 
 interface CartContextType {
   cartItems: CartItem[];
@@ -25,8 +26,10 @@ interface CartContextType {
   updateCartItemQuantity: (
     cartItemId: number,
     quantity: number,
+    whatToDo: string,
   ) => Promise<void>;
   removeFromCart: (cartItemId: number, productId: number) => Promise<void>;
+  removeProductAllItemsFromCart: (cartItemId: number, productId: number) => Promise<void>;
   clearCart: () => Promise<void>;
   getCartTotal: () => number;
   getCartItemCount: () => number;
@@ -41,6 +44,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cartId, setCartId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
 
   // Load cart ID from cookie on initial render
   useEffect(() => {
@@ -53,8 +57,27 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (cartId) {
       fetchCart();
+    } else {
+      fetchCartId();
     }
-  }, [cartId]);
+  }, [cartId, user]);
+
+  const fetchCartId = useCallback(async () => {
+    if (!user) return;
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await cartService.fetchCartId();
+      if (response.code === 200) {
+        setCartId(response.data.cartId);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to fetch cart id");
+      console.error("Error fetching cart id:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user]);
 
   const fetchCart = useCallback(async () => {
     if (!cartId) return;
@@ -135,14 +158,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   );
 
   const updateCartItemQuantity = useCallback(
-    async (cartItemId: number, quantity: number) => {
+    async (cartItemId: number, quantity: number, whatToDo: string) => {
       if (!cartId) return;
 
       setIsLoading(true);
       setError(null);
 
       try {
-        // Find the cart item to update
         const itemToUpdate = cartItems.find(
           (item) => item.cartItemId === cartItemId,
         );
@@ -150,33 +172,25 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           throw new Error("Item not found in cart");
         }
 
-        // If quantity is 0 or less, remove the item
-        if (quantity <= 0) {
-          await removeFromCart(cartItemId, itemToUpdate.productId);
-          return;
+        if (whatToDo === INCREASE_BY_ONE) {
+          const addResponse = await cartService.addProduct({
+            cartId,
+            productId: itemToUpdate.productId,
+            quantity,
+            material: itemToUpdate.material,
+            materialId: itemToUpdate.materialId,
+            type: itemToUpdate.type,
+            typeId: itemToUpdate.typeId,
+            color: itemToUpdate.color,
+          });
+
+          if (addResponse.code === 200 && Array.isArray(addResponse.data)) {
+            setCartItems(addResponse.data);
+          }
         }
 
-        // First remove the item
-        await cartService.removeProduct({
-          cartItemId,
-          productId: itemToUpdate.productId,
-          cartId,
-        });
-
-        // Then add it back with the new quantity
-        const addResponse = await cartService.addProduct({
-          cartId,
-          productId: itemToUpdate.productId,
-          quantity,
-          material: itemToUpdate.material,
-          materialId: itemToUpdate.materialId,
-          type: itemToUpdate.type,
-          typeId: itemToUpdate.typeId,
-          color: itemToUpdate.color,
-        });
-
-        if (addResponse.code === 200 && Array.isArray(addResponse.data)) {
-          setCartItems(addResponse.data);
+        if (whatToDo === DECREASE_BY_ONE) {
+          await removeFromCart(cartItemId, itemToUpdate.productId);
         }
       } catch (err) {
         setError(
@@ -213,6 +227,38 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           err instanceof Error ? err.message : "Failed to remove from cart",
         );
         console.error("Error removing from cart:", err);
+        throw err;
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [cartId],
+  );
+
+  const removeProductAllItemsFromCart = useCallback(
+    async (cartItemId: number, productId: number) => {
+      if (!cartId) return;
+
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const response = await cartService.removeProductAllItems({
+          cartItemId,
+          productId,
+          cartId,
+        });
+
+        if (response.code === 200 && Array.isArray(response.data)) {
+          setCartItems(response.data);
+        }
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Failed to remove product all items from cart",
+        );
+        console.error("Error removing product all items from cart:", err);
         throw err;
       } finally {
         setIsLoading(false);
@@ -267,6 +313,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     clearCart,
     getCartTotal,
     getCartItemCount,
+    removeProductAllItemsFromCart,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

@@ -105,3 +105,17 @@ export interface OrderOperationResponse {
   };
   timestamp: string;
 }
+
+export interface AddProductOrderRequest {
+  totalAmount: number;
+  products: OrderProducts[];
+}
+
+export interface OrderProducts {
+  cartItemId: number;
+  cartId: number;
+  productId: number;
+  price: number;
+  quantity: number;
+  colorId: number;
+}

@@ -4,6 +4,7 @@ export const CONTACT_US_PAGE_PATH = "/contact-us";
 export const PRINT_PAGE_PATH = "/print";
 export const DESIGN_PAGE_PATH = "/design";
 export const BLOG_PAGE_PATH = "/blogs";
+export const ORDER_PAGE_PATH = "/orders";
 
 export const TERMS_AND_CONDITIONS_PAGE_PATH = "/terms-and-conditions";
 export const PRIVACY_POLICY_PAGE_PATH = "/privacy-policy";

@@ -2,12 +2,14 @@
 import {
   AddDesignOrderRequest,
   AddPrintingOrderRequest,
+  AddProductOrderRequest,
   OrderOperationResponse,
   OrdersResponse,
 } from "@/types/order-types";
 import {
   ADD_DESIGN_ORDER_DATA_FE,
   ADD_PRINTING_ORDER_DATA_FE,
+  ADD_PRODUCT_ORDER_DATA_FE,
   GET_ORDERS_DETAILS_BY_USER_ID_DATA_FE,
 } from "@/utils/frontEndConstant";
 
@@ -86,6 +88,30 @@ export class OrderService {
       return data;
     } catch (error) {
       console.error("Error adding design order:", error);
+      throw error;
+    }
+  }
+
+  async addProductOrder(
+    orderData: AddProductOrderRequest,
+  ): Promise<OrderOperationResponse> {
+    try {
+      const response = await fetch(ADD_PRODUCT_ORDER_DATA_FE, {
+        method: "POST",
+        headers: this.getAuthHeaders(),
+        credentials: "include",
+        body: JSON.stringify(orderData),
+      });
+
+      const data: OrderOperationResponse = await response.json();
+
+      if (data.code !== 200) {
+        throw new Error(data.message || "Failed to add product order");
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Error adding product order:", error);
       throw error;
     }
   }

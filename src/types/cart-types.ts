@@ -65,3 +65,7 @@ export interface ClearCartRequest {
 export interface FetchCartRequest {
   cartId: number;
 }
+
+export interface FetchCartIdResponse {
+  cartId: number;
+}

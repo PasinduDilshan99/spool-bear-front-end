@@ -1,15 +1,28 @@
+import { Linkedin } from 'lucide-react';
 export const COMPANY_OWNER = "Ravindu Lakshan";
 export const COMPANY_NAME = "Spool Bear";
 export const COMPANY_INFO_EMAIL = "spoolbear@gmail.com";
 export const COMPANY_INFO_EMAIL_LINK = "mailto:spoolbear@gmail.com";
 export const COMPANY_CONTACT_NUMBER = "+94 70 455 6451";
+export const COMPANY_CONTACT_NUMBER_FOR_LINK = "+94704556451";
 export const COMPANY_CONTACT_NUMBER_LINK = "tel:+94704556451";
 export const COMPANY_SMS_CONTACT_NUMBER_LINK = "sms:+94704556451";
+export const COMPANY_WHATSAPP_CONTACT_NUMBER = "+94 70 455 6451";
+export const COMPANY_WHATSAPP_CONTACT_NUMBER_FOR_LINK = "+94704556451";
 export const COMPANY_WHATSAPP_CONTACT_NUMBER_LINK = "https://wa.me/94704556451";
 export const COMPANY_EMERGENCY_CONTACT_NUMBER = "+94 70 455 6451";
 export const COMPANY_LOCATION = "Colombo, Sri Lanka";
 export const COMPANY_LONGITUDE = 79.97891916858308;
 export const COMPANY_LATITUDE = 6.934789851969375;
+
+export const COMPANY_ADDRESS_NUMBER = "97/5,"
+export const COMPANY_ADDRESS_LINE1 = "Mambulgoda,"
+export const COMPANY_ADDRESS_LINE2 = "Pannipitiya"
+
+export const FACE_BOOK_LINK = ""
+export const TWITTER_LINK = ""
+export const INSTAGRAM_LINK = ""
+export const LINKEDIN_LINK = ""
 
 export const UNIQUE_CODE_NAME = "uniqueCode";
 export const CART_NAME = "cart";
@@ -33,3 +46,7 @@ export const SHIPS_IN = 48;
 export const NUMBER_OF_PRINTS_COMPLETED = 100;
 export const NUMBER_OF_HAPPY_CLIENTS = 20;
 export const SUPPORT = "24/7";
+
+
+export const INCREASE_BY_ONE = "increaseByOne"
+export const DECREASE_BY_ONE = "decreaseByOne"

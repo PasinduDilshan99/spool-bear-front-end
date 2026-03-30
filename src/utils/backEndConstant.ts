@@ -112,6 +112,7 @@ export const GET_USER_REVIEWS_DATA = `${BASE_PATH}${API}${VERSION}${REVIEWS}/rev
 export const GET_ORDERS_DETAILS_BY_USER_ID_DATA = `${BASE_PATH}${API}${VERSION}${ORDERS}/orders-by-user`;
 export const ADD_PRINTING_ORDER_DATA = `${BASE_PATH}${API}${VERSION}${ORDERS}/add-printing-order`;
 export const ADD_DESIGN_ORDER_DATA = `${BASE_PATH}${API}${VERSION}${ORDERS}/add-design-order`;
+export const ADD_PRODUCT_ORDER_DATA = `${BASE_PATH}${API}${VERSION}${ORDERS}/add-product-order`;
 
 // Orders
 export const ADD_INQUIRY_DATA = `${BASE_PATH}${API}${VERSION}${CONTACT_US}/inquiry`;
