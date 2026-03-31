@@ -116,7 +116,8 @@ export function ProductInfo({
         productId={product.productId}
         productName={product.productName}
         productPrice={product.price}
-        colors={product.colors || []} // Pass the string array
+        stockQuantity={product.stockQuantity} // Add this line
+        colors={product.colors || []}
         material={product.materialName || undefined}
         materialId={product.materialId || undefined}
         type={product.typeName}

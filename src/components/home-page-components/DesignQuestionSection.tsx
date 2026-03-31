@@ -41,8 +41,6 @@ const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
   return (
     <>
       <style global jsx>{`
-        @import url("https://fonts.googleapis.com/css2?family=Faculty+Glyphic&display=swap");
-
         @keyframes dqsReveal {
           from {
             opacity: 0;

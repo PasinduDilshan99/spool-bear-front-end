@@ -5,6 +5,13 @@ import NavBar from "@/components/common-components/navBar/NavBar";
 import Footer from "@/components/common-components/footer/Footer";
 import { CartProvider } from "@/context/CartContext";
 import { DEFAULT_PAGE_TITLE } from "@/utils/headerTitle";
+import { Faculty_Glyphic } from "next/font/google";
+
+const facultyGlyphic = Faculty_Glyphic({
+  subsets: ["latin"],
+  weight: ["400"], // adjust if needed
+  variable: "--font-faculty",
+});
 
 export const metadata: Metadata = {
   title: {

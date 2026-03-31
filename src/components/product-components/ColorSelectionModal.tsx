@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { X, Palette, Loader2, ShoppingCart, CheckCircle } from "lucide-react";
+import { X, Palette, Loader2, ShoppingCart, CheckCircle, Minus, Plus } from "lucide-react";
 import { Product } from "@/types/product-types";
 import { PLACE_HOLDER_IMAGE } from "@/utils/constant";
 
@@ -11,7 +11,7 @@ interface ColorSelectionModalProps {
   product: Product;
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (color: string, colorCode: string) => void;
+  onConfirm: (color: string, colorCode: string, quantity: number) => void; // Add quantity parameter
   isLoading: boolean;
 }
 
@@ -52,6 +52,7 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
 }) => {
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedCode, setSelectedCode] = useState("#888888");
+  const [quantity, setQuantity] = useState<number>(1);
   const [imgError, setImgError] = useState(false);
 
   useEffect(() => {
@@ -60,7 +61,9 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
       setSelectedColor(first.name);
       setSelectedCode(first.code);
     }
-  }, [product]);
+    // Reset quantity when modal opens or product changes
+    setQuantity(1);
+  }, [product, isOpen]);
 
   if (!isOpen) return null;
 
@@ -68,6 +71,15 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
     product.images?.find((i) => i.isPrimary)?.imageUrl ||
     product.images?.[0]?.imageUrl ||
     PLACE_HOLDER_IMAGE;
+
+  const inStock = product.stockQuantity > 0;
+  const totalPrice = product.price * quantity;
+
+  const handleQuantityChange = (newQuantity: number) => {
+    if (newQuantity >= 1 && newQuantity <= product.stockQuantity) {
+      setQuantity(newQuantity);
+    }
+  };
 
   return (
     <div
@@ -103,7 +115,7 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
               <Palette size={16} className="text-[#FF5000]" />
             </div>
             <h3 className="font-black text-[#101113] text-base">
-              Select Color
+              Select Options
             </h3>
           </div>
           <button
@@ -133,12 +145,28 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
             <p className="text-[11px] text-gray-400 mt-0.5">
               {product.categoryName}
             </p>
-            <p className="font-black text-[#FF5000] text-base mt-0.5">
-              {new Intl.NumberFormat("en-US", {
-                style: "currency",
-                currency: "USD",
-              }).format(product.price)}
-            </p>
+            <div className="flex items-center gap-2 mt-1">
+              <p className="font-black text-[#FF5000] text-base">
+                {new Intl.NumberFormat("en-US", {
+                  style: "currency",
+                  currency: "USD",
+                }).format(product.price)}
+              </p>
+              <span className="text-[10px] text-gray-400">per item</span>
+            </div>
+            {/* Stock indicator */}
+            <div className="flex items-center gap-1 mt-1">
+              <div
+                className="w-1.5 h-1.5 rounded-full"
+                style={{ background: inStock ? "#22c55e" : "#ef4444" }}
+              />
+              <span
+                className="text-[10px] font-medium"
+                style={{ color: inStock ? "#22c55e" : "#ef4444" }}
+              >
+                {inStock ? `${product.stockQuantity} units available` : "Out of stock"}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -205,6 +233,66 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
             })}
           </div>
 
+          {/* Quantity Selection */}
+          <div className="mb-6">
+            <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-3">
+              Quantity
+            </label>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => handleQuantityChange(quantity - 1)}
+                disabled={quantity <= 1 || isLoading}
+                className="w-10 h-10 rounded-xl border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Minus size={16} className="text-gray-600" />
+              </button>
+              <input
+                type="number"
+                value={quantity}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value);
+                  if (!isNaN(val) && val >= 1 && val <= product.stockQuantity) {
+                    setQuantity(val);
+                  }
+                }}
+                min={1}
+                max={product.stockQuantity}
+                disabled={!inStock || isLoading}
+                className="w-20 h-10 text-center border border-gray-200 rounded-xl focus:outline-none focus:border-[#FF5000] focus:ring-2 focus:ring-[#FF5000]/10 text-sm font-bold text-[#101113]"
+              />
+              <button
+                onClick={() => handleQuantityChange(quantity + 1)}
+                disabled={quantity >= product.stockQuantity || isLoading}
+                className="w-10 h-10 rounded-xl border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Plus size={16} className="text-gray-600" />
+              </button>
+              <span className="text-xs text-gray-400 ml-2">
+                max {product.stockQuantity}
+              </span>
+            </div>
+          </div>
+
+          {/* Total Price */}
+          <div className="mb-6 p-4 bg-gradient-to-r from-orange-50 to-gray-50 rounded-xl border border-orange-100">
+            <div className="flex justify-between items-center">
+              <span className="font-bold text-[#2b2e33] text-sm">Total:</span>
+              <div className="text-right">
+                <span className="text-2xl font-black text-[#FF5000]">
+                  {new Intl.NumberFormat("en-US", {
+                    style: "currency",
+                    currency: "USD",
+                  }).format(totalPrice)}
+                </span>
+                {quantity > 1 && (
+                  <p className="text-[10px] text-gray-400 mt-0.5">
+                    ({quantity} × ${product.price.toFixed(2)})
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
           {/* Actions */}
           <div className="flex gap-3">
             <button
@@ -215,8 +303,8 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
               Cancel
             </button>
             <button
-              onClick={() => onConfirm(selectedColor, selectedCode)}
-              disabled={isLoading || !selectedColor}
+              onClick={() => onConfirm(selectedColor, selectedCode, quantity)}
+              disabled={isLoading || !selectedColor || !inStock}
               className="flex-1 flex items-center justify-center gap-2 py-3 font-bold text-white rounded-xl transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-40 disabled:cursor-not-allowed disabled:translate-y-0 text-sm"
               style={{
                 background: "linear-gradient(145deg, #FF5000, #e34800)",
@@ -229,7 +317,8 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
                 </>
               ) : (
                 <>
-                  <ShoppingCart size={15} /> Add to Cart
+                  <ShoppingCart size={15} /> 
+                  {quantity > 1 ? `Add ${quantity} Items` : "Add to Cart"}
                 </>
               )}
             </button>

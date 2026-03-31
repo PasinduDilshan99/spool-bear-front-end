@@ -1,15 +1,16 @@
 // components/product/ColorSelectionModal.tsx
 import { useState } from "react";
-import { X } from "lucide-react";
+import { X, Minus, Plus } from "lucide-react";
 
 interface ColorSelectionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  colors: string[]; // Now expecting string array
+  colors: string[];
   productName: string;
   productPrice: number;
   productId: number;
-  onConfirm: (selectedColor: string) => void; // Returns string instead of Color object
+  stockQuantity: number; // Add stock quantity prop
+  onConfirm: (selectedColor: string, quantity: number) => void;
 }
 
 // Helper function to get a consistent color code for each color name
@@ -49,11 +50,26 @@ export function ColorSelectionModal({
   productName,
   productPrice,
   productId,
+  stockQuantity,
   onConfirm,
 }: ColorSelectionModalProps) {
   const [selectedColor, setSelectedColor] = useState<string>(colors[0]);
+  const [quantity, setQuantity] = useState<number>(1);
 
   if (!isOpen) return null;
+
+  const handleQuantityChange = (newQuantity: number) => {
+    if (newQuantity >= 1 && newQuantity <= stockQuantity) {
+      setQuantity(newQuantity);
+    }
+  };
+
+  const handleConfirm = () => {
+    onConfirm(selectedColor, quantity);
+    onClose();
+  };
+
+  const totalPrice = productPrice * quantity;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -67,7 +83,7 @@ export function ColorSelectionModal({
       <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full animate-in fade-in zoom-in duration-200">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
-          <h3 className="text-xl font-bold text-[#101113]">Select Color</h3>
+          <h3 className="text-xl font-bold text-[#101113]">Select Options</h3>
           <button
             onClick={onClose}
             className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
@@ -79,12 +95,19 @@ export function ColorSelectionModal({
         {/* Content */}
         <div className="p-6">
           <div className="mb-6">
-            <h4 className="font-semibold text-[#2b2e33] mb-3">{productName}</h4>
+            <h4 className="font-semibold text-[#2b2e33] mb-2">{productName}</h4>
+            <p className="text-sm text-gray-500 mb-2">
+              {stockQuantity} units available
+            </p>
             <p className="text-2xl font-bold text-[#FF5000]">
               ${productPrice.toFixed(2)}
+              <span className="text-sm font-normal text-gray-500 ml-1">
+                per item
+              </span>
             </p>
           </div>
 
+          {/* Color Selection */}
           <div className="mb-6">
             <label className="block text-sm font-semibold text-[#2b2e33] mb-3">
               Choose a color:
@@ -113,6 +136,55 @@ export function ColorSelectionModal({
             </p>
           </div>
 
+          {/* Quantity Selection */}
+          <div className="mb-6">
+            <label className="block text-sm font-semibold text-[#2b2e33] mb-3">
+              Quantity:
+            </label>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => handleQuantityChange(quantity - 1)}
+                disabled={quantity <= 1}
+                className="w-10 text-red-700 h-10 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Minus size={16} />
+              </button>
+              <input
+                type="number"
+                value={quantity}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value);
+                  if (!isNaN(val)) {
+                    handleQuantityChange(val);
+                  }
+                }}
+                min={1}
+                max={stockQuantity}
+                className="w-20 h-10 text-center text-black border border-gray-200 rounded-lg focus:outline-none focus:border-[#FF5000] focus:ring-1 focus:ring-[#FF5000]"
+              />
+              <button
+                onClick={() => handleQuantityChange(quantity + 1)}
+                disabled={quantity >= stockQuantity}
+                className="w-10 text-green-700 h-10 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Plus size={16} />
+              </button>
+              <span className="text-sm text-gray-500 ml-2">
+                max {stockQuantity}
+              </span>
+            </div>
+          </div>
+
+          {/* Total Price */}
+          <div className="mb-6 p-4 bg-gray-50 rounded-xl">
+            <div className="flex justify-between items-center">
+              <span className="font-semibold text-[#2b2e33]">Total:</span>
+              <span className="text-2xl font-bold text-[#FF5000]">
+                ${totalPrice.toFixed(2)}
+              </span>
+            </div>
+          </div>
+
           {/* Actions */}
           <div className="flex gap-3">
             <button
@@ -122,13 +194,10 @@ export function ColorSelectionModal({
               Cancel
             </button>
             <button
-              onClick={() => {
-                onConfirm(selectedColor);
-                onClose();
-              }}
+              onClick={handleConfirm}
               className="flex-1 px-4 py-3 bg-gradient-to-r from-[#FF5000] to-[#e34800] text-white font-semibold rounded-xl hover:shadow-lg transition-all"
             >
-              Add to Cart
+              Add {quantity > 1 ? `${quantity} items` : "to Cart"}
             </button>
           </div>
         </div>

@@ -14,6 +14,8 @@ const BROWSER_HISTORY = "/browser-history";
 const REVIEWS = "/reviews";
 const ORDERS = "/orders";
 const CONTACT_US = "/contact-us";
+const MATERIAL = "/material";
+
 
 // Auth endpoints for frontend (relative paths for proxy)
 export const LOGIN_FE = `${API}${AUTH}/login`;
@@ -95,5 +97,9 @@ export const ADD_PRINTING_ORDER_DATA_FE = `${API}${ORDERS}/add-printing-order`;
 export const ADD_DESIGN_ORDER_DATA_FE = `${API}${ORDERS}/add-design-order`;
 export const ADD_PRODUCT_ORDER_DATA_FE = `${API}${ORDERS}/add-product-order`;
 
-// Orders
+// Contact
 export const ADD_INQUIRY_DATA_FE = `${API}${CONTACT_US}/inquiry`;
+
+// Materials
+export const GET_ALL_MATERIALS_DETAILS_DATA_FE = `${API}${MATERIAL}/all`;
+export const GET_MATERIAL_DETAILS_BY_ID_DATA_FE = `${API}${MATERIAL}/material-details-by-id`;

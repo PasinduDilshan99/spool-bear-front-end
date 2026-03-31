@@ -270,7 +270,7 @@ const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
     {
       iconWrapClass: "",
       icon: {
-        src: "https://res.cloudinary.com/dkfonkmwr/image/upload/v1774768676/nxulbgutpu3yhvobiyw7.png",
+        src: "https://res.cloudinary.com/dkfonkmwr/image/upload/v1774956995/lohtt7twxtccnpzdrk1o.png",
         alt: "Upload icon",
       },
       title: "Upload and Describe",
@@ -280,7 +280,7 @@ const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
     {
       iconWrapClass: "",
       icon: {
-        src: "https://res.cloudinary.com/dkfonkmwr/image/upload/v1774768660/ljdaxcopoyyqb6915ig6.png",
+        src: "https://res.cloudinary.com/dkfonkmwr/image/upload/v1774957022/ann2f9zcaffpfh2cueq3.png",
         alt: "Quote icon",
       },
       title: "Get an Instant Quote",
@@ -290,7 +290,7 @@ const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
     {
       iconWrapClass: "",
       icon: {
-        src: "https://res.cloudinary.com/dkfonkmwr/image/upload/v1774768592/vmsjqy46lwpf0b1pj8j6.png",
+        src: "https://res.cloudinary.com/dkfonkmwr/image/upload/v1774957040/pigldn7cjs8qk5uv6whu.png",
         alt: "Print and delivery icon",
       },
       title: "Print & Deliver",
@@ -321,8 +321,6 @@ const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
   return (
     <>
       <style global jsx>{`
-        @import url("https://fonts.googleapis.com/css2?family=Faculty+Glyphic&display=swap");
-
         @keyframes hiwReveal {
           from {
             opacity: 0;

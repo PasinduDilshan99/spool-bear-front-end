@@ -246,7 +246,11 @@ const ProductsPage = () => {
     setIsColorModalOpen(true);
   };
 
-  const handleAddToCartWithColor = async (color: string, colorCode: string) => {
+  const handleAddToCartWithColor = async (
+    color: string,
+    colorCode: string,
+    quantity: number = 1,
+  ) => {
     if (!selectedProductForColor) return;
     setAddingToCart(selectedProductForColor.productId);
     try {
@@ -254,7 +258,7 @@ const ProductsPage = () => {
         productId: selectedProductForColor.productId,
         name: selectedProductForColor.productName,
         price: selectedProductForColor.price,
-        quantity: 1,
+        quantity: quantity,
         material: selectedProductForColor.materialName || "Default Material",
         materialId: selectedProductForColor.materialId || 0,
         type: selectedProductForColor.typeName || "Default Type",
@@ -418,6 +422,25 @@ const ProductsPage = () => {
     value: FilterState[K],
   ) => setFilters((prev) => ({ ...prev, [key]: value }));
 
+  // const clearFilter = (key: keyof FilterState) => {
+  //   setFilters((prev) => {
+  //     const n = { ...prev };
+  //     if (
+  //       [
+  //         "categoryId",
+  //         "typeId",
+  //         "materialId",
+  //         "minPrice",
+  //         "maxPrice",
+  //         "name",
+  //       ].includes(key)
+  //     )
+  //       (n as any)[key] = undefined;
+  //     else if (key === "inStock") n.inStock = false;
+  //     else if (key === "sortBy") n.sortBy = "newest";
+  //     return n;
+  //   });
+  // };
   const clearFilter = (key: keyof FilterState) => {
     setFilters((prev) => {
       const n = { ...prev };
@@ -430,10 +453,14 @@ const ProductsPage = () => {
           "maxPrice",
           "name",
         ].includes(key)
-      )
-        (n as any)[key] = undefined;
-      else if (key === "inStock") n.inStock = false;
-      else if (key === "sortBy") n.sortBy = "newest";
+      ) {
+        (n as Record<typeof key, FilterState[typeof key] | undefined>)[key] =
+          undefined;
+      } else if (key === "inStock") {
+        n.inStock = false;
+      } else if (key === "sortBy") {
+        n.sortBy = "newest";
+      }
       return n;
     });
   };

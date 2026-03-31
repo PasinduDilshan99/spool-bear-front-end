@@ -114,7 +114,7 @@ const DesignCategories: React.FC = () => {
             }}
           >
             <img
-              src="https://images.unsplash.com/photo-1581091226033-d5c48150dbaa?auto=format&fit=crop&w=800&q=80"
+              src="https://res.cloudinary.com/dkfonkmwr/image/upload/v1773844362/cld-sample-2.jpg"
               alt="3D Design"
               className="w-full h-full object-cover"
               style={{ minHeight: "300px" }}

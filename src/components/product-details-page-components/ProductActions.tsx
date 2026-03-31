@@ -12,12 +12,13 @@ interface ProductActionsProps {
   productId: number;
   productName: string;
   productPrice: number;
+  stockQuantity: number; // Add stock quantity
   colors: string[];
   material?: string;
   materialId?: number;
   type?: string;
   typeId?: number;
-  colorCode?: string; // Add colorCode if needed
+  colorCode?: string;
 }
 
 export function ProductActions({
@@ -27,6 +28,7 @@ export function ProductActions({
   productId,
   productName,
   productPrice,
+  stockQuantity,
   colors,
   material,
   materialId,
@@ -61,18 +63,17 @@ export function ProductActions({
     if (colors && colors.length > 0) {
       setShowColorModal(true);
     } else {
-      addToCartWithColor(undefined);
+      addToCartWithColor(undefined, 1);
     }
   };
 
-  const addToCartWithColor = async (selectedColor?: string) => {
+  const addToCartWithColor = async (selectedColor?: string, quantity: number = 1) => {
     setIsCartLoading(true);
     try {
-      // Create the cart item object matching the required structure
       const cartItem = {
         productId,
-        name: productName, // Add product name
-        quantity: 1,
+        name: productName,
+        quantity: quantity,
         price: productPrice,
         color: selectedColor || (colors && colors[0]) || "Default",
         colorCode:
@@ -94,7 +95,6 @@ export function ProductActions({
     }
   };
 
-  // Helper function to get color code (same as in ColorSelectionModal)
   const getColorCode = (colorName: string): string => {
     const colorMap: Record<string, string> = {
       red: "#ef4444",
@@ -195,6 +195,7 @@ export function ProductActions({
         productName={productName}
         productPrice={productPrice}
         productId={productId}
+        stockQuantity={stockQuantity}
         onConfirm={addToCartWithColor}
       />
     </>

@@ -76,7 +76,7 @@ const ScrolledDesktopNav: React.FC<ScrolledDesktopNavProps> = ({
   // SpoolBear specific styles for scrolled state (slightly smaller)
   const navLinkStyle = {
     color: spoolbearTheme.colors.text,
-    fontSize: "14px", // Slightly smaller for scrolled state
+    fontSize: "16px", // Slightly smaller for scrolled state
     fontWeight: 600,
     letterSpacing: "0.06em",
     textTransform: "uppercase" as const,

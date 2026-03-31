@@ -13,8 +13,6 @@ const AboutPage = () => {
   return (
     <>
       <style global jsx>{`
-        @import url("https://fonts.googleapis.com/css2?family=Faculty+Glyphic&display=swap");
-
         @keyframes aboutReveal {
           from {
             opacity: 0;

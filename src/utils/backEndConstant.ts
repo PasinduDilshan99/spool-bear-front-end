@@ -40,6 +40,7 @@ const OTHERS = "/others";
 const REVIEWS = "/reviews";
 const ORDERS = "/orders";
 const CONTACT_US = "/contact-us";
+const MATERIAL = "/material";
 
 // Auth endpoints
 export const LOGIN = `${BASE_PATH}${API}${VERSION}${AUTH}/login`;
@@ -121,6 +122,10 @@ export const ADD_PRINTING_ORDER_DATA = `${BASE_PATH}${API}${VERSION}${ORDERS}/ad
 export const ADD_DESIGN_ORDER_DATA = `${BASE_PATH}${API}${VERSION}${ORDERS}/add-design-order`;
 export const ADD_PRODUCT_ORDER_DATA = `${BASE_PATH}${API}${VERSION}${ORDERS}/add-product-order`;
 
-// Orders
+// Contact
 export const ADD_INQUIRY_DATA = `${BASE_PATH}${API}${VERSION}${CONTACT_US}/inquiry`;
+
+// Materials
+export const GET_ALL_MATERIALS_DETAILS_DATA = `${BASE_PATH}${API}${VERSION}${MATERIAL}/all`;
+export const GET_MATERIAL_DETAILS_BY_ID_DATA = `${BASE_PATH}${API}${VERSION}${MATERIAL}/material-details-by-id`;
 
