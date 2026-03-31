@@ -21,7 +21,7 @@ import { spoolbearTheme } from "@/theme/spoolbear-theme";
 const BlogDetailsPage = () => {
   const params = useParams();
   const router = useRouter();
-  const id = params?.blogId;
+  const id = params?.blogsId;
   const { user } = useAuth();
 
   const [loading, setLoading] = useState(true);

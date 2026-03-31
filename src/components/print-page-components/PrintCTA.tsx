@@ -1,6 +1,6 @@
-// components/print/PrintCTA.tsx
+// components/print-page-components/PrintCTA.tsx
 "use client";
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { CONTACT_US_PAGE_PATH } from "@/utils/urls";
 
@@ -9,13 +9,37 @@ interface PrintCTAProps {
 }
 
 const PrintCTA: React.FC<PrintCTAProps> = ({ onScrollToForm }) => {
+  const ref = useRef<HTMLElement>(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          setVisible(true);
+          obs.disconnect();
+        }
+      },
+      { threshold: 0.1 },
+    );
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, []);
+
   return (
-    <section className="py-14 sm:py-16 md:py-20">
+    <section
+      ref={ref}
+      className="py-14 sm:py-16 md:py-20"
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? "none" : "translateY(28px)",
+        transition: "opacity 0.65s ease-out, transform 0.65s ease-out",
+      }}
+    >
       <div
         className="relative rounded-2xl sm:rounded-3xl overflow-hidden"
         style={{ background: "#1A1A1A" }}
       >
-        {/* Grid texture */}
+        {/* Grid */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
@@ -24,8 +48,7 @@ const PrintCTA: React.FC<PrintCTAProps> = ({ onScrollToForm }) => {
             backgroundSize: "32px 32px",
           }}
         />
-
-        {/* Orange dot pattern */}
+        {/* Dots */}
         <div
           className="absolute inset-0 pointer-events-none opacity-[0.08]"
           style={{
@@ -34,10 +57,8 @@ const PrintCTA: React.FC<PrintCTAProps> = ({ onScrollToForm }) => {
             backgroundSize: "28px 28px",
           }}
         />
-
         {/* Orange top bar */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-[#FF5000]" />
-
         {/* Glow */}
         <div
           className="absolute -top-20 -right-20 w-64 h-64 rounded-full pointer-events-none"
@@ -105,7 +126,7 @@ const PrintCTA: React.FC<PrintCTAProps> = ({ onScrollToForm }) => {
             {/* Secondary */}
             <Link
               href={CONTACT_US_PAGE_PATH}
-              className="cursor-pointer inline-flex items-center gap-2 font-black uppercase tracking-[0.08em] text-white transition-all duration-300 hover:bg-white/10 w-full sm:w-auto justify-center"
+              className="cursor-pointer inline-flex items-center gap-2 font-black uppercase tracking-[0.08em] text-white transition-all duration-300 hover:bg-white/10 hover:-translate-y-0.5 w-full sm:w-auto justify-center"
               style={{
                 fontSize: "clamp(11px, 1.1vw, 14px)",
                 padding: "clamp(13px, 1.5vw, 16px) clamp(24px, 3vw, 40px)",

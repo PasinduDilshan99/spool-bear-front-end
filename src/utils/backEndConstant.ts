@@ -107,6 +107,13 @@ export const UPLOAD_IMAGE_TO_CLOUDINARY =
 
 // Reviews
 export const GET_USER_REVIEWS_DATA = `${BASE_PATH}${API}${VERSION}${REVIEWS}/reviews-by-user`;
+export const GET_ALL_REVIEWS_DATA = `${BASE_PATH}${API}${VERSION}${REVIEWS}/all`;
+export const ADD_REVIEW_DATA = `${BASE_PATH}${API}${VERSION}${REVIEWS}/add-review`;
+export const ADD_REVIEW_REACTION_DATA = `${BASE_PATH}${API}${VERSION}${REVIEWS}/add-react`;
+export const ADD_REVIEW_COMMENT_REACTION_DATA = `${BASE_PATH}${API}${VERSION}${REVIEWS}/add-comment-react`;
+export const ADD_REVIEW_COMMENT_DATA = `${BASE_PATH}${API}${VERSION}${REVIEWS}/add-comment`;
+export const GET_REVIEW_BY_REVIEW_ID_DATA = `${BASE_PATH}${API}${VERSION}${REVIEWS}/review-by-id`;
+export const GET_REVIEW_BY_PRODUCT_ID_DATA = `${BASE_PATH}${API}${VERSION}${REVIEWS}/reviews-by-product-id`;
 
 // Orders
 export const GET_ORDERS_DETAILS_BY_USER_ID_DATA = `${BASE_PATH}${API}${VERSION}${ORDERS}/orders-by-user`;

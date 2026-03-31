@@ -28,3 +28,5 @@ export const PRIVACY_POLICY_PAGE_TITLE = `Privacy Policy | ${COMPANY_NAME}`;
 export const CART_PAGE_TITLE = `Cart | ${COMPANY_NAME}`;
 export const ORDER_DETAILS_PAGE_TITLE = `Order Details | ${COMPANY_NAME}`;
 export const FAQ_PAGE_TITLE = `FAQ | ${COMPANY_NAME}`;
+export const REVIEWS_PAGE_TITLE = `Reviews | ${COMPANY_NAME}`;
+export const REVIEW_DETAILS_PAGE_TITLE = `Review Details | ${COMPANY_NAME}`;

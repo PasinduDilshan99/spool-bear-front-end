@@ -13,6 +13,7 @@ import {
   Calendar,
   Layers,
 } from "lucide-react";
+import GalleryHomeSkeleton, { GalleryHomeSkeletonWithAnimation } from "./loadings/GalleryHomeSkeleton";
 
 // ── Gallery Image Tile ──────────────────────────────────────────────────────
 const GalleryImage = React.memo(
@@ -217,65 +218,13 @@ const GalleryHome = () => {
 
   const visibleRows = getVisibleRows();
 
-  // ── Loading ──
   if (loading) {
-    const { width, height } = getImageDimensions();
     return (
-      <div className="bg-[#F7F7F7] py-6 sm:py-10 px-2 sm:px-4">
-        <div className="space-y-3 sm:space-y-4 max-w-full mx-auto">
-          {[...Array(isMobile ? 2 : 3)].map((_, rowIndex) => (
-            <div
-              key={rowIndex}
-              className="flex gap-3 sm:gap-4 overflow-hidden justify-center py-2"
-            >
-              {[...Array(6)].map((_, i) => (
-                <div
-                  key={i}
-                  className="flex-shrink-0 rounded-xl bg-gray-200 animate-pulse overflow-hidden relative"
-                  style={{
-                    width: `${width}px`,
-                    height: `${height}px`,
-                    animationDelay: `${rowIndex * 100 + i * 50}ms`,
-                  }}
-                >
-                  {/* Shimmer */}
-                  <div
-                    className="absolute inset-0"
-                    style={{
-                      background:
-                        "linear-gradient(90deg, transparent 0%, rgba(255,80,0,0.06) 50%, transparent 100%)",
-                      animation: "shimmer 1.8s infinite",
-                      backgroundSize: "200% 100%",
-                    }}
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Layers size={24} className="text-gray-300" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-        {/* Loading toast */}
-        <div className="flex justify-center mt-6">
-          <div className="flex items-center gap-3 px-5 py-3 bg-[#1A1A1A] rounded-full shadow-xl">
-            <div className="w-4 h-4 rounded-full border-2 border-[#FF5000] border-t-transparent animate-spin" />
-            <span className="text-sm font-medium text-white/80">
-              Loading gallery...
-            </span>
-          </div>
-        </div>
-        <style jsx>{`
-          @keyframes shimmer {
-            0% {
-              background-position: -200% 0;
-            }
-            100% {
-              background-position: 200% 0;
-            }
-          }
-        `}</style>
-      </div>
+      <GalleryHomeSkeletonWithAnimation
+        // isMobile={isMobile}
+        // isTablet={isTablet}
+        // isLaptop={isLaptop}
+      />
     );
   }
 
@@ -451,7 +400,7 @@ const GalleryHome = () => {
                   </div>
                   <button
                     onClick={() => setSelectedImage(null)}
-                    className="w-8 h-8 flex items-center justify-center rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-all duration-150 flex-shrink-0 ml-3"
+                    className="cursor-pointer w-8 h-8 flex items-center justify-center rounded-lg text-white/40 hover:text-red-500 hover:bg-white/10 transition-all duration-150 flex-shrink-0 ml-3"
                     aria-label="Close"
                   >
                     <X size={17} />

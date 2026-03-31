@@ -1,7 +1,13 @@
 // app/products/page.tsx
 "use client";
 
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
@@ -18,7 +24,6 @@ import {
   Box,
   AlertCircle,
 } from "lucide-react";
-import { spoolbearTheme } from "@/theme/spoolbear-theme";
 import { Product } from "@/types/product-types";
 import { useCart } from "@/context/CartContext";
 import { PLACE_HOLDER_IMAGE } from "@/utils/constant";
@@ -27,13 +32,12 @@ import { WishListService } from "@/service/wishListService";
 import { ColorSelectionModal } from "@/components/product-components/ColorSelectionModal";
 import { Toast } from "@/components/product-components/Toast";
 import { ProductToolbar } from "@/components/product-components/ProductToolbar";
-import { EmptyState } from "@/components/product-components/EmptyState";
 import { ProductCard } from "@/components/product-components/ProductCard";
 import { ProductListItem } from "@/components/product-components/ProductListItem";
 import { ProductPagination } from "@/components/product-components/ProductPagination";
+import { EmptyState } from "@/components/product-components/EmptyState";
 import { ProductService } from "@/service/productService";
 
-// Types for filter state
 interface FilterState {
   categoryId?: number;
   typeId?: number;
@@ -50,16 +54,92 @@ interface FilterOption {
   name: string;
   count?: number;
 }
-
 interface FilterOptions {
   categories: (FilterOption & { count: number })[];
   types: (FilterOption & { categoryId: number; count: number })[];
   materials: (FilterOption & { typeId: number; count: number })[];
-  priceRange: {
-    min: number;
-    max: number;
-  };
+  priceRange: { min: number; max: number };
 }
+
+/* ── Sidebar filter section ── */
+function FilterSection({
+  icon,
+  label,
+  expanded,
+  onToggle,
+  children,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  expanded: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="pb-4 mb-4 border-b border-gray-100 last:border-0 last:pb-0 last:mb-0">
+      <button
+        onClick={onToggle}
+        className="flex items-center justify-between w-full mb-3 group"
+      >
+        <span className="flex items-center gap-2 font-black text-sm text-[#101113] group-hover:text-[#FF5000] transition-colors duration-150">
+          <span className="text-[#FF5000]">{icon}</span>
+          {label}
+        </span>
+        {expanded ? (
+          <ChevronUp size={15} className="text-gray-400" />
+        ) : (
+          <ChevronDown size={15} className="text-gray-400" />
+        )}
+      </button>
+      {expanded && (
+        <div style={{ animation: "filterSectionIn 0.22s ease-out both" }}>
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── Filter option button ── */
+function FilterOptionButton({
+  label,
+  count,
+  active,
+  onClick,
+}: {
+  label: string;
+  count?: number;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="flex items-center justify-between w-full px-3 py-2 rounded-xl text-sm transition-all duration-150 hover:-translate-y-0.5"
+      style={{
+        background: active ? "rgba(255,80,0,0.10)" : "transparent",
+        color: active ? "#FF5000" : "#2b2e33",
+        fontWeight: active ? 700 : 500,
+        border: active
+          ? "1.5px solid rgba(255,80,0,0.25)"
+          : "1.5px solid transparent",
+      }}
+    >
+      <span className="truncate">{label}</span>
+      {count !== undefined && (
+        <span
+          className="text-xs ml-2 flex-shrink-0 font-bold"
+          style={{ color: active ? "#FF5000" : "#9ca3af" }}
+        >
+          {count}
+        </span>
+      )}
+    </button>
+  );
+}
+
+const inputClass =
+  "w-full px-3 py-2.5 text-sm text-[#101113] bg-gray-50 border border-gray-200 rounded-xl outline-none placeholder:text-gray-400 focus:border-[#FF5000] focus:ring-2 focus:ring-[#FF5000]/10 focus:bg-white transition-all duration-200 font-medium";
 
 const ProductsPage = () => {
   const router = useRouter();
@@ -97,6 +177,8 @@ const ProductsPage = () => {
   const [isColorModalOpen, setIsColorModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(12);
+  // Stagger animation
+  const [cardsVisible, setCardsVisible] = useState(false);
 
   const [filters, setFilters] = useState<FilterState>(() => ({
     categoryId: searchParams?.get("category")
@@ -119,10 +201,8 @@ const ProductsPage = () => {
     sortBy: (searchParams?.get("sort") as FilterState["sortBy"]) || "newest",
   }));
 
-  const showToast = (message: string, type: "success" | "error" | "info") => {
+  const showToast = (message: string, type: "success" | "error" | "info") =>
     setToast({ message, type });
-  };
-
   const wishListService = useMemo(() => new WishListService(), []);
 
   const handleWishlistToggle = async (product: Product) => {
@@ -131,32 +211,26 @@ const ProductsPage = () => {
       router.push("/login");
       return;
     }
-
     setTogglingWishlist(product.productId);
-
     try {
       const response = await wishListService.addWishList({
         productId: product.productId,
       });
-
       if (response.code === 200) {
-        setProducts((prevProducts) =>
-          prevProducts.map((p) =>
+        setProducts((prev) =>
+          prev.map((p) =>
             p.productId === product.productId ? { ...p, isWish: !p.isWish } : p,
           ),
         );
-
-        const action = !product.isWish ? "added to" : "removed from";
-        showToast(`${product.productName} ${action} wishlist`, "success");
+        showToast(
+          `${product.productName} ${!product.isWish ? "added to" : "removed from"} wishlist`,
+          "success",
+        );
       } else {
-        showToast(`Failed to update wishlist`, "error");
+        showToast("Failed to update wishlist", "error");
       }
-    } catch (err) {
-      console.error("Error toggling wishlist:", err);
-      showToast(
-        `Failed to ${product.isWish ? "remove from" : "add to"} wishlist`,
-        "error",
-      );
+    } catch {
+      showToast(`Failed to update wishlist`, "error");
     } finally {
       setTogglingWishlist(null);
     }
@@ -174,9 +248,7 @@ const ProductsPage = () => {
 
   const handleAddToCartWithColor = async (color: string, colorCode: string) => {
     if (!selectedProductForColor) return;
-
     setAddingToCart(selectedProductForColor.productId);
-
     try {
       await addToCart({
         productId: selectedProductForColor.productId,
@@ -187,18 +259,16 @@ const ProductsPage = () => {
         materialId: selectedProductForColor.materialId || 0,
         type: selectedProductForColor.typeName || "Default Type",
         typeId: selectedProductForColor.typeId || 0,
-        color: color,
-        colorCode: colorCode,
+        color,
+        colorCode,
       });
-
       showToast(
-        `${selectedProductForColor.productName} (${color}) added to cart successfully!`,
+        `${selectedProductForColor.productName} (${color}) added to cart!`,
         "success",
       );
       setIsColorModalOpen(false);
       setSelectedProductForColor(null);
-    } catch (err) {
-      console.error("Error adding to cart:", err);
+    } catch {
       showToast(
         `Failed to add ${selectedProductForColor.productName} to cart`,
         "error",
@@ -208,93 +278,52 @@ const ProductsPage = () => {
     }
   };
 
-  // Extract filter options from products
+  // Build filter options from products
   useEffect(() => {
-    if (products.length > 0) {
-      const categoryMap = new Map<number, { name: string; count: number }>();
-      products.forEach((product) => {
-        if (!categoryMap.has(product.categoryId)) {
-          categoryMap.set(product.categoryId, {
-            name: product.categoryName,
+    if (!products.length) return;
+    const catMap = new Map<number, { name: string; count: number }>();
+    const typeMap = new Map<
+      number,
+      { name: string; categoryId: number; count: number }
+    >();
+    const matMap = new Map<
+      number,
+      { name: string; typeId: number; count: number }
+    >();
+
+    products.forEach((p) => {
+      if (!catMap.has(p.categoryId))
+        catMap.set(p.categoryId, { name: p.categoryName, count: 1 });
+      else catMap.get(p.categoryId)!.count++;
+
+      if (p.typeId) {
+        if (!typeMap.has(p.typeId))
+          typeMap.set(p.typeId, {
+            name: p.typeName || `Type ${p.typeId}`,
+            categoryId: p.categoryId,
             count: 1,
           });
-        } else {
-          const existing = categoryMap.get(product.categoryId)!;
-          existing.count += 1;
-        }
-      });
+        else typeMap.get(p.typeId)!.count++;
+      }
 
-      const categories = Array.from(categoryMap.entries()).map(
-        ([id, data]) => ({
-          id,
-          name: data.name,
-          count: data.count,
-        }),
-      );
-
-      const typeMap = new Map<
-        number,
-        { name: string; categoryId: number; count: number }
-      >();
-      products.forEach((product) => {
-        if (product.typeId && !typeMap.has(product.typeId)) {
-          typeMap.set(product.typeId, {
-            name: product.typeName || `Type ${product.typeId}`,
-            categoryId: product.categoryId,
+      if (p.materialId && p.materialName) {
+        if (!matMap.has(p.materialId))
+          matMap.set(p.materialId, {
+            name: p.materialName,
+            typeId: p.typeId || 0,
             count: 1,
           });
-        } else if (product.typeId) {
-          const existing = typeMap.get(product.typeId)!;
-          existing.count += 1;
-        }
-      });
+        else matMap.get(p.materialId)!.count++;
+      }
+    });
 
-      const types = Array.from(typeMap.entries()).map(([id, data]) => ({
-        id,
-        name: data.name,
-        categoryId: data.categoryId,
-        count: data.count,
-      }));
-
-      const materialMap = new Map<
-        number,
-        { name: string; typeId: number; count: number }
-      >();
-      products.forEach((product) => {
-        if (
-          product.materialId &&
-          product.materialName &&
-          !materialMap.has(product.materialId)
-        ) {
-          materialMap.set(product.materialId, {
-            name: product.materialName,
-            typeId: product.typeId || 0,
-            count: 1,
-          });
-        } else if (product.materialId && product.materialName) {
-          const existing = materialMap.get(product.materialId)!;
-          existing.count += 1;
-        }
-      });
-
-      const materials = Array.from(materialMap.entries()).map(([id, data]) => ({
-        id,
-        name: data.name,
-        typeId: data.typeId,
-        count: data.count,
-      }));
-
-      const prices = products.map((p) => p.price);
-      const minPrice = Math.min(...prices);
-      const maxPrice = Math.max(...prices);
-
-      setFilterOptions({
-        categories,
-        types,
-        materials,
-        priceRange: { min: minPrice, max: maxPrice },
-      });
-    }
+    const prices = products.map((p) => p.price);
+    setFilterOptions({
+      categories: Array.from(catMap.entries()).map(([id, d]) => ({ id, ...d })),
+      types: Array.from(typeMap.entries()).map(([id, d]) => ({ id, ...d })),
+      materials: Array.from(matMap.entries()).map(([id, d]) => ({ id, ...d })),
+      priceRange: { min: Math.min(...prices), max: Math.max(...prices) },
+    });
   }, [products]);
 
   const loadProducts = async () => {
@@ -302,18 +331,14 @@ const ProductsPage = () => {
       setInitialLoading(true);
       setLoading(true);
       setError(null);
-
       const productService = new ProductService();
-
       const response = await productService.fetchProducts({});
-
       if (response.code === 200 && response.data) {
         setProducts(response.data);
       } else {
         setError(response.message || "Failed to load products");
       }
-    } catch (err) {
-      console.error("Error loading products:", err);
+    } catch {
       setError("An error occurred while loading products");
     } finally {
       setLoading(false);
@@ -327,39 +352,28 @@ const ProductsPage = () => {
 
   const applyFilters = useCallback(() => {
     setLoading(true);
+    setCardsVisible(false);
     let filtered = [...products];
 
     if (filters.name) {
-      const searchLower = filters.name.toLowerCase();
+      const s = filters.name.toLowerCase();
       filtered = filtered.filter(
         (p) =>
-          p.productName.toLowerCase().includes(searchLower) ||
-          p.productDescription.toLowerCase().includes(searchLower),
+          p.productName.toLowerCase().includes(s) ||
+          p.productDescription.toLowerCase().includes(s),
       );
     }
-
-    if (filters.categoryId) {
+    if (filters.categoryId)
       filtered = filtered.filter((p) => p.categoryId === filters.categoryId);
-    }
-
-    if (filters.typeId) {
+    if (filters.typeId)
       filtered = filtered.filter((p) => p.typeId === filters.typeId);
-    }
-
-    if (filters.materialId) {
+    if (filters.materialId)
       filtered = filtered.filter((p) => p.materialId === filters.materialId);
-    }
-
-    if (filters.minPrice !== undefined) {
+    if (filters.minPrice !== undefined)
       filtered = filtered.filter((p) => p.price >= filters.minPrice!);
-    }
-    if (filters.maxPrice !== undefined) {
+    if (filters.maxPrice !== undefined)
       filtered = filtered.filter((p) => p.price <= filters.maxPrice!);
-    }
-
-    if (filters.inStock) {
-      filtered = filtered.filter((p) => p.stockQuantity > 0);
-    }
+    if (filters.inStock) filtered = filtered.filter((p) => p.stockQuantity > 0);
 
     filtered.sort((a, b) => {
       switch (filters.sortBy) {
@@ -371,7 +385,6 @@ const ProductsPage = () => {
           return a.productName.localeCompare(b.productName);
         case "name-desc":
           return b.productName.localeCompare(a.productName);
-        case "newest":
         default:
           return b.productId - a.productId;
       }
@@ -380,11 +393,11 @@ const ProductsPage = () => {
     setFilteredProducts(filtered);
     setCurrentPage(1);
     setLoading(false);
+    setTimeout(() => setCardsVisible(true), 60);
   }, [products, filters]);
 
   useEffect(() => {
     applyFilters();
-
     const params = new URLSearchParams();
     if (filters.categoryId)
       params.set("category", filters.categoryId.toString());
@@ -396,40 +409,36 @@ const ProductsPage = () => {
     if (filters.inStock) params.set("inStock", "true");
     if (filters.name) params.set("search", filters.name);
     if (filters.sortBy !== "newest") params.set("sort", filters.sortBy);
-
-    const queryString = params.toString();
-    router.push(queryString ? `?${queryString}` : "/shop", { scroll: false });
+    const qs = params.toString();
+    router.push(qs ? `?${qs}` : "/shop", { scroll: false });
   }, [filters, applyFilters, router]);
 
   const handleFilterChange = <K extends keyof FilterState>(
     key: K,
     value: FilterState[K],
-  ) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
-  };
+  ) => setFilters((prev) => ({ ...prev, [key]: value }));
 
   const clearFilter = (key: keyof FilterState) => {
     setFilters((prev) => {
-      const newFilters = { ...prev };
+      const n = { ...prev };
       if (
-        key === "categoryId" ||
-        key === "typeId" ||
-        key === "materialId" ||
-        key === "minPrice" ||
-        key === "maxPrice" ||
-        key === "name"
-      ) {
-        newFilters[key] = undefined;
-      } else if (key === "inStock") {
-        newFilters[key] = false;
-      } else if (key === "sortBy") {
-        newFilters[key] = "newest";
-      }
-      return newFilters;
+        [
+          "categoryId",
+          "typeId",
+          "materialId",
+          "minPrice",
+          "maxPrice",
+          "name",
+        ].includes(key)
+      )
+        (n as any)[key] = undefined;
+      else if (key === "inStock") n.inStock = false;
+      else if (key === "sortBy") n.sortBy = "newest";
+      return n;
     });
   };
 
-  const clearAllFilters = () => {
+  const clearAllFilters = () =>
     setFilters({
       categoryId: undefined,
       typeId: undefined,
@@ -440,179 +449,129 @@ const ProductsPage = () => {
       name: "",
       sortBy: "newest",
     });
-  };
 
-  const toggleSection = (section: keyof typeof expandedSections) => {
-    setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }));
-  };
+  const toggleSection = (s: keyof typeof expandedSections) =>
+    setExpandedSections((prev) => ({ ...prev, [s]: !prev[s] }));
 
-  const getActiveFilterCount = useCallback(() => {
-    let count = 0;
-    if (filters.categoryId) count++;
-    if (filters.typeId) count++;
-    if (filters.materialId) count++;
-    if (filters.minPrice || filters.maxPrice) count++;
-    if (filters.inStock) count++;
-    if (filters.name) count++;
-    if (filters.sortBy !== "newest") count++;
-    return count;
+  const activeFilterCount = useMemo(() => {
+    let c = 0;
+    if (filters.categoryId) c++;
+    if (filters.typeId) c++;
+    if (filters.materialId) c++;
+    if (filters.minPrice || filters.maxPrice) c++;
+    if (filters.inStock) c++;
+    if (filters.name) c++;
+    if (filters.sortBy !== "newest") c++;
+    return c;
   }, [filters]);
 
-  const getActiveFilters = useCallback(() => {
+  const activeFilters = useMemo(() => {
     const active: { key: keyof FilterState; label: string; value: string }[] =
       [];
-
     if (filters.categoryId) {
-      const category = filterOptions.categories.find(
+      const c = filterOptions.categories.find(
         (c) => c.id === filters.categoryId,
       );
-      if (category) {
-        active.push({
-          key: "categoryId",
-          label: "Category",
-          value: category.name,
-        });
-      }
+      if (c)
+        active.push({ key: "categoryId", label: "Category", value: c.name });
     }
-
     if (filters.typeId) {
-      const type = filterOptions.types.find((t) => t.id === filters.typeId);
-      if (type) {
-        active.push({ key: "typeId", label: "Type", value: type.name });
-      }
+      const t = filterOptions.types.find((t) => t.id === filters.typeId);
+      if (t) active.push({ key: "typeId", label: "Type", value: t.name });
     }
-
     if (filters.materialId) {
-      const material = filterOptions.materials.find(
+      const m = filterOptions.materials.find(
         (m) => m.id === filters.materialId,
       );
-      if (material) {
-        active.push({
-          key: "materialId",
-          label: "Material",
-          value: material.name,
-        });
-      }
+      if (m)
+        active.push({ key: "materialId", label: "Material", value: m.name });
     }
-
     if (filters.minPrice || filters.maxPrice) {
-      let priceLabel = "";
-      if (filters.minPrice && filters.maxPrice) {
-        priceLabel = `$${filters.minPrice} - $${filters.maxPrice}`;
-      } else if (filters.minPrice) {
-        priceLabel = `≥ $${filters.minPrice}`;
-      } else if (filters.maxPrice) {
-        priceLabel = `≤ $${filters.maxPrice}`;
-      }
-      active.push({ key: "minPrice", label: "Price", value: priceLabel });
+      const label =
+        filters.minPrice && filters.maxPrice
+          ? `$${filters.minPrice} – $${filters.maxPrice}`
+          : filters.minPrice
+            ? `≥ $${filters.minPrice}`
+            : `≤ $${filters.maxPrice}`;
+      active.push({ key: "minPrice", label: "Price", value: label });
     }
-
-    if (filters.inStock) {
+    if (filters.inStock)
       active.push({ key: "inStock", label: "Stock", value: "In Stock Only" });
-    }
-
-    if (filters.name) {
+    if (filters.name)
       active.push({ key: "name", label: "Search", value: `"${filters.name}"` });
-    }
-
     if (filters.sortBy !== "newest") {
-      let sortLabel = "";
-      switch (filters.sortBy) {
-        case "price-asc":
-          sortLabel = "Price: Low to High";
-          break;
-        case "price-desc":
-          sortLabel = "Price: High to Low";
-          break;
-        case "name-asc":
-          sortLabel = "Name: A to Z";
-          break;
-        case "name-desc":
-          sortLabel = "Name: Z to A";
-          break;
-      }
-      active.push({ key: "sortBy", label: "Sort", value: sortLabel });
+      const sortLabels: Record<string, string> = {
+        "price-asc": "Price: Low → High",
+        "price-desc": "Price: High → Low",
+        "name-asc": "Name: A → Z",
+        "name-desc": "Name: Z → A",
+      };
+      active.push({
+        key: "sortBy",
+        label: "Sort",
+        value: sortLabels[filters.sortBy] || "",
+      });
     }
-
     return active;
   }, [filters, filterOptions]);
 
   const getProductImage = (product: Product) => {
-    const primaryImage = product.images?.find((img) => img.isPrimary);
-    if (primaryImage?.imageUrl) {
-      return primaryImage.imageUrl.startsWith("http")
-        ? primaryImage.imageUrl
-        : `http://localhost:8080${primaryImage.imageUrl}`;
-    }
-    if (product.images?.[0]?.imageUrl) {
+    const primary = product.images?.find((img) => img.isPrimary);
+    if (primary?.imageUrl)
+      return primary.imageUrl.startsWith("http")
+        ? primary.imageUrl
+        : `http://localhost:8080${primary.imageUrl}`;
+    if (product.images?.[0]?.imageUrl)
       return product.images[0].imageUrl.startsWith("http")
         ? product.images[0].imageUrl
         : `http://localhost:8080${product.images[0].imageUrl}`;
-    }
     return PLACE_HOLDER_IMAGE;
   };
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
+  const formatPrice = (price: number) =>
+    new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
       minimumFractionDigits: 2,
     }).format(price);
-  };
 
   const paginatedProducts = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    return filteredProducts.slice(startIndex, startIndex + itemsPerPage);
+    const start = (currentPage - 1) * itemsPerPage;
+    return filteredProducts.slice(start, start + itemsPerPage);
   }, [filteredProducts, currentPage, itemsPerPage]);
 
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-  const activeFilterCount = getActiveFilterCount();
-  const activeFilters = getActiveFilters();
 
+  // ── Initial loading ──
   if (initialLoading) {
     return (
       <div className="min-h-screen bg-[#e4e7ec] flex items-center justify-center">
         <div className="text-center">
-          <Loader2
-            className="w-12 h-12 animate-spin mx-auto mb-4"
-            style={{ color: spoolbearTheme.colors.accent }}
-          />
-          <p className="text-lg" style={{ color: spoolbearTheme.colors.text }}>
-            Loading products...
-          </p>
+          <div className="w-16 h-16 rounded-2xl bg-orange-50 border border-orange-200 flex items-center justify-center mx-auto mb-4">
+            <Loader2 size={28} className="text-[#FF5000] animate-spin" />
+          </div>
+          <p className="font-bold text-[#2b2e33] text-sm">Loading products…</p>
         </div>
       </div>
     );
   }
 
+  // ── Error ──
   if (error) {
     return (
-      <div className="min-h-screen bg-[#e4e7ec] flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto">
-          <AlertCircle
-            className="w-16 h-16 mx-auto mb-4"
-            style={{ color: spoolbearTheme.colors.accent }}
-          />
-          <p
-            className="text-lg font-medium mb-2"
-            style={{ color: spoolbearTheme.colors.text }}
-          >
-            Oops! Something went wrong
-          </p>
-          <p className="mb-6" style={{ color: spoolbearTheme.colors.muted }}>
-            {error}
-          </p>
+      <div className="min-h-screen bg-[#e4e7ec] flex items-center justify-center p-6">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-xl p-8 max-w-sm w-full text-center relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-[#FF5000]" />
+          <div className="w-14 h-14 rounded-2xl bg-orange-50 flex items-center justify-center mx-auto mb-4 border border-orange-100">
+            <AlertCircle size={26} className="text-[#FF5000]" />
+          </div>
+          <h3 className="font-black text-[#101113] mb-2">
+            Something went wrong
+          </h3>
+          <p className="text-sm text-gray-500 mb-6">{error}</p>
           <button
             onClick={loadProducts}
-            className="px-6 py-3 text-white rounded-lg transition-colors cursor-pointer"
-            style={{ backgroundColor: spoolbearTheme.colors.accent }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.backgroundColor = "#e64800")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.backgroundColor =
-                spoolbearTheme.colors.accent)
-            }
+            className="w-full py-3 bg-[#FF5000] text-white rounded-xl font-bold text-sm hover:bg-[#CC4000] transition-colors"
           >
             Try Again
           </button>
@@ -621,8 +580,212 @@ const ProductsPage = () => {
     );
   }
 
+  const FilterSidebar = (
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      {/* Header */}
+      <div className="h-1 bg-[#FF5000]" />
+      <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-orange-50 flex items-center justify-center">
+            <Filter size={14} className="text-[#FF5000]" />
+          </div>
+          <h2 className="font-black text-sm text-[#101113]">Filters</h2>
+          {activeFilterCount > 0 && (
+            <span className="flex items-center justify-center w-5 h-5 rounded-full bg-[#FF5000] text-[9px] font-black text-white">
+              {activeFilterCount}
+            </span>
+          )}
+        </div>
+        {activeFilterCount > 0 && (
+          <button
+            onClick={clearAllFilters}
+            className="text-xs font-bold text-[#FF5000] hover:underline"
+          >
+            Clear All
+          </button>
+        )}
+      </div>
+
+      <div className="p-4 space-y-0">
+        {/* Search */}
+        <div className="pb-4 mb-4 border-b border-gray-100">
+          <div className="relative">
+            <Search
+              size={14}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            />
+            <input
+              type="text"
+              value={filters.name || ""}
+              onChange={(e) => handleFilterChange("name", e.target.value)}
+              placeholder="Search products…"
+              className={`${inputClass} pl-9`}
+            />
+          </div>
+        </div>
+
+        {/* Categories */}
+        {filterOptions.categories.length > 0 && (
+          <FilterSection
+            icon={<Tag size={14} />}
+            label="Categories"
+            expanded={expandedSections.categories}
+            onToggle={() => toggleSection("categories")}
+          >
+            <div className="space-y-1 max-h-56 overflow-y-auto">
+              {filterOptions.categories.map((c) => (
+                <FilterOptionButton
+                  key={c.id}
+                  label={c.name}
+                  count={c.count}
+                  active={filters.categoryId === c.id}
+                  onClick={() =>
+                    handleFilterChange(
+                      "categoryId",
+                      filters.categoryId === c.id ? undefined : c.id,
+                    )
+                  }
+                />
+              ))}
+            </div>
+          </FilterSection>
+        )}
+
+        {/* Types */}
+        {filterOptions.types.length > 0 && (
+          <FilterSection
+            icon={<Layers size={14} />}
+            label="Types"
+            expanded={expandedSections.types}
+            onToggle={() => toggleSection("types")}
+          >
+            <div className="space-y-1 max-h-56 overflow-y-auto">
+              {filterOptions.types
+                .filter(
+                  (t) =>
+                    !filters.categoryId || t.categoryId === filters.categoryId,
+                )
+                .map((t) => (
+                  <FilterOptionButton
+                    key={t.id}
+                    label={t.name}
+                    count={t.count}
+                    active={filters.typeId === t.id}
+                    onClick={() =>
+                      handleFilterChange(
+                        "typeId",
+                        filters.typeId === t.id ? undefined : t.id,
+                      )
+                    }
+                  />
+                ))}
+            </div>
+          </FilterSection>
+        )}
+
+        {/* Materials */}
+        {filterOptions.materials.length > 0 && (
+          <FilterSection
+            icon={<Box size={14} />}
+            label="Materials"
+            expanded={expandedSections.materials}
+            onToggle={() => toggleSection("materials")}
+          >
+            <div className="space-y-1 max-h-56 overflow-y-auto">
+              {filterOptions.materials
+                .filter((m) => !filters.typeId || m.typeId === filters.typeId)
+                .map((m) => (
+                  <FilterOptionButton
+                    key={m.id}
+                    label={m.name}
+                    count={m.count}
+                    active={filters.materialId === m.id}
+                    onClick={() =>
+                      handleFilterChange(
+                        "materialId",
+                        filters.materialId === m.id ? undefined : m.id,
+                      )
+                    }
+                  />
+                ))}
+            </div>
+          </FilterSection>
+        )}
+
+        {/* Price */}
+        <FilterSection
+          icon={<DollarSign size={14} />}
+          label="Price Range"
+          expanded={expandedSections.price}
+          onToggle={() => toggleSection("price")}
+        >
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1 block">
+                Min
+              </label>
+              <input
+                type="number"
+                value={filters.minPrice || ""}
+                placeholder={`$${filterOptions.priceRange.min}`}
+                onChange={(e) =>
+                  handleFilterChange(
+                    "minPrice",
+                    e.target.value ? parseInt(e.target.value) : undefined,
+                  )
+                }
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1 block">
+                Max
+              </label>
+              <input
+                type="number"
+                value={filters.maxPrice || ""}
+                placeholder={`$${filterOptions.priceRange.max}`}
+                onChange={(e) =>
+                  handleFilterChange(
+                    "maxPrice",
+                    e.target.value ? parseInt(e.target.value) : undefined,
+                  )
+                }
+                className={inputClass}
+              />
+            </div>
+          </div>
+        </FilterSection>
+
+        {/* In Stock */}
+        <div>
+          <label className="flex items-center gap-3 cursor-pointer group py-2">
+            <div
+              className="relative w-9 h-5 rounded-full transition-colors duration-200 flex-shrink-0"
+              style={{ background: filters.inStock ? "#FF5000" : "#e5e7eb" }}
+              onClick={() => handleFilterChange("inStock", !filters.inStock)}
+            >
+              <div
+                className="absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200"
+                style={{
+                  transform: filters.inStock
+                    ? "translateX(18px)"
+                    : "translateX(2px)",
+                }}
+              />
+            </div>
+            <span className="text-sm font-semibold text-[#2b2e33] group-hover:text-[#101113] transition-colors">
+              In Stock Only
+            </span>
+          </label>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="min-h-screen bg-[#e4e7ec] relative">
+    <div className="min-h-screen bg-[#e4e7ec] relative overflow-x-hidden">
+      {/* Modals */}
       {selectedProductForColor && (
         <ColorSelectionModal
           product={selectedProductForColor}
@@ -635,7 +798,6 @@ const ProductsPage = () => {
           isLoading={addingToCart === selectedProductForColor.productId}
         />
       )}
-
       {toast && (
         <Toast
           message={toast.message}
@@ -644,550 +806,198 @@ const ProductsPage = () => {
         />
       )}
 
+      {/* Grid texture */}
       <div
-        className="absolute inset-0 opacity-[0.02] pointer-events-none"
+        className="fixed inset-0 pointer-events-none z-0"
         style={{
-          backgroundImage: `linear-gradient(${spoolbearTheme.colors.accent}1a 1px, transparent 1px), 
-                           linear-gradient(90deg, ${spoolbearTheme.colors.accent}1a 1px, transparent 1px)`,
+          backgroundImage:
+            "linear-gradient(rgba(255,80,0,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,80,0,0.04) 1px, transparent 1px)",
           backgroundSize: "44px 44px",
         }}
       />
 
-      <div className="container mx-auto px-4 py-8 relative z-10">
+      {/* Mobile filter overlay */}
+      {showMobileFilters && (
+        <div className="fixed inset-0 z-50 flex">
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowMobileFilters(false)}
+          />
+          <div
+            className="relative ml-auto w-80 max-w-[85vw] h-full bg-[#e4e7ec] overflow-y-auto p-4"
+            style={{
+              animation:
+                "slideInRight 0.3s cubic-bezier(0.34,1.56,0.64,1) both",
+            }}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-black text-[#101113] text-lg">Filters</h2>
+              <button
+                onClick={() => setShowMobileFilters(false)}
+                className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-gray-500 hover:text-gray-800 shadow-sm"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            {FilterSidebar}
+            <button
+              onClick={() => setShowMobileFilters(false)}
+              className="w-full mt-4 py-3 bg-[#FF5000] text-white rounded-xl font-bold text-sm hover:bg-[#CC4000] transition-colors shadow-md shadow-orange-200"
+            >
+              Apply Filters
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div
+        className="container mx-auto relative z-10"
+        style={{
+          maxWidth: "1400px",
+          padding: "clamp(24px, 4vw, 48px) clamp(16px, 4vw, 64px)",
+        }}
+      >
+        {/* Page header */}
         <div className="mb-8">
+          <div className="flex items-center gap-2 mb-2">
+            <div
+              className="h-[2px] rounded-full bg-[#FF5000]"
+              style={{ width: "clamp(20px, 3vw, 36px)" }}
+            />
+            <span
+              className="font-black uppercase tracking-[0.2em] text-[#FF5000]"
+              style={{ fontSize: "clamp(9px, 1vw, 12px)" }}
+            >
+              Shop
+            </span>
+          </div>
           <h1
-            className="text-3xl md:text-4xl lg:text-5xl font-black mb-4"
-            style={{ color: spoolbearTheme.colors.text }}
+            className="font-black text-[#101113] tracking-tight"
+            style={{
+              fontSize: "clamp(24px, 4vw, 48px)",
+              letterSpacing: "-0.03em",
+            }}
           >
             Our Products
           </h1>
-          <p className="text-lg" style={{ color: spoolbearTheme.colors.muted }}>
+          <p
+            className="font-medium text-[#2b2e33] mt-1"
+            style={{ fontSize: "clamp(13px, 1.4vw, 16px)" }}
+          >
             Discover our collection of premium 3D printing materials and
             accessories
           </p>
         </div>
 
-        {/* Mobile Filter Button - Simplified for brevity, you can extract this too */}
+        {/* Mobile filter button */}
         <div className="lg:hidden mb-4">
           <button
             onClick={() => setShowMobileFilters(true)}
-            className="w-full px-4 py-3 rounded-lg flex items-center justify-between border cursor-pointer"
-            style={{
-              backgroundColor: "white",
-              borderColor: `${spoolbearTheme.colors.accent}30`,
-            }}
+            className="flex items-center gap-2.5 px-4 py-3 bg-white rounded-xl border border-gray-100 shadow-sm font-bold text-sm text-[#101113] hover:border-orange-200 transition-colors duration-200"
           >
-            <span
-              className="flex items-center gap-2"
-              style={{ color: spoolbearTheme.colors.text }}
-            >
-              <SlidersHorizontal
-                className="w-5 h-5"
-                style={{ color: spoolbearTheme.colors.accent }}
-              />
-              Filters & Sort
-            </span>
+            <SlidersHorizontal size={16} className="text-[#FF5000]" />
+            Filters & Sort
             {activeFilterCount > 0 && (
-              <span
-                className="text-sm px-2 py-1 rounded-full"
-                style={{
-                  backgroundColor: spoolbearTheme.colors.accent,
-                  color: "white",
-                }}
-              >
+              <span className="w-5 h-5 rounded-full bg-[#FF5000] text-[9px] font-black text-white flex items-center justify-center">
                 {activeFilterCount}
               </span>
             )}
           </button>
         </div>
 
+        {/* Active filter chips */}
         {activeFilterCount > 0 && (
           <div
-            className="mb-6 p-4 bg-white/80 backdrop-blur-sm rounded-2xl border flex flex-wrap items-center gap-3"
-            style={{ borderColor: `${spoolbearTheme.colors.accent}20` }}
+            className="mb-5 flex flex-wrap items-center gap-2"
+            style={{ animation: "filterSectionIn 0.2s ease-out both" }}
           >
-            <span
-              className="text-sm font-medium"
-              style={{ color: spoolbearTheme.colors.text }}
-            >
-              Active Filters:
+            <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
+              Active:
             </span>
-            {activeFilters.map((filter) => (
-              <span
-                key={filter.key}
-                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm"
+            {activeFilters.map((f) => (
+              <button
+                key={f.key}
+                onClick={() => clearFilter(f.key)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-150 hover:scale-[1.03]"
                 style={{
-                  backgroundColor: `${spoolbearTheme.colors.accent}10`,
-                  color: spoolbearTheme.colors.text,
+                  background: "rgba(255,80,0,0.10)",
+                  color: "#FF5000",
+                  border: "1.5px solid rgba(255,80,0,0.25)",
                 }}
               >
-                <span
-                  className="font-medium"
-                  style={{ color: spoolbearTheme.colors.accent }}
-                >
-                  {filter.label}:
-                </span>
-                {filter.value}
-                <button
-                  onClick={() => clearFilter(filter.key)}
-                  className="hover:opacity-75 cursor-pointer"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
+                <span className="font-black">{f.label}:</span>
+                {f.value}
+                <X size={11} />
+              </button>
             ))}
             <button
               onClick={clearAllFilters}
-              className="text-sm ml-auto hover:underline cursor-pointer"
-              style={{ color: spoolbearTheme.colors.accent }}
+              className="text-xs font-bold text-gray-400 hover:text-[#FF5000] transition-colors ml-1"
             >
-              Clear All
+              Clear all
             </button>
           </div>
         )}
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Filters Sidebar - Keep as is or extract to separate component */}
+        <div className="flex gap-6 lg:gap-8">
+          {/* Desktop sidebar */}
           <div
-            className={`
-            lg:w-80 flex-shrink-0
-            ${
-              showMobileFilters
-                ? "fixed inset-0 z-50 bg-[#e4e7ec] overflow-auto"
-                : "hidden lg:block"
-            }
-          `}
+            className="hidden lg:block flex-shrink-0"
+            style={{ width: "clamp(220px, 22vw, 280px)" }}
           >
-            {showMobileFilters && (
-              <div
-                className="sticky top-0 z-10 p-4 border-b bg-[#e4e7ec]"
-                style={{ borderColor: `${spoolbearTheme.colors.accent}20` }}
-              >
-                <div className="flex items-center justify-between">
-                  <h2
-                    className="text-xl font-bold"
-                    style={{ color: spoolbearTheme.colors.text }}
-                  >
-                    Filters
-                  </h2>
-                  <button
-                    onClick={() => setShowMobileFilters(false)}
-                    className="p-2 rounded-lg cursor-pointer"
-                    style={{ color: spoolbearTheme.colors.muted }}
-                  >
-                    <X className="w-6 h-6" />
-                  </button>
-                </div>
-              </div>
-            )}
-
-            <div className="p-4 lg:p-0">
-              <div
-                className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border"
-                style={{ borderColor: `${spoolbearTheme.colors.accent}20` }}
-              >
-                <div
-                  className="flex items-center justify-between mb-6 pb-4 border-b"
-                  style={{ borderColor: `${spoolbearTheme.colors.accent}20` }}
-                >
-                  <div className="flex items-center gap-2">
-                    <Filter
-                      className="w-5 h-5"
-                      style={{ color: spoolbearTheme.colors.accent }}
-                    />
-                    <h2
-                      className="text-xl font-bold"
-                      style={{ color: spoolbearTheme.colors.text }}
-                    >
-                      Filters
-                    </h2>
-                  </div>
-                  {activeFilterCount > 0 && (
-                    <button
-                      onClick={clearAllFilters}
-                      className="text-sm px-3 py-1 rounded-lg transition-colors cursor-pointer"
-                      style={{ color: spoolbearTheme.colors.accent }}
-                    >
-                      Clear All
-                    </button>
-                  )}
-                </div>
-
-                {/* Search */}
-                <div className="mb-6">
-                  <div className="relative">
-                    <Search
-                      className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4"
-                      style={{ color: spoolbearTheme.colors.muted }}
-                    />
-                    <input
-                      type="text"
-                      value={filters.name || ""}
-                      onChange={(e) =>
-                        handleFilterChange("name", e.target.value)
-                      }
-                      placeholder="Search products..."
-                      className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#ff5000] focus:border-transparent"
-                      style={{
-                        borderColor: `${spoolbearTheme.colors.muted}30`,
-                        color: spoolbearTheme.colors.text,
-                      }}
-                    />
-                  </div>
-                </div>
-
-                {/* Categories */}
-                {filterOptions.categories.length > 0 && (
-                  <div
-                    className="mb-4 border-b pb-4"
-                    style={{ borderColor: `${spoolbearTheme.colors.accent}20` }}
-                  >
-                    <button
-                      onClick={() => toggleSection("categories")}
-                      className="flex items-center justify-between w-full mb-3 cursor-pointer"
-                    >
-                      <span
-                        className="font-semibold flex items-center gap-2"
-                        style={{ color: spoolbearTheme.colors.text }}
-                      >
-                        <Tag
-                          className="w-4 h-4"
-                          style={{ color: spoolbearTheme.colors.accent }}
-                        />
-                        Categories
-                      </span>
-                      {expandedSections.categories ? (
-                        <ChevronUp
-                          className="w-4 h-4"
-                          style={{ color: spoolbearTheme.colors.muted }}
-                        />
-                      ) : (
-                        <ChevronDown
-                          className="w-4 h-4"
-                          style={{ color: spoolbearTheme.colors.muted }}
-                        />
-                      )}
-                    </button>
-                    {expandedSections.categories && (
-                      <div className="space-y-2 max-h-64 overflow-y-auto">
-                        {filterOptions.categories.map((category) => (
-                          <button
-                            key={category.id}
-                            onClick={() =>
-                              handleFilterChange(
-                                "categoryId",
-                                filters.categoryId === category.id
-                                  ? undefined
-                                  : category.id,
-                              )
-                            }
-                            className="flex items-center justify-between w-full px-2 py-1.5 rounded-lg transition-colors cursor-pointer"
-                            style={{
-                              backgroundColor:
-                                filters.categoryId === category.id
-                                  ? `${spoolbearTheme.colors.accent}15`
-                                  : "transparent",
-                              color: spoolbearTheme.colors.text,
-                            }}
-                          >
-                            <span>{category.name}</span>
-                            <span
-                              className="text-sm"
-                              style={{ color: spoolbearTheme.colors.muted }}
-                            >
-                              ({category.count})
-                            </span>
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Types */}
-                {filterOptions.types.length > 0 && (
-                  <div
-                    className="mb-4 border-b pb-4"
-                    style={{ borderColor: `${spoolbearTheme.colors.accent}20` }}
-                  >
-                    <button
-                      onClick={() => toggleSection("types")}
-                      className="flex items-center justify-between w-full mb-3 cursor-pointer"
-                    >
-                      <span
-                        className="font-semibold flex items-center gap-2"
-                        style={{ color: spoolbearTheme.colors.text }}
-                      >
-                        <Layers
-                          className="w-4 h-4"
-                          style={{ color: spoolbearTheme.colors.accent }}
-                        />
-                        Types
-                      </span>
-                      {expandedSections.types ? (
-                        <ChevronUp
-                          className="w-4 h-4"
-                          style={{ color: spoolbearTheme.colors.muted }}
-                        />
-                      ) : (
-                        <ChevronDown
-                          className="w-4 h-4"
-                          style={{ color: spoolbearTheme.colors.muted }}
-                        />
-                      )}
-                    </button>
-                    {expandedSections.types && (
-                      <div className="space-y-2 max-h-64 overflow-y-auto">
-                        {filterOptions.types
-                          .filter(
-                            (t) =>
-                              !filters.categoryId ||
-                              t.categoryId === filters.categoryId,
-                          )
-                          .map((type) => (
-                            <button
-                              key={type.id}
-                              onClick={() =>
-                                handleFilterChange(
-                                  "typeId",
-                                  filters.typeId === type.id
-                                    ? undefined
-                                    : type.id,
-                                )
-                              }
-                              className="flex items-center justify-between w-full px-2 py-1.5 rounded-lg transition-colors cursor-pointer"
-                              style={{
-                                backgroundColor:
-                                  filters.typeId === type.id
-                                    ? `${spoolbearTheme.colors.accent}15`
-                                    : "transparent",
-                                color: spoolbearTheme.colors.text,
-                              }}
-                            >
-                              <span>{type.name}</span>
-                              <span
-                                className="text-sm"
-                                style={{ color: spoolbearTheme.colors.muted }}
-                              >
-                                ({type.count})
-                              </span>
-                            </button>
-                          ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Materials */}
-                {filterOptions.materials.length > 0 && (
-                  <div
-                    className="mb-4 border-b pb-4"
-                    style={{ borderColor: `${spoolbearTheme.colors.accent}20` }}
-                  >
-                    <button
-                      onClick={() => toggleSection("materials")}
-                      className="flex items-center justify-between w-full mb-3 cursor-pointer"
-                    >
-                      <span
-                        className="font-semibold flex items-center gap-2"
-                        style={{ color: spoolbearTheme.colors.text }}
-                      >
-                        <Box
-                          className="w-4 h-4"
-                          style={{ color: spoolbearTheme.colors.accent }}
-                        />
-                        Materials
-                      </span>
-                      {expandedSections.materials ? (
-                        <ChevronUp
-                          className="w-4 h-4"
-                          style={{ color: spoolbearTheme.colors.muted }}
-                        />
-                      ) : (
-                        <ChevronDown
-                          className="w-4 h-4"
-                          style={{ color: spoolbearTheme.colors.muted }}
-                        />
-                      )}
-                    </button>
-                    {expandedSections.materials && (
-                      <div className="space-y-2 max-h-64 overflow-y-auto">
-                        {filterOptions.materials
-                          .filter(
-                            (m) =>
-                              !filters.typeId || m.typeId === filters.typeId,
-                          )
-                          .map((material) => (
-                            <button
-                              key={material.id}
-                              onClick={() =>
-                                handleFilterChange(
-                                  "materialId",
-                                  filters.materialId === material.id
-                                    ? undefined
-                                    : material.id,
-                                )
-                              }
-                              className="flex items-center justify-between w-full px-2 py-1.5 rounded-lg cursor-pointer transition-colors"
-                              style={{
-                                backgroundColor:
-                                  filters.materialId === material.id
-                                    ? `${spoolbearTheme.colors.accent}15`
-                                    : "transparent",
-                                color: spoolbearTheme.colors.text,
-                              }}
-                            >
-                              <span>{material.name}</span>
-                              <span
-                                className="text-sm"
-                                style={{ color: spoolbearTheme.colors.muted }}
-                              >
-                                ({material.count})
-                              </span>
-                            </button>
-                          ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Price Range */}
-                <div
-                  className="mb-4 border-b pb-4"
-                  style={{ borderColor: `${spoolbearTheme.colors.accent}20` }}
-                >
-                  <button
-                    onClick={() => toggleSection("price")}
-                    className="flex items-center justify-between w-full mb-3 cursor-pointer"
-                  >
-                    <span
-                      className="font-semibold flex items-center gap-2"
-                      style={{ color: spoolbearTheme.colors.text }}
-                    >
-                      <DollarSign
-                        className="w-4 h-4"
-                        style={{ color: spoolbearTheme.colors.accent }}
-                      />
-                      Price Range
-                    </span>
-                    {expandedSections.price ? (
-                      <ChevronUp
-                        className="w-4 h-4"
-                        style={{ color: spoolbearTheme.colors.muted }}
-                      />
-                    ) : (
-                      <ChevronDown
-                        className="w-4 h-4"
-                        style={{ color: spoolbearTheme.colors.muted }}
-                      />
-                    )}
-                  </button>
-                  {expandedSections.price && (
-                    <div className="space-y-4">
-                      <div className="flex gap-2">
-                        <input
-                          type="number"
-                          value={filters.minPrice || ""}
-                          onChange={(e) =>
-                            handleFilterChange(
-                              "minPrice",
-                              e.target.value
-                                ? parseInt(e.target.value)
-                                : undefined,
-                            )
-                          }
-                          placeholder={`Min $${filterOptions.priceRange.min}`}
-                          className="w-1/2 px-3 py-2 border rounded-lg"
-                          style={{
-                            borderColor: `${spoolbearTheme.colors.muted}30`,
-                            color: spoolbearTheme.colors.text,
-                          }}
-                        />
-                        <input
-                          type="number"
-                          value={filters.maxPrice || ""}
-                          onChange={(e) =>
-                            handleFilterChange(
-                              "maxPrice",
-                              e.target.value
-                                ? parseInt(e.target.value)
-                                : undefined,
-                            )
-                          }
-                          placeholder={`Max $${filterOptions.priceRange.max}`}
-                          className="w-1/2 px-3 py-2 border rounded-lg"
-                          style={{
-                            borderColor: `${spoolbearTheme.colors.muted}30`,
-                            color: spoolbearTheme.colors.text,
-                          }}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* In Stock Only */}
-                <div className="mb-4">
-                  <label className="flex items-center gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={filters.inStock || false}
-                      onChange={(e) =>
-                        handleFilterChange("inStock", e.target.checked)
-                      }
-                      className="w-4 h-4 rounded"
-                      style={{ accentColor: spoolbearTheme.colors.accent }}
-                    />
-                    <span style={{ color: spoolbearTheme.colors.text }}>
-                      In Stock Only
-                    </span>
-                  </label>
-                </div>
-
-                {showMobileFilters && (
-                  <button
-                    onClick={() => setShowMobileFilters(false)}
-                    className="w-full mt-6 py-3 text-white rounded-lg font-medium cursor-pointer"
-                    style={{ backgroundColor: spoolbearTheme.colors.accent }}
-                  >
-                    Apply Filters
-                  </button>
-                )}
-              </div>
-            </div>
+            <div className="sticky top-6">{FilterSidebar}</div>
           </div>
 
-          {/* Products Grid */}
-          <div className="flex-1">
+          {/* Products area */}
+          <div className="flex-1 min-w-0">
             <ProductToolbar
               totalProducts={filteredProducts.length}
               viewMode={viewMode}
               onViewModeChange={setViewMode}
               sortBy={filters.sortBy}
-              onSortChange={(value) =>
-                handleFilterChange("sortBy", value as any)
+              onSortChange={(v) =>
+                handleFilterChange("sortBy", v as FilterState["sortBy"])
               }
             />
 
-            {loading && (
-              <div className="flex justify-center py-12">
-                <Loader2
-                  className="w-8 h-8 animate-spin"
-                  style={{ color: spoolbearTheme.colors.accent }}
-                />
+            {loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {[...Array(6)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="bg-white rounded-2xl overflow-hidden border border-gray-100"
+                    style={{ animationDelay: `${i * 60}ms` }}
+                  >
+                    <div className="aspect-[4/3] bg-gray-100 animate-pulse" />
+                    <div className="p-4 space-y-2">
+                      <div className="h-3 w-16 bg-gray-100 rounded animate-pulse" />
+                      <div className="h-4 w-3/4 bg-gray-100 rounded animate-pulse" />
+                      <div className="h-3 w-full bg-gray-100 rounded animate-pulse" />
+                      <div className="h-3 w-2/3 bg-gray-100 rounded animate-pulse" />
+                      <div className="flex justify-between items-center pt-2">
+                        <div className="h-5 w-16 bg-orange-100 rounded animate-pulse" />
+                        <div className="h-8 w-20 bg-orange-100 rounded-xl animate-pulse" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
-            )}
-
-            {!loading && filteredProducts.length === 0 ? (
+            ) : filteredProducts.length === 0 ? (
               <EmptyState onClearFilters={clearAllFilters} />
             ) : (
-              !loading && (
-                <>
-                  {viewMode === "grid" ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {paginatedProducts.map((product) => (
+              <>
+                {viewMode === "grid" ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
+                    {paginatedProducts.map((product, i) => (
+                      <div
+                        key={product.productId}
+                        style={{
+                          opacity: cardsVisible ? 1 : 0,
+                          transform: cardsVisible ? "none" : "translateY(16px)",
+                          transition: `opacity 0.4s ${i * 45}ms ease-out, transform 0.4s ${i * 45}ms ease-out`,
+                        }}
+                      >
                         <ProductCard
-                          key={product.productId}
                           product={product}
                           formatPrice={formatPrice}
                           getProductImage={getProductImage}
@@ -1198,13 +1008,23 @@ const ProductsPage = () => {
                             togglingWishlist === product.productId
                           }
                         />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {paginatedProducts.map((product) => (
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {paginatedProducts.map((product, i) => (
+                      <div
+                        key={product.productId}
+                        style={{
+                          opacity: cardsVisible ? 1 : 0,
+                          transform: cardsVisible
+                            ? "none"
+                            : "translateX(-12px)",
+                          transition: `opacity 0.4s ${i * 40}ms ease-out, transform 0.4s ${i * 40}ms ease-out`,
+                        }}
+                      >
                         <ProductListItem
-                          key={product.productId}
                           product={product}
                           formatPrice={formatPrice}
                           getProductImage={getProductImage}
@@ -1215,21 +1035,42 @@ const ProductsPage = () => {
                             togglingWishlist === product.productId
                           }
                         />
-                      ))}
-                    </div>
-                  )}
+                      </div>
+                    ))}
+                  </div>
+                )}
 
-                  <ProductPagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={setCurrentPage}
-                  />
-                </>
-              )
+                <ProductPagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                />
+              </>
             )}
           </div>
         </div>
       </div>
+
+      <style jsx global>{`
+        @keyframes filterSectionIn {
+          from {
+            opacity: 0;
+            transform: translateY(8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes slideInRight {
+          from {
+            transform: translateX(100%);
+          }
+          to {
+            transform: translateX(0);
+          }
+        }
+      `}</style>
     </div>
   );
 };

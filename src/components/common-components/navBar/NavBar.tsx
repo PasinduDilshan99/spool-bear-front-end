@@ -9,6 +9,7 @@ import MobileNav from "./MobileNav";
 import ScrolledDesktopNav from "./ScrolledDesktopNav";
 import ScrolledMobileNav from "./ScrolledMobileNav";
 import { NavBarService } from "@/service/navBarService";
+import NavBarSkeleton from "./NavBarSkeleton";
 
 const NavBar = () => {
   const [loading, setLoading] = useState(true);
@@ -95,12 +96,8 @@ const NavBar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [isScrolled]);
 
-  if (loading || authLoading)
-    return (
-      <div className="bg-gradient-to-br from-slate-900 via-gray-900 to-teal-950  ">
-        {/* <BasicLoading width="w-full" height="h-16" /> */}
-      </div>
-    );
+  if (loading || authLoading) return <NavBarSkeleton />;
+
   if (error) return null;
 
   const visibleNavBarItems = navBarData.filter(
@@ -137,7 +134,7 @@ const NavBar = () => {
           borderColor: "rgba(14, 165, 233, 0.2)",
         }}
       >
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-360 mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             {/* Desktop Navigation */}
             <DesktopNav
@@ -209,7 +206,7 @@ const NavBar = () => {
           borderColor: "rgba(14, 165, 233, 0.3)",
         }}
       >
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-360 mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             {/* Scrolled Desktop Navigation */}
             <ScrolledDesktopNav

@@ -24,7 +24,7 @@ const NoDesignSection: React.FC<NoDesignSectionProps> = ({
     "You'll be able to review the design before we move forward with printing.",
   ],
   closingLine = "You bring the idea — we handle the design and printing.",
-  imagePath = "/images/3D_Printer(Home).png",
+  imagePath = "https://res.cloudinary.com/dkfonkmwr/image/upload/v1774766973/xx8944nyn602dmyxcy4b.png",
 }) => {
   const sectionRef = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);

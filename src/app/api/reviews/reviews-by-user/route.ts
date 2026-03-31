@@ -1,11 +1,11 @@
-import { GET_USER_REVIEWS_DATA } from "@/utils/backEndConstant";
+import { GET_ALL_REVIEWS_DATA } from "@/utils/backEndConstant";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   try {
     const cookie = request.headers.get("cookie");
 
-    const response = await fetch(GET_USER_REVIEWS_DATA, {
+    const response = await fetch(GET_ALL_REVIEWS_DATA, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

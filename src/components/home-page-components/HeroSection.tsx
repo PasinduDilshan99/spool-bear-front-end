@@ -9,6 +9,7 @@ import {
   NUMBER_OF_MODELS,
   SHIPS_IN,
 } from "@/utils/constant";
+import HeroSectionSkeleton from "./loadings/HeroSectionSkeleton";
 
 interface HeroSectionProps {
   title?: string;

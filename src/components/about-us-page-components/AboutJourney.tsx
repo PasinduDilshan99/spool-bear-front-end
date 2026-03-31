@@ -4,6 +4,7 @@ import React from "react";
 import { Quote } from "lucide-react";
 import { useScrollReveal } from "./aboutUtils";
 import Image from "next/image";
+import { COMPANY_OWNER } from "@/utils/constant";
 
 const milestones = [
   {
@@ -184,7 +185,7 @@ const AboutJourney: React.FC = () => {
                 className="font-black uppercase tracking-[0.10em] text-[#FF5000]"
                 style={{ fontSize: "clamp(9px, 0.9vw, 11px)" }}
               >
-                — Sarah Johnson, Founder
+                — {COMPANY_OWNER}, Founder
               </p>
             </div>
           </div>

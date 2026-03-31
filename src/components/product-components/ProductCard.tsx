@@ -1,14 +1,21 @@
-// components/products/ProductCard.tsx
+// components/product-components/ProductCard.tsx
 "use client";
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Heart, ShoppingCart, Eye, Loader2, Box, Palette } from "lucide-react";
+import Image from "next/image";
+import {
+  Heart,
+  ShoppingCart,
+  Eye,
+  Loader2,
+  Box,
+  Palette,
+  CheckCircle,
+} from "lucide-react";
 import { Product } from "@/types/product-types";
 import { PLACE_HOLDER_IMAGE } from "@/utils/constant";
-import { spoolbearTheme } from "@/theme/spoolbear-theme";
 import { SHOP_PAGE_PATH } from "@/utils/urls";
-import Image from "next/image";
 
 interface ProductCardProps {
   product: Product;
@@ -21,15 +28,13 @@ interface ProductCardProps {
 }
 
 const parseColorCode = (colorStr: string): string => {
-  if (colorStr.includes("|")) {
-    return colorStr.split("|")[1];
-  }
-  const defaultCodes: { [key: string]: string } = {
+  if (colorStr.includes("|")) return colorStr.split("|")[1].trim();
+  const defaults: Record<string, string> = {
     Red: "#FF0000",
     Blue: "#0000FF",
     Green: "#00FF00",
     Black: "#000000",
-    White: "#FFFFFF",
+    White: "#F5F5F5",
     Yellow: "#FFFF00",
     Purple: "#800080",
     Orange: "#FFA500",
@@ -37,15 +42,11 @@ const parseColorCode = (colorStr: string): string => {
     Gray: "#808080",
     Brown: "#A52A2A",
   };
-  return defaultCodes[colorStr] || "#000000";
+  return defaults[colorStr] || "#888";
 };
 
-const parseColorName = (colorStr: string): string => {
-  if (colorStr.includes("|")) {
-    return colorStr.split("|")[0];
-  }
-  return colorStr;
-};
+const parseColorName = (colorStr: string): string =>
+  colorStr.includes("|") ? colorStr.split("|")[0].trim() : colorStr;
 
 export const ProductCard: React.FC<ProductCardProps> = ({
   product,
@@ -56,182 +57,193 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   isAddingToCart,
   isTogglingWishlist,
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
+  const [imgError, setImgError] = useState(false);
+  const inStock = product.stockQuantity > 0;
+
   return (
-    <div
-      className="group bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden border hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 cursor-pointer"
-      style={{ borderColor: `${spoolbearTheme.colors.accent}20` }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <div className="relative h-64 overflow-hidden">
+    <div className="group relative bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-orange-200 hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col">
+      {/* ── Image ── */}
+      <div
+        className="relative overflow-hidden bg-gray-100"
+        style={{ aspectRatio: "4/3" }}
+      >
         <Image
-          src={getProductImage(product)}
+          src={imgError ? PLACE_HOLDER_IMAGE : getProductImage(product)}
           alt={product.productName}
-          className={`w-full h-full object-cover transition-transform duration-700 ${
-            isHovered ? "scale-110" : "scale-100"
-          }`}
-          width={2000}
-          height={2000}
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = PLACE_HOLDER_IMAGE;
-          }}
+          fill
+          className="object-cover transition-transform duration-500 group-hover:scale-108"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          onError={() => setImgError(true)}
         />
 
-        <div
-          className={`absolute inset-0 bg-gradient-to-t from-[#101113]/80 via-transparent to-transparent transition-opacity duration-500 ${
-            isHovered ? "opacity-100" : "opacity-0"
-          }`}
-        />
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-        <div className="absolute top-4 left-4">
+        {/* Orange corner tag */}
+        <div className="absolute top-0 left-0 w-0 h-0 border-l-[48px] border-l-[#FF5000] border-b-[48px] border-b-transparent" />
+
+        {/* Category label */}
+        <div className="absolute top-1 left-1.5">
           <span
-            className="px-3 py-1 text-white text-xs font-semibold rounded-full shadow-lg"
-            style={{ backgroundColor: spoolbearTheme.colors.accent }}
+            className="text-[9px] font-black text-white uppercase tracking-wider"
+            style={{ textShadow: "0 1px 2px rgba(0,0,0,0.6)" }}
           >
             {product.categoryName}
           </span>
         </div>
 
+        {/* Stock badge */}
+        <div className="absolute top-3 right-3">
+          <span
+            className="flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold text-white"
+            style={{
+              background: inStock
+                ? "rgba(34,197,94,0.85)"
+                : "rgba(107,114,128,0.85)",
+              backdropFilter: "blur(4px)",
+            }}
+          >
+            <span
+              className="w-1.5 h-1.5 rounded-full"
+              style={{ background: inStock ? "#fff" : "#ddd" }}
+            />
+            {inStock ? "In Stock" : "Out of Stock"}
+          </span>
+        </div>
+
+        {/* Wishlist button */}
         <button
           onClick={(e) => {
             e.stopPropagation();
             onWishlistToggle(product);
           }}
           disabled={isTogglingWishlist}
-          className="absolute cursor-pointer top-4 right-4 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg transition-all duration-200 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{
-            color: product.isWish ? "#ff0000" : spoolbearTheme.colors.muted,
-          }}
+          className="absolute bottom-3 right-3 w-9 h-9 rounded-full flex items-center justify-center bg-white shadow-md transition-all duration-200 hover:scale-110 disabled:opacity-50 opacity-0 group-hover:opacity-100"
+          style={{ color: product.isWish ? "#FF5000" : "#9ca3af" }}
         >
           {isTogglingWishlist ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
+            <Loader2 size={15} className="animate-spin" />
           ) : (
             <Heart
-              className="w-4 h-4"
-              fill={product.isWish ? "#ff0000" : "none"}
+              size={15}
+              fill={product.isWish ? "#FF5000" : "none"}
+              stroke={product.isWish ? "#FF5000" : "currentColor"}
             />
           )}
         </button>
 
-        <div className="absolute top-4 right-16">
-          <span
-            className={`px-3 py-1 text-xs font-semibold rounded-full shadow-lg ${
-              product.stockQuantity > 0
-                ? "bg-green-500 text-white"
-                : "bg-gray-500 text-white"
-            }`}
+        {/* Quick action bar */}
+        <div className="absolute bottom-3 left-3 flex gap-2 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+          <Link
+            href={`${SHOP_PAGE_PATH}/${product.productId}`}
+            onClick={(e) => e.stopPropagation()}
           >
-            {product.stockQuantity > 0 ? "In Stock" : "Out of Stock"}
-          </span>
-        </div>
-
-        <div
-          className={`absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 transition-all duration-500 ${
-            isHovered ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
-          }`}
-        >
-          <Link href={`${SHOP_PAGE_PATH}/${product.productId}`}>
-            <button
-              className="cursor-pointer w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-[#ff5000] hover:text-white transition-colors shadow-lg"
-              style={{ color: spoolbearTheme.colors.text }}
-            >
-              <Eye className="w-5 h-5" />
-            </button>
+            <div className="w-9 h-9 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-[#FF5000] hover:text-white transition-colors duration-200 text-gray-700">
+              <Eye size={15} />
+            </div>
           </Link>
           <button
-            onClick={() => onAddToCart(product)}
-            disabled={isAddingToCart || product.stockQuantity === 0}
-            className="cursor-pointer w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-[#ff5000] hover:text-white transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{ color: spoolbearTheme.colors.text }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onAddToCart(product);
+            }}
+            disabled={isAddingToCart || !inStock}
+            className="w-9 h-9 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-[#FF5000] hover:text-white transition-colors duration-200 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isAddingToCart ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <Loader2 size={15} className="animate-spin" />
             ) : (
-              <ShoppingCart className="w-5 h-5" />
+              <ShoppingCart size={15} />
             )}
           </button>
         </div>
       </div>
 
-      <div className="p-6">
-        <Link href={`${SHOP_PAGE_PATH}/${product.productId}`} className="block">
+      {/* ── Info ── */}
+      <div className="flex flex-col flex-1 p-4 sm:p-5">
+        {/* Type + material */}
+        <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-[#FF5000]">
+            {product.typeName}
+          </span>
+          {product.materialName && (
+            <>
+              <span className="text-gray-300">·</span>
+              <span className="text-[10px] font-medium text-gray-400 flex items-center gap-1">
+                <Box size={10} />
+                {product.materialName}
+              </span>
+            </>
+          )}
+        </div>
+
+        {/* Name */}
+        <Link href={`${SHOP_PAGE_PATH}/${product.productId}`}>
           <h3
-            className="text-xl font-bold mb-2 hover:text-[#ff5000] transition-colors line-clamp-1"
-            style={{ color: spoolbearTheme.colors.text }}
+            className="font-black text-[#101113] leading-snug mb-1.5 line-clamp-2 hover:text-[#FF5000] transition-colors duration-200"
+            style={{ fontSize: "clamp(14px, 1.5vw, 16px)" }}
           >
             {product.productName}
           </h3>
         </Link>
-        <p
-          className="text-sm mb-4 line-clamp-2"
-          style={{ color: spoolbearTheme.colors.muted }}
-        >
+
+        {/* Description */}
+        <p className="text-xs text-gray-500 line-clamp-2 mb-3 leading-relaxed flex-1">
           {product.productDescription}
         </p>
 
-        <div className="flex items-center justify-between">
-          <div>
-            <span
-              className="text-2xl font-black"
-              style={{ color: spoolbearTheme.colors.accent }}
-            >
-              {formatPrice(product.price)}
-            </span>
-          </div>
-          <button
-            onClick={() => onAddToCart(product)}
-            disabled={isAddingToCart || product.stockQuantity === 0}
-            className="cursor-pointer px-4 py-2 bg-[#ff5000] text-white rounded-lg hover:bg-[#e64800] transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isAddingToCart ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <ShoppingCart className="w-4 h-4" />
-            )}
-            {isAddingToCart ? "Adding..." : "Add to Cart"}
-          </button>
-        </div>
-
-        {product.colors && product.colors.length > 0 && (
-          <div
-            className="mt-4 pt-4 border-t flex items-center gap-2"
-            style={{ borderColor: `${spoolbearTheme.colors.accent}20` }}
-          >
-            <Palette
-              className="w-4 h-4"
-              style={{ color: spoolbearTheme.colors.accent }}
-            />
-            <div className="flex gap-1.5">
-              {product.colors.slice(0, 3).map((colorStr, index) => (
+        {/* Colors */}
+        {product.colors?.length > 0 && (
+          <div className="flex items-center gap-1.5 mb-3">
+            <Palette size={11} className="text-[#FF5000] flex-shrink-0" />
+            <div className="flex gap-1.5 flex-wrap">
+              {product.colors.slice(0, 5).map((c, i) => (
                 <div
-                  key={index}
-                  className="w-4 h-4 rounded-full border border-gray-300"
-                  style={{ backgroundColor: parseColorCode(colorStr) }}
-                  title={parseColorName(colorStr)}
+                  key={i}
+                  title={parseColorName(c)}
+                  className="w-3.5 h-3.5 rounded-full border border-black/10 hover:scale-125 transition-transform duration-150 cursor-default"
+                  style={{ background: parseColorCode(c) }}
                 />
               ))}
-              {product.colors.length > 3 && (
-                <span
-                  className="text-xs"
-                  style={{ color: spoolbearTheme.colors.muted }}
-                >
-                  +{product.colors.length - 3}
+              {product.colors.length > 5 && (
+                <span className="text-[10px] text-gray-400 font-bold">
+                  +{product.colors.length - 5}
                 </span>
               )}
             </div>
           </div>
         )}
 
-        {product.materialName && (
-          <div
-            className="mt-2 flex items-center gap-2"
-            style={{ color: spoolbearTheme.colors.muted }}
+        {/* Price + CTA */}
+        <div className="flex items-center justify-between gap-2 mt-auto pt-3 border-t border-gray-100">
+          <span
+            className="font-black text-[#FF5000]"
+            style={{ fontSize: "clamp(16px, 2vw, 20px)" }}
           >
-            <Box className="w-3 h-3" />
-            <span className="text-xs">{product.materialName}</span>
-          </div>
-        )}
+            {formatPrice(product.price)}
+          </span>
+          <button
+            onClick={() => onAddToCart(product)}
+            disabled={isAddingToCart || !inStock}
+            className="flex items-center gap-1.5 font-bold text-white transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-40 disabled:cursor-not-allowed disabled:translate-y-0"
+            style={{
+              fontSize: "clamp(10px, 1.1vw, 12px)",
+              padding: "clamp(7px, 0.9vw, 9px) clamp(10px, 1.4vw, 16px)",
+              background: inStock
+                ? "linear-gradient(145deg, #FF5000, #e34800)"
+                : "#ccc",
+              borderRadius: "clamp(8px, 1vw, 10px)",
+              boxShadow: inStock ? "0 4px 12px rgba(255,80,0,0.3)" : "none",
+            }}
+          >
+            {isAddingToCart ? (
+              <Loader2 size={12} className="animate-spin" />
+            ) : (
+              <ShoppingCart size={12} />
+            )}
+            {isAddingToCart ? "Adding…" : "Add"}
+          </button>
+        </div>
       </div>
     </div>
   );

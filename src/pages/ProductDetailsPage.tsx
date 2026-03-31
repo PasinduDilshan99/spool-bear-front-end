@@ -11,6 +11,7 @@ import { ImageGallery } from "@/components/product-details-page-components/Image
 import { NotFoundState } from "@/components/product-details-page-components/NotFoundState";
 import { ErrorState } from "@/components/product-details-page-components/ErrorState";
 import { ProductDetailsSkeleton } from "@/components/product-details-page-components/ProductDetailsSkeleton";
+import { ProductReviews } from "@/components/product-details-page-components/ProductReviews"; // Import the new component
 
 const ProductDetailsPage = () => {
   const params = useParams();
@@ -113,6 +114,9 @@ const ProductDetailsPage = () => {
             onWishlistToggle={() => setIsWished((w) => !w)}
           />
         </div>
+
+        {/* ── REVIEWS SECTION ── */}
+        <ProductReviews productId={Number(productId)} />
       </div>
     </div>
   );

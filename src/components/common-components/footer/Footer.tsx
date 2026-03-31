@@ -1,14 +1,38 @@
 // Footer.tsx
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { FooterProps } from "@/types/footer-types";
 import { footerData as defaultFooterData } from "@/data/footer-data";
 import SmoothScrollLink from "./SmoothScrollLink";
+import FooterSkeleton, { ResponsiveFooterSkeleton } from "./FooterSkeleton";
 
-const Footer: React.FC<FooterProps> = ({
+interface FooterWithLoadingProps extends FooterProps {
+  loading?: boolean;
+  minLoadTime?: number;
+}
+
+const Footer: React.FC<FooterWithLoadingProps> = ({
   data = defaultFooterData,
   className = "",
+  loading = false,
+  minLoadTime = 2000,
 }) => {
+  const [showContent, setShowContent] = useState(false);
+
+  useEffect(() => {
+    if (!loading) {
+      const timer = setTimeout(() => {
+        setShowContent(true);
+      }, minLoadTime);
+
+      return () => clearTimeout(timer);
+    }
+  }, [loading, minLoadTime]);
+
+  if (loading || !showContent) {
+    return <ResponsiveFooterSkeleton />;
+  }
+
   return (
     <footer
       className={`relative py-20 ${className}`}
@@ -22,7 +46,6 @@ const Footer: React.FC<FooterProps> = ({
         position: "relative" as const,
       }}
     >
-      {/* Optional background image overlay */}
       {data.backgroundImage && (
         <div
           className="absolute inset-0 opacity-10"
@@ -43,7 +66,7 @@ const Footer: React.FC<FooterProps> = ({
           {data.columns.map(({ title, links, class: columnClass }) => (
             <div key={title} className={columnClass || ""}>
               <p
-                className="mb-5 text-xs font-black uppercase tracking-[0.10em]"
+                className="mb-5 text-xs font-black uppercase tracking-widest"
                 style={{ color: "#ff5000" }}
               >
                 {title}
@@ -71,7 +94,7 @@ const Footer: React.FC<FooterProps> = ({
 
         <div className="mt-14 flex flex-col items-center gap-4">
           <div
-            className="h-[2px] w-[min(720px,78%)]"
+            className="h-0.5 w-[min(720px,78%)]"
             style={{ background: "rgba(255,255,255,0.14)" }}
           />
           <span

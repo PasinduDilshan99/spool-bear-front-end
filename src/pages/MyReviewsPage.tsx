@@ -13,13 +13,14 @@ import Image from "next/image";
 import { PLACE_HOLDER_IMAGE } from "@/utils/constant";
 import { ReviewService } from "@/service/reviewService";
 
-export default function ReviewsPage() {
+export default function MyReviewsPage() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<
     "all" | "recent" | "top-rated"
   >("all");
+  const [orderTypeFilter, setOrderTypeFilter] = useState<"all" | "PRODUCT" | "PRINTING">("all");
   const [expandedComments, setExpandedComments] = useState<Set<number>>(
     new Set(),
   );
@@ -63,14 +64,18 @@ export default function ReviewsPage() {
   };
 
   const filteredReviews = reviews.filter((review) => {
-    if (activeFilter === "all") return true;
+    // Filter by review type (all/recent/top-rated)
     if (activeFilter === "recent") {
       const reviewDate = new Date(review.reviewCreatedAt);
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-      return reviewDate >= thirtyDaysAgo;
+      if (reviewDate < thirtyDaysAgo) return false;
     }
-    if (activeFilter === "top-rated") return review.rating >= 4;
+    if (activeFilter === "top-rated" && review.rating < 4) return false;
+    
+    // Filter by order type (PRODUCT/PRINTING)
+    if (orderTypeFilter !== "all" && review.orderType !== orderTypeFilter) return false;
+    
     return true;
   });
 
@@ -115,6 +120,28 @@ export default function ReviewsPage() {
         return "💡";
       default:
         return "❤️";
+    }
+  };
+
+  const getOrderTypeIcon = (orderType: string) => {
+    switch (orderType) {
+      case "PRINTING":
+        return "🖨️";
+      case "PRODUCT":
+        return "📦";
+      default:
+        return "📝";
+    }
+  };
+
+  const getOrderTypeLabel = (orderType: string) => {
+    switch (orderType) {
+      case "PRINTING":
+        return "3D Printing Service";
+      case "PRODUCT":
+        return "Product";
+      default:
+        return "Review";
     }
   };
 
@@ -193,7 +220,7 @@ export default function ReviewsPage() {
             My Reviews
           </h1>
           <p className="text-gray-600 mt-2 text-sm md:text-base">
-            Your reviews for 3D printing products and accessories
+            Your reviews for 3D printing products and services
           </p>
         </div>
 
@@ -225,12 +252,12 @@ export default function ReviewsPage() {
                 </div>
               </div>
               <p className="text-sm text-gray-600">
-                Product reviews across your purchase history
+                Product and service reviews across your purchase history
               </p>
             </div>
 
             {/* Filter Buttons */}
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={() => setActiveFilter("all")}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 whitespace-nowrap ${
@@ -264,6 +291,44 @@ export default function ReviewsPage() {
             </div>
           </div>
 
+          {/* Order Type Filter Tabs */}
+          <div className="mb-6">
+            <div className="flex flex-wrap gap-2 border-b border-gray-200">
+              <button
+                onClick={() => setOrderTypeFilter("all")}
+                className={`px-4 py-2 text-sm font-medium transition-all duration-300 ${
+                  orderTypeFilter === "all"
+                    ? "text-[#FF5000] border-b-2 border-[#FF5000]"
+                    : "text-gray-600 hover:text-gray-800"
+                }`}
+              >
+                All Types
+              </button>
+              <button
+                onClick={() => setOrderTypeFilter("PRODUCT")}
+                className={`px-4 py-2 text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
+                  orderTypeFilter === "PRODUCT"
+                    ? "text-[#FF5000] border-b-2 border-[#FF5000]"
+                    : "text-gray-600 hover:text-gray-800"
+                }`}
+              >
+                <span>📦</span>
+                Products
+              </button>
+              <button
+                onClick={() => setOrderTypeFilter("PRINTING")}
+                className={`px-4 py-2 text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
+                  orderTypeFilter === "PRINTING"
+                    ? "text-[#FF5000] border-b-2 border-[#FF5000]"
+                    : "text-gray-600 hover:text-gray-800"
+                }`}
+              >
+                <span>🖨️</span>
+                3D Printing Services
+              </button>
+            </div>
+          </div>
+
           {/* Mobile Stats */}
           <div className="md:hidden flex items-center justify-between bg-white rounded-lg p-3 border border-gray-200 mb-4">
             <div className="flex items-center space-x-2">
@@ -284,6 +349,11 @@ export default function ReviewsPage() {
                 comments
               </span>
             </div>
+            <div className="text-xs text-gray-500">
+              {orderTypeFilter === "all" 
+                ? `${filteredReviews.length} total` 
+                : `${filteredReviews.length} ${orderTypeFilter === "PRODUCT" ? "products" : "services"}`}
+            </div>
           </div>
         </div>
 
@@ -292,14 +362,14 @@ export default function ReviewsPage() {
           <div className="bg-white rounded-xl md:rounded-2xl shadow-lg border border-gray-200 p-6 md:p-8 text-center">
             <div className="text-[#FF5000] text-5xl md:text-6xl mb-4">📝</div>
             <h3 className="text-xl md:text-2xl font-semibold text-gray-800 mb-2">
-              {activeFilter === "all"
-                ? "No Reviews Yet"
-                : "No Reviews Match Filter"}
+              {activeFilter !== "all" || orderTypeFilter !== "all"
+                ? "No Reviews Match Filters"
+                : "No Reviews Yet"}
             </h3>
             <p className="text-gray-600 mb-4 md:mb-6 max-w-md mx-auto">
-              {activeFilter === "all"
-                ? "You haven't reviewed any products yet. Share your 3D printing experiences!"
-                : `No ${activeFilter === "recent" ? "recent" : "top-rated"} reviews found.`}
+              {activeFilter !== "all" || orderTypeFilter !== "all"
+                ? `No ${orderTypeFilter !== "all" ? (orderTypeFilter === "PRODUCT" ? "product" : "printing service") : ""} ${activeFilter === "recent" ? "recent" : activeFilter === "top-rated" ? "top-rated" : ""} reviews found.`
+                : "You haven't reviewed any products or services yet. Share your 3D printing experiences!"}
             </p>
             <button
               onClick={() => router.push("/products")}
@@ -326,12 +396,37 @@ export default function ReviewsPage() {
                             {formatDate(review.reviewCreatedAt)}
                           </span>
                         </div>
-                        <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-1 line-clamp-1">
+                        
+                        {/* Order Type Badge and Name */}
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+                            review.orderType === "PRINTING"
+                              ? "bg-purple-100 text-purple-700 border border-purple-200"
+                              : "bg-blue-100 text-blue-700 border border-blue-200"
+                          }`}>
+                            <span>{getOrderTypeIcon(review.orderType)}</span>
+                            <span>{getOrderTypeLabel(review.orderType)}</span>
+                          </span>
+                          <span className="text-xs text-gray-400">•</span>
+                          <span className="text-xs text-gray-500">
+                            Order #{review.orderId}
+                          </span>
+                        </div>
+                        
+                        <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-1 line-clamp-2">
                           {review.productName}
                         </h3>
-                        <p className="text-sm text-gray-600 mb-2">
-                          Product ID: #{review.productId}
-                        </p>
+                        
+                        {/* Show different info based on order type */}
+                        {review.orderType === "PRINTING" ? (
+                          <p className="text-sm text-gray-500 mb-2">
+                            Custom Printing Request
+                          </p>
+                        ) : (
+                          <p className="text-sm text-gray-500 mb-2">
+                            Product ID: #{review.productId}
+                          </p>
+                        )}
                       </div>
                       <span
                         className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap ${
@@ -460,14 +555,22 @@ export default function ReviewsPage() {
                     {/* Footer Actions */}
                     <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
                       <button
-                        onClick={() =>
-                          router.push(
-                            `/products/${review.productId}?name=${encodeURIComponent(review.productName)}`,
-                          )
-                        }
+                        onClick={() => {
+                          if (review.orderType === "PRINTING") {
+                            router.push(`/printing/${review.orderId}`);
+                          } else {
+                            router.push(
+                              `/products/${review.productId}?name=${encodeURIComponent(review.productName)}`,
+                            );
+                          }
+                        }}
                         className="text-[#FF5000] hover:text-[#ff6b2c] text-sm font-medium flex items-center space-x-1 transition-colors"
                       >
-                        <span>View Product</span>
+                        <span>
+                          {review.orderType === "PRINTING" 
+                            ? "View Printing Order" 
+                            : "View Product"}
+                        </span>
                         <svg
                           className="w-4 h-4"
                           fill="none"

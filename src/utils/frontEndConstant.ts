@@ -81,6 +81,13 @@ export const UPLOAD_FILE_TO_CLOUDINARY_FE = `${API}${OTHERS}/save-images`;
 
 // Reviews
 export const GET_USER_REVIEWS_DATA_FE = `${API}${REVIEWS}/reviews-by-user`;
+export const GET_ALL_REVIEWS_DATA_FE = `${API}${REVIEWS}/all`;
+export const ADD_REVIEW_DATA_FE = `${API}${REVIEWS}/add-review`;
+export const ADD_REVIEW_REACTION_DATA_FE = `${API}${REVIEWS}/add-react`;
+export const ADD_REVIEW_COMMENT_REACTION_DATA_FE = `${API}${REVIEWS}/add-comment-react`;
+export const ADD_REVIEW_COMMENT_DATA_FE = `${API}${REVIEWS}/add-comment`;
+export const GET_REVIEW_BY_REVIEW_ID_DATA_FE = `${API}${REVIEWS}/review-by-id`;
+export const GET_REVIEW_BY_PRODUCT_ID_DATA_FE = `${API}${REVIEWS}/reviews-by-product-id`;
 
 // Orders
 export const GET_ORDERS_DETAILS_BY_USER_ID_DATA_FE = `${API}${ORDERS}/orders-by-user`;
