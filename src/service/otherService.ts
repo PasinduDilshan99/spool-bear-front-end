@@ -33,26 +33,30 @@ export class OtherService {
   }
 
   static async uploadFile(file: File): Promise<UploadFileDataResponse> {
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("upload_preset", "sample_upload_present");
-
-      const response = await fetch(UPLOAD_FILE_TO_CLOUDINARY_FE, {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "spoolbear");
+    
+    const response = await fetch(
+      "https://api.cloudinary.com/v1_1/dkfonkmwr/raw/upload",
+      {
         method: "POST",
         body: formData,
-      });
-
-      if (!response.ok) {
-        const text = await response.text();
-        console.error("Cloudinary API error:", text);
-        throw new Error("Failed to upload file");
       }
+    );
 
-      return response.json();
-    } catch (error) {
-      console.error(error);
-      throw error;
+    if (!response.ok) {
+      const text = await response.text();
+      console.error("Cloudinary API error:", text);
+      throw new Error("Failed to upload file");
     }
+
+    const data: UploadFileDataResponse = await response.json();
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
   }
+}
 }

@@ -20,6 +20,7 @@ export interface Product {
   materialId: number | null;
   materialName: string | null;
   materialDescription: string | null;
+  materialType: string | null;
   categoryId: number;
   categoryName: string;
   colors: string[];

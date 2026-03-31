@@ -27,5 +27,21 @@ export interface UploadImageDataResponse {
 }
 
 export interface UploadFileDataResponse {
-  data: UploadImageData;
+  asset_id: string;
+  public_id: string;
+  version: number;
+  version_id: string;
+  signature: string;
+  resource_type: string; // "raw"
+  created_at: string;
+  tags: string[];
+  bytes: number;
+  type: string; // "upload"
+  etag: string;
+  placeholder: boolean;
+  url: string;        // HTTP URL
+  secure_url: string; // HTTPS URL
+  asset_folder: string;
+  display_name: string;
+  original_filename: string;
 }

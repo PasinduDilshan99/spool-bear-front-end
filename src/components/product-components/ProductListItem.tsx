@@ -82,7 +82,7 @@ export const ProductListItem: React.FC<ProductListItemProps> = ({
               {/* Category + type */}
               <div className="flex items-center gap-1.5 mb-1 flex-wrap">
                 <span className="text-[10px] font-black uppercase tracking-widest text-[#FF5000]">
-                  {product.categoryName}
+                  {product.materialType}
                 </span>
                 {product.typeName && (
                   <>

@@ -27,13 +27,13 @@ const NavBar = () => {
   const getMaxVisibleItems = () => {
     switch (screenSize) {
       case "laptop":
-        return 6;
+        return 5;
       case "desktop":
-        return 8;
+        return 7;
       case "large":
-        return 10;
+        return 9;
       default:
-        return 6;
+        return 4;
     }
   };
 

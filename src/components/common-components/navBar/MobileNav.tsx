@@ -10,6 +10,7 @@ import MobileMenuItem from "./MobileMenuItem";
 import { spoolbearTheme } from "@/theme/spoolbear-theme";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 import { useCart } from "@/context/CartContext";
+import { CurrencySelector } from "../CurrencySelector";
 
 interface MobileNavProps {
   visibleNavBarItems: NavBarItem[];
@@ -56,6 +57,13 @@ const MobileNav: React.FC<MobileNavProps> = ({
           {visibleNavBarItems.map((item) => (
             <MobileMenuItem key={item.id} item={item} onClose={handleClose} />
           ))}
+
+          {/* Currency Selector - Only for logged-in users */}
+          {user && (
+            <div className="px-4 py-3">
+              <CurrencySelector />
+            </div>
+          )}
 
           {/* Cart Link - Only for logged-in users */}
           {user && (

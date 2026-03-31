@@ -19,7 +19,6 @@ interface MaterialFiltersProps {
     >,
     value: string,
   ) => void;
-  onPriceRangeChange: (value: [number, number]) => void;
   onClearFilters: () => void;
 }
 
@@ -28,7 +27,6 @@ export const MaterialFilters: React.FC<MaterialFiltersProps> = ({
   filters,
   materials,
   onFilterChange,
-  onPriceRangeChange,
   onClearFilters,
 }) => {
   return (
@@ -43,7 +41,7 @@ export const MaterialFilters: React.FC<MaterialFiltersProps> = ({
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Strength Filter */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -101,33 +99,6 @@ export const MaterialFilters: React.FC<MaterialFiltersProps> = ({
                 <span className="text-sm text-gray-600">{type}</span>
               </label>
             ))}
-          </div>
-        </div>
-
-        {/* Price Range */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Price Range (per gram)
-          </label>
-          <div className="space-y-3">
-            <input
-              type="range"
-              min={Math.min(...materials.map((m) => m.pricePerGram))}
-              max={Math.max(...materials.map((m) => m.pricePerGram))}
-              step={0.001}
-              value={filters.priceRange[1]}
-              onChange={(e) =>
-                onPriceRangeChange([
-                  filters.priceRange[0],
-                  parseFloat(e.target.value),
-                ])
-              }
-              className="w-full"
-            />
-            <div className="flex justify-between text-sm text-gray-600">
-              <span>${filters.priceRange[0].toFixed(3)}</span>
-              <span>${filters.priceRange[1].toFixed(3)}</span>
-            </div>
           </div>
         </div>
       </div>

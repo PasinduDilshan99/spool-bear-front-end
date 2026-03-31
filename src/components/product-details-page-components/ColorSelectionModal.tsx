@@ -1,15 +1,18 @@
 // components/product/ColorSelectionModal.tsx
+"use client";
+
 import { useState } from "react";
 import { X, Minus, Plus } from "lucide-react";
+import { useCurrency } from "@/context/CurrencyContext";
 
 interface ColorSelectionModalProps {
   isOpen: boolean;
   onClose: () => void;
   colors: string[];
   productName: string;
-  productPrice: number;
+  productPrice: number; // This is in LKR from database
   productId: number;
-  stockQuantity: number; // Add stock quantity prop
+  stockQuantity: number;
   onConfirm: (selectedColor: string, quantity: number) => void;
 }
 
@@ -53,6 +56,7 @@ export function ColorSelectionModal({
   stockQuantity,
   onConfirm,
 }: ColorSelectionModalProps) {
+  const { formatPrice, currentCurrency, convertPrice } = useCurrency();
   const [selectedColor, setSelectedColor] = useState<string>(colors[0]);
   const [quantity, setQuantity] = useState<number>(1);
 
@@ -69,7 +73,17 @@ export function ColorSelectionModal({
     onClose();
   };
 
-  const totalPrice = productPrice * quantity;
+  // Calculate prices with currency conversion
+  const pricePerItem = productPrice; // In LKR from database
+  const totalPrice = pricePerItem * quantity;
+
+  // Format prices with current currency
+  const formattedPricePerItem = formatPrice(pricePerItem);
+  const formattedTotalPrice = formatPrice(totalPrice);
+
+  // Show original LKR price if different currency is selected
+  const showOriginalPrice = currentCurrency.code !== "LKR";
+  const originalPriceInLKR = totalPrice;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -99,12 +113,19 @@ export function ColorSelectionModal({
             <p className="text-sm text-gray-500 mb-2">
               {stockQuantity} units available
             </p>
-            <p className="text-2xl font-bold text-[#FF5000]">
-              ${productPrice.toFixed(2)}
-              <span className="text-sm font-normal text-gray-500 ml-1">
-                per item
-              </span>
-            </p>
+            <div className="flex items-center gap-2">
+              <p className="text-2xl font-bold text-[#FF5000]">
+                {formattedPricePerItem}
+                <span className="text-sm font-normal text-gray-500 ml-1">
+                  per item
+                </span>
+              </p>
+              {showOriginalPrice && (
+                <p className="text-sm text-gray-400 line-through">
+                  LKR {pricePerItem.toFixed(2)}
+                </p>
+              )}
+            </div>
           </div>
 
           {/* Color Selection */}
@@ -179,9 +200,21 @@ export function ColorSelectionModal({
           <div className="mb-6 p-4 bg-gray-50 rounded-xl">
             <div className="flex justify-between items-center">
               <span className="font-semibold text-[#2b2e33]">Total:</span>
-              <span className="text-2xl font-bold text-[#FF5000]">
-                ${totalPrice.toFixed(2)}
-              </span>
+              <div className="text-right">
+                <span className="text-2xl font-bold text-[#FF5000]">
+                  {formattedTotalPrice}
+                </span>
+                {showOriginalPrice && (
+                  <p className="text-xs text-gray-400 line-through mt-0.5">
+                    LKR {originalPriceInLKR.toFixed(2)}
+                  </p>
+                )}
+                {quantity > 1 && (
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    ({quantity} × {formattedPricePerItem})
+                  </p>
+                )}
+              </div>
             </div>
           </div>
 

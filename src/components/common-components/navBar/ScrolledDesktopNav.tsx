@@ -12,6 +12,7 @@ import Image from "next/image";
 import { spoolbearTheme } from "@/theme/spoolbear-theme";
 import CartIcon from "../CartIcon";
 import { LOGO_WITH_NAME } from "@/utils/constant";
+import { CurrencySelector } from "../CurrencySelector";
 
 interface ScrolledDesktopNavProps {
   visibleItems: NavBarItem[];
@@ -107,7 +108,7 @@ const ScrolledDesktopNav: React.FC<ScrolledDesktopNavProps> = ({
           <Image
             src={LOGO_WITH_NAME}
             alt={companyName}
-            width={2000} // Slightly smaller for scrolled state
+            width={2000}
             height={2000}
             className="h-20 w-auto" // Smaller height for scrolled state
           />
@@ -424,6 +425,9 @@ const ScrolledDesktopNav: React.FC<ScrolledDesktopNavProps> = ({
       <div className="hidden md:flex items-center space-x-3">
         {user ? (
           <>
+            {/* Currency Selector - Added before cart */}
+            <CurrencySelector />
+
             {/* Cart Icon - Only shown when user is logged in */}
             <CartIcon onCloseAll={closeAllDropdowns} />
 

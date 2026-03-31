@@ -20,7 +20,6 @@ export interface FilterState {
   search: string;
   strengths: string[];
   flexibilities: string[];
-  priceRange: [number, number];
   materialTypes: string[];
   isAvailable: boolean | null;
   isPopular: boolean | null;
@@ -38,7 +37,6 @@ const MaterialsPage = () => {
     search: "",
     strengths: [],
     flexibilities: [],
-    priceRange: [0, 0.1],
     materialTypes: [],
     isAvailable: null,
     isPopular: null,
@@ -62,11 +60,6 @@ const MaterialsPage = () => {
       const response = await materialService.getAllMaterials();
       if (response.code === 200) {
         setMaterials(response.data);
-        const prices = response.data.map((m) => m.pricePerGram);
-        setFilters((prev) => ({
-          ...prev,
-          priceRange: [Math.min(...prices), Math.max(...prices)],
-        }));
       } else {
         setError(response.message || "Failed to load materials");
       }
@@ -126,12 +119,6 @@ const MaterialsPage = () => {
       filtered = filtered.filter((m) => m.isPopular === filters.isPopular);
     }
 
-    filtered = filtered.filter(
-      (m) =>
-        m.pricePerGram >= filters.priceRange[0] &&
-        m.pricePerGram <= filters.priceRange[1],
-    );
-
     filtered.sort((a, b) => {
       switch (sortBy) {
         case "name":
@@ -177,17 +164,11 @@ const MaterialsPage = () => {
     }));
   };
 
-  const handlePriceRangeChange = (value: [number, number]) => {
-    setFilters((prev) => ({ ...prev, priceRange: value }));
-  };
-
   const handleClearFilters = () => {
-    const prices = materials.map((m) => m.pricePerGram);
     setFilters({
       search: "",
       strengths: [],
       flexibilities: [],
-      priceRange: [Math.min(...prices), Math.max(...prices)],
       materialTypes: [],
       isAvailable: null,
       isPopular: null,
@@ -224,7 +205,6 @@ const MaterialsPage = () => {
             filters={filters}
             materials={materials}
             onFilterChange={handleFilterChange}
-            onPriceRangeChange={handlePriceRangeChange}
             onClearFilters={handleClearFilters}
           />
         </div>

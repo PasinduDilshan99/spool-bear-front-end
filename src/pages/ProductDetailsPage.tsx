@@ -11,12 +11,14 @@ import { ImageGallery } from "@/components/product-details-page-components/Image
 import { NotFoundState } from "@/components/product-details-page-components/NotFoundState";
 import { ErrorState } from "@/components/product-details-page-components/ErrorState";
 import { ProductDetailsSkeleton } from "@/components/product-details-page-components/ProductDetailsSkeleton";
-import { ProductReviews } from "@/components/product-details-page-components/ProductReviews"; // Import the new component
+import { ProductReviews } from "@/components/product-details-page-components/ProductReviews";
+import { useCurrency } from "@/context/CurrencyContext";
 
 const ProductDetailsPage = () => {
   const params = useParams();
   const router = useRouter();
   const productId = params?.productId;
+  const { formatPrice, currentCurrency } = useCurrency();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);

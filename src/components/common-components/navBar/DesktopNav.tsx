@@ -13,6 +13,7 @@ import Image from "next/image";
 import { spoolbearTheme } from "@/theme/spoolbear-theme";
 import CartIcon from "../CartIcon";
 import { LOGO_WITH_NAME } from "@/utils/constant";
+import { CurrencySelector } from "../CurrencySelector";
 
 interface DesktopNavProps {
   visibleItems: NavBarItem[];
@@ -175,6 +176,9 @@ const DesktopNav: React.FC<DesktopNavProps> = ({
       <div className="hidden md:flex items-center space-x-4">
         {user ? (
           <>
+            {/* Currency Selector - Added before cart */}
+            <CurrencySelector />
+            
             {/* Cart Icon - Only shown when user is logged in */}
             <CartIcon onCloseAll={closeAllDropdowns} />
 

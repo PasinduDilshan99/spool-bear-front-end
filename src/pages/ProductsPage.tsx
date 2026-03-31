@@ -37,6 +37,7 @@ import { ProductListItem } from "@/components/product-components/ProductListItem
 import { ProductPagination } from "@/components/product-components/ProductPagination";
 import { EmptyState } from "@/components/product-components/EmptyState";
 import { ProductService } from "@/service/productService";
+import { useCurrency } from "@/context/CurrencyContext";
 
 interface FilterState {
   categoryId?: number;
@@ -146,7 +147,11 @@ const ProductsPage = () => {
   const searchParams = useSearchParams();
   const { user } = useAuth();
   const { addToCart } = useCart();
-
+  const {
+    formatPrice: formatCurrencyPrice,
+    convertPrice,
+    currentCurrency,
+  } = useCurrency();
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -555,12 +560,9 @@ const ProductsPage = () => {
     return PLACE_HOLDER_IMAGE;
   };
 
-  const formatPrice = (price: number) =>
-    new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-    }).format(price);
+  const formatPrice = (price: number) => {
+    return currentCurrency.symbol + convertPrice(price).toFixed(2);
+  };
 
   const paginatedProducts = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;

@@ -94,12 +94,12 @@ export const MaterialListView: React.FC<MaterialListViewProps> = ({
                     {material.materialType?.name}
                   </p>
                 </div>
-                <div className="text-right">
+                {/* <div className="text-right">
                   <div className="text-xl font-bold text-[#FF5000]">
                     ${material.pricePerGram.toFixed(3)}
                   </div>
                   <div className="text-xs text-gray-500">per gram</div>
-                </div>
+                </div> */}
               </div>
 
               <p className="text-sm text-gray-600 mb-3 line-clamp-2">

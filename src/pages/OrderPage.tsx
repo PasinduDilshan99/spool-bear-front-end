@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { PLACE_HOLDER_IMAGE } from "@/utils/constant";
 import { OrderService } from "@/service/orderService";
+import { useCurrency } from "@/context/CurrencyContext";
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -31,6 +32,7 @@ export default function OrdersPage() {
   const orderService = new OrderService();
   const router = useRouter();
   const { user } = useAuth();
+  const { formatPrice, currentCurrency, convertPrice } = useCurrency();
 
   const orderStatuses = [
     "REQUESTED",
@@ -130,12 +132,9 @@ export default function OrdersPage() {
     setDateRange({});
   };
 
+  // Updated formatCurrency to use currency context
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-    }).format(amount);
+    return formatPrice(amount);
   };
 
   const formatDate = (dateString: string) => {
@@ -218,6 +217,7 @@ export default function OrdersPage() {
   };
 
   const stats = getStats();
+  const showOriginalPrice = currentCurrency.code !== "LKR";
 
   const FilterDropdown = ({
     label,
@@ -367,6 +367,15 @@ export default function OrdersPage() {
               <p className="text-gray-600 text-sm md:text-base">
                 Track and manage your orders
               </p>
+              {showOriginalPrice && (
+                <p className="text-xs text-gray-500 mt-1">
+                  Prices shown in {currentCurrency.code} (
+                  {currentCurrency.symbol})
+                  <span className="text-gray-400 ml-2">
+                    (Original prices shown in LKR)
+                  </span>
+                </p>
+              )}
             </div>
             <button
               onClick={() => setShowFilters(!showFilters)}
@@ -403,8 +412,15 @@ export default function OrdersPage() {
               <div className="text-sm text-gray-600 font-medium mb-1">
                 Total Spent
               </div>
-              <div className="text-2xl font-bold text-gray-900">
-                {formatCurrency(stats.totalSpent)}
+              <div>
+                <div className="text-2xl font-bold text-gray-900">
+                  {formatCurrency(stats.totalSpent)}
+                </div>
+                {showOriginalPrice && (
+                  <div className="text-xs text-gray-400 line-through">
+                    LKR {stats.totalSpent.toFixed(2)}
+                  </div>
+                )}
               </div>
             </div>
             <div className="bg-gradient-to-r from-green-50 to-green-100 border border-green-200 rounded-xl p-4">
@@ -595,6 +611,11 @@ export default function OrdersPage() {
                         <div className="text-xl font-bold text-[#FF5000]">
                           {formatCurrency(order.totalAmount)}
                         </div>
+                        {showOriginalPrice && (
+                          <div className="text-xs text-gray-400 line-through">
+                            LKR {order.totalAmount.toFixed(2)}
+                          </div>
+                        )}
                       </div>
                       <div className="text-right">
                         <div className="text-sm text-gray-500 mb-1">Status</div>
@@ -758,6 +779,11 @@ export default function OrdersPage() {
                                         Unit Price:{" "}
                                         {formatCurrency(printing.unitPrice)}
                                       </span>
+                                      {showOriginalPrice && (
+                                        <span className="text-xs text-gray-400 line-through">
+                                          LKR {printing.unitPrice.toFixed(2)}
+                                        </span>
+                                      )}
                                     </div>
 
                                     {/* Printer Info */}
@@ -811,9 +837,16 @@ export default function OrdersPage() {
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
                           <span className="text-gray-600">Subtotal:</span>
-                          <span className="font-medium">
-                            {formatCurrency(order.totalAmount)}
-                          </span>
+                          <div>
+                            <span className="font-medium">
+                              {formatCurrency(order.totalAmount)}
+                            </span>
+                            {showOriginalPrice && (
+                              <div className="text-xs text-gray-400 line-through">
+                                LKR {order.totalAmount.toFixed(2)}
+                              </div>
+                            )}
+                          </div>
                         </div>
                         <div className="flex justify-between text-sm">
                           <span className="text-gray-600">Shipping:</span>
@@ -824,9 +857,16 @@ export default function OrdersPage() {
                         <div className="border-t border-gray-200 pt-2 mt-2">
                           <div className="flex justify-between font-semibold">
                             <span>Total:</span>
-                            <span className="text-[#FF5000] text-lg">
-                              {formatCurrency(order.totalAmount)}
-                            </span>
+                            <div>
+                              <span className="text-[#FF5000] text-lg">
+                                {formatCurrency(order.totalAmount)}
+                              </span>
+                              {showOriginalPrice && (
+                                <div className="text-xs text-gray-400 line-through text-right">
+                                  LKR {order.totalAmount.toFixed(2)}
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>

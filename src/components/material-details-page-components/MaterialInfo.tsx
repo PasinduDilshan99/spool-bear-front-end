@@ -26,12 +26,12 @@ export const MaterialInfo: React.FC<MaterialInfoProps> = ({
           </h1>
           <p className="text-sm text-gray-500">{type}</p>
         </div>
-        <div className="text-right">
+        {/* <div className="text-right">
           <div className="text-3xl lg:text-4xl font-bold text-[#FF5000]">
             {formatPrice(price)}
           </div>
           <div className="text-sm text-gray-500">per gram</div>
-        </div>
+        </div> */}
       </div>
 
       <div className="bg-gray-50 rounded-xl p-4">

@@ -3,15 +3,24 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { X, Palette, Loader2, ShoppingCart, CheckCircle, Minus, Plus } from "lucide-react";
+import {
+  X,
+  Palette,
+  Loader2,
+  ShoppingCart,
+  CheckCircle,
+  Minus,
+  Plus,
+} from "lucide-react";
 import { Product } from "@/types/product-types";
 import { PLACE_HOLDER_IMAGE } from "@/utils/constant";
+import { useCurrency } from "@/context/CurrencyContext";
 
 interface ColorSelectionModalProps {
   product: Product;
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (color: string, colorCode: string, quantity: number) => void; // Add quantity parameter
+  onConfirm: (color: string, colorCode: string, quantity: number) => void;
   isLoading: boolean;
 }
 
@@ -50,6 +59,7 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
   onConfirm,
   isLoading,
 }) => {
+  const { formatPrice, convertPrice, currentCurrency } = useCurrency();
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedCode, setSelectedCode] = useState("#888888");
   const [quantity, setQuantity] = useState<number>(1);
@@ -61,7 +71,6 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
       setSelectedColor(first.name);
       setSelectedCode(first.code);
     }
-    // Reset quantity when modal opens or product changes
     setQuantity(1);
   }, [product, isOpen]);
 
@@ -73,13 +82,18 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
     PLACE_HOLDER_IMAGE;
 
   const inStock = product.stockQuantity > 0;
-  const totalPrice = product.price * quantity;
 
-  const handleQuantityChange = (newQuantity: number) => {
-    if (newQuantity >= 1 && newQuantity <= product.stockQuantity) {
-      setQuantity(newQuantity);
-    }
-  };
+  // Calculate prices using currency conversion
+  const pricePerItem = product.price; // This is in LKR from database
+  const totalPrice = pricePerItem * quantity;
+
+  // Format prices with current currency
+  const formattedPricePerItem = formatPrice(pricePerItem);
+  const formattedTotalPrice = formatPrice(totalPrice);
+
+  // Get original price in LKR to show if different currency is selected
+  const showOriginalPrice = currentCurrency.code !== "LKR";
+  const originalPriceInLKR = totalPrice;
 
   return (
     <div
@@ -147,12 +161,13 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
             </p>
             <div className="flex items-center gap-2 mt-1">
               <p className="font-black text-[#FF5000] text-base">
-                {new Intl.NumberFormat("en-US", {
-                  style: "currency",
-                  currency: "USD",
-                }).format(product.price)}
+                {formattedPricePerItem}
               </p>
-              <span className="text-[10px] text-gray-400">per item</span>
+              {showOriginalPrice && (
+                <span className="text-[10px] text-gray-400 line-through">
+                  LKR {pricePerItem.toFixed(2)}
+                </span>
+              )}
             </div>
             {/* Stock indicator */}
             <div className="flex items-center gap-1 mt-1">
@@ -164,7 +179,9 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
                 className="text-[10px] font-medium"
                 style={{ color: inStock ? "#22c55e" : "#ef4444" }}
               >
-                {inStock ? `${product.stockQuantity} units available` : "Out of stock"}
+                {inStock
+                  ? `${product.stockQuantity} units available`
+                  : "Out of stock"}
               </span>
             </div>
           </div>
@@ -240,7 +257,7 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
             </label>
             <div className="flex items-center gap-3">
               <button
-                onClick={() => handleQuantityChange(quantity - 1)}
+                onClick={() => setQuantity(Math.max(1, quantity - 1))}
                 disabled={quantity <= 1 || isLoading}
                 className="w-10 h-10 rounded-xl border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -261,7 +278,9 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
                 className="w-20 h-10 text-center border border-gray-200 rounded-xl focus:outline-none focus:border-[#FF5000] focus:ring-2 focus:ring-[#FF5000]/10 text-sm font-bold text-[#101113]"
               />
               <button
-                onClick={() => handleQuantityChange(quantity + 1)}
+                onClick={() =>
+                  setQuantity(Math.min(product.stockQuantity, quantity + 1))
+                }
                 disabled={quantity >= product.stockQuantity || isLoading}
                 className="w-10 h-10 rounded-xl border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -279,14 +298,16 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
               <span className="font-bold text-[#2b2e33] text-sm">Total:</span>
               <div className="text-right">
                 <span className="text-2xl font-black text-[#FF5000]">
-                  {new Intl.NumberFormat("en-US", {
-                    style: "currency",
-                    currency: "USD",
-                  }).format(totalPrice)}
+                  {formattedTotalPrice}
                 </span>
+                {showOriginalPrice && (
+                  <p className="text-[10px] text-gray-400 line-through mt-0.5">
+                    LKR {originalPriceInLKR.toFixed(2)}
+                  </p>
+                )}
                 {quantity > 1 && (
                   <p className="text-[10px] text-gray-400 mt-0.5">
-                    ({quantity} × ${product.price.toFixed(2)})
+                    ({quantity} × {formattedPricePerItem})
                   </p>
                 )}
               </div>
@@ -317,7 +338,7 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
                 </>
               ) : (
                 <>
-                  <ShoppingCart size={15} /> 
+                  <ShoppingCart size={15} />
                   {quantity > 1 ? `Add ${quantity} Items` : "Add to Cart"}
                 </>
               )}

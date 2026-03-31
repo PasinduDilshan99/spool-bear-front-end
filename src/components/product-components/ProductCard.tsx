@@ -88,7 +88,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             className="text-[9px] font-black text-white uppercase tracking-wider"
             style={{ textShadow: "0 1px 2px rgba(0,0,0,0.6)" }}
           >
-            {product.categoryName}
+            {product.materialType}
           </span>
         </div>
 

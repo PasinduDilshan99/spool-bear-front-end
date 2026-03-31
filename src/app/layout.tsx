@@ -6,6 +6,7 @@ import Footer from "@/components/common-components/footer/Footer";
 import { CartProvider } from "@/context/CartContext";
 import { DEFAULT_PAGE_TITLE } from "@/utils/headerTitle";
 import { Faculty_Glyphic } from "next/font/google";
+import { CurrencyProvider } from "@/context/CurrencyContext";
 
 const facultyGlyphic = Faculty_Glyphic({
   subsets: ["latin"],
@@ -31,9 +32,11 @@ export default function RootLayout({
       <body className="min-h-screen">
         <AuthProvider>
           <CartProvider>
-            <NavBar />
-            {children}
-            <Footer />
+            <CurrencyProvider>
+              <NavBar />
+              {children}
+              <Footer />
+            </CurrencyProvider>
           </CartProvider>
         </AuthProvider>
       </body>

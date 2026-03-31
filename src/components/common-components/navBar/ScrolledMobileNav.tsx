@@ -10,6 +10,7 @@ import Image from "next/image";
 import { spoolbearTheme } from "@/theme/spoolbear-theme";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 import { useCart } from "@/context/CartContext";
+import { CurrencySelector } from "../CurrencySelector";
 
 interface ScrolledMobileNavProps {
   visibleNavBarItems: NavBarItem[];
@@ -61,6 +62,13 @@ const ScrolledMobileNav: React.FC<ScrolledMobileNavProps> = ({
               isScrolled={true}
             />
           ))}
+
+          {/* Currency Selector - Only for logged-in users (compact version for scrolled state) */}
+          {user && (
+            <div className="px-3 py-2">
+              <CurrencySelector />
+            </div>
+          )}
 
           {/* Cart Link - Only for logged-in users (compact version for scrolled state) */}
           {user && (

@@ -7,6 +7,7 @@ import Image from "next/image";
 import { PLACE_HOLDER_IMAGE } from "@/utils/constant";
 import { WishItem } from "@/types/wish-list-types";
 import { WishListService } from "@/service/wishListService";
+import { useCurrency } from "@/context/CurrencyContext";
 
 export default function WishListPage() {
   const [wishListData, setWishListData] = useState<WishItem[]>([]);
@@ -17,6 +18,7 @@ export default function WishListPage() {
   const wishListService = new WishListService();
   const router = useRouter();
   const { user } = useAuth();
+  const { formatPrice, currentCurrency, convertPrice } = useCurrency();
 
   useEffect(() => {
     loadWishListDetails();
@@ -60,12 +62,9 @@ export default function WishListPage() {
     }
   };
 
+  // Updated formatCurrency to use the currency context
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-    }).format(amount);
+    return formatPrice(amount);
   };
 
   const formatDate = (dateString: string) => {
@@ -80,6 +79,15 @@ export default function WishListPage() {
 
   const handleItemClick = (url: string, name: string) => {
     router.push(`/shop/${url}?name=${name}`);
+  };
+
+  // Calculate original price before discount
+  const calculateOriginalPrice = (
+    currentPrice: number,
+    discountPercent: number,
+  ) => {
+    if (discountPercent === 0) return currentPrice;
+    return currentPrice * (100 / (100 - discountPercent));
   };
 
   // Wish Icon Button Component
@@ -120,6 +128,13 @@ export default function WishListPage() {
 
   const ProductCard = ({ item }: { item: WishItem }) => {
     const isRemoving = removingItem === item.productId;
+    const showOriginalPrice = currentCurrency.code !== "LKR";
+    const originalPrice = calculateOriginalPrice(
+      item.productPrice,
+      item.discount,
+    );
+    const formattedCurrentPrice = formatCurrency(item.productPrice);
+    const formattedOriginalPrice = formatCurrency(originalPrice);
 
     return (
       <div
@@ -173,12 +188,20 @@ export default function WishListPage() {
 
           <div className="mb-4">
             <div className="text-lg font-bold text-[#FF5000]">
-              {formatCurrency(item.productPrice)}
+              {formattedCurrentPrice}
+              {showOriginalPrice && (
+                <span className="text-sm text-gray-400 ml-2">
+                  (LKR {item.productPrice.toFixed(2)})
+                </span>
+              )}
             </div>
             {item.discount > 0 && (
               <div className="text-sm text-gray-500 line-through">
-                {formatCurrency(
-                  item.productPrice * (100 / (100 - item.discount)),
+                {formattedOriginalPrice}
+                {showOriginalPrice && (
+                  <span className="text-xs text-gray-400 ml-2">
+                    LKR {originalPrice.toFixed(2)}
+                  </span>
                 )}
               </div>
             )}
@@ -293,6 +316,15 @@ export default function WishListPage() {
               <p className="text-gray-600 text-sm md:text-base">
                 Your saved 3D printing products and accessories
               </p>
+              {currentCurrency.code !== "LKR" && (
+                <p className="text-xs text-gray-500 mt-1">
+                  Prices shown in {currentCurrency.code} (
+                  {currentCurrency.symbol})
+                  <span className="text-gray-400 ml-2">
+                    (Original prices shown in LKR)
+                  </span>
+                </p>
+              )}
             </div>
             <div className="flex items-center space-x-2">
               <span className="px-4 py-2 bg-[#FFF5E6] text-[#FF5000] rounded-lg text-sm font-medium border border-[#FFE0C2]">
@@ -394,6 +426,12 @@ export default function WishListPage() {
                   <span className="font-medium text-gray-800">
                     {new Date().toLocaleDateString()}
                   </span>
+                  {currentCurrency.code !== "LKR" && (
+                    <span className="block mt-1 text-xs text-gray-400">
+                      Prices are displayed in {currentCurrency.code} with
+                      original LKR prices shown for reference
+                    </span>
+                  )}
                 </p>
               </div>
             </div>

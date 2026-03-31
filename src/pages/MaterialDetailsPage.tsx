@@ -131,13 +131,13 @@ const MaterialDetailsPage = () => {
 
             <MaterialProsCons pros={material.pros} cons={material.cons} />
 
-            <MaterialActions
+            {/* <MaterialActions
               isAvailable={material.isAvailable}
               onAddToCart={handleAddToCart}
               onAddToFavorites={handleAddToFavorites}
-            />
+            /> */}
 
-            <ShippingInfo />
+            {/* <ShippingInfo /> */}
           </div>
         </div>
 

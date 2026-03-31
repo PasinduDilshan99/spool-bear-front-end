@@ -1,9 +1,12 @@
-// components/product/ProductInfo.tsx
+// components/product-details-page-components/ProductInfo.tsx
+"use client";
+
 import { Product } from "@/types/product-types";
 import { ColorSwatches } from "./ColorSwatches";
 import { ProductActions } from "./ProductActions";
 import { ProductSpecs } from "./ProductSpecs";
 import { Wrench } from "lucide-react";
+import { useCurrency } from "@/context/CurrencyContext";
 
 interface ProductInfoProps {
   product: Product;
@@ -18,7 +21,11 @@ export function ProductInfo({
   visible,
   onWishlistToggle,
 }: ProductInfoProps) {
+  const { formatPrice, currentCurrency } = useCurrency();
   const inStock = product.stockQuantity > 0;
+  const showOriginalPrice = currentCurrency.code !== "LKR";
+  const formattedPrice = formatPrice(product.price);
+  const originalPrice = product.price;
 
   return (
     <div
@@ -58,13 +65,23 @@ export function ProductInfo({
       </h1>
 
       {/* Price + stock row */}
-      <div className="flex items-center gap-4 mb-5">
-        <span
-          className="font-black text-[#FF5000]"
-          style={{ fontSize: "clamp(24px, 3.5vw, 42px)", lineHeight: 1 }}
-        >
-          ${product.price.toFixed(2)}
-        </span>
+      <div className="flex items-center gap-4 mb-5 flex-wrap">
+        <div>
+          <span
+            className="font-black text-[#FF5000]"
+            style={{ fontSize: "clamp(24px, 3.5vw, 42px)", lineHeight: 1 }}
+          >
+            {formattedPrice}
+          </span>
+          {showOriginalPrice && (
+            <span
+              className="ml-2 text-sm text-gray-400 line-through"
+              style={{ fontSize: "clamp(12px, 1.5vw, 14px)" }}
+            >
+              LKR {originalPrice.toFixed(2)}
+            </span>
+          )}
+        </div>
 
         <div className="flex items-center gap-1.5">
           <div
@@ -116,7 +133,7 @@ export function ProductInfo({
         productId={product.productId}
         productName={product.productName}
         productPrice={product.price}
-        stockQuantity={product.stockQuantity} // Add this line
+        stockQuantity={product.stockQuantity}
         colors={product.colors || []}
         material={product.materialName || undefined}
         materialId={product.materialId || undefined}
