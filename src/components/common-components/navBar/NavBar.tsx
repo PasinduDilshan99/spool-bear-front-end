@@ -31,7 +31,7 @@ const NavBar = () => {
       case "desktop":
         return 7;
       case "large":
-        return 9;
+        return 8;
       default:
         return 4;
     }

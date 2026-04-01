@@ -1,7 +1,8 @@
-// components/material-details/BackButton.tsx
+// components/material-details-page-components/BackButton.tsx
 "use client";
 import React from "react";
 import { motion } from "framer-motion";
+import { ArrowLeft } from "lucide-react";
 
 interface BackButtonProps {
   onClick: () => void;
@@ -10,25 +11,26 @@ interface BackButtonProps {
 export const BackButton: React.FC<BackButtonProps> = ({ onClick }) => {
   return (
     <motion.button
-      initial={{ opacity: 0, x: -20 }}
+      initial={{ opacity: 0, x: -12 }}
       animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.35 }}
       onClick={onClick}
-      className="mb-6 flex items-center gap-2 text-gray-600 hover:text-[#FF5000] transition-colors group"
+      whileHover={{ x: -3 }}
+      whileTap={{ scale: 0.96 }}
+      className="group flex items-center gap-2.5 mb-8 px-4 py-2.5 rounded-2xl transition-colors duration-150"
+      style={{
+        background: "#F7F5F2",
+        border: "1px solid #EAE4DC",
+      }}
     >
-      <svg
-        className="w-5 h-5 group-hover:-translate-x-1 transition-transform"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M10 19l-7-7m0 0l7-7m-7 7h18"
-        />
-      </svg>
-      <span>Back to Materials</span>
+      <ArrowLeft
+        size={16}
+        strokeWidth={2.5}
+        className="text-[#6B5F56] transition-transform duration-200 group-hover:-translate-x-0.5"
+      />
+      <span className="text-[13px] font-bold text-[#6B5F56]">
+        Back to Materials
+      </span>
     </motion.button>
   );
 };

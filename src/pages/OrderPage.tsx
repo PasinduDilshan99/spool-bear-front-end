@@ -53,6 +53,7 @@ export default function OrdersPage() {
     "RETURN_REQUESTED",
     "RETURNED",
     "REPLACEMENT_IN_PROGRESS",
+    "REVIEWED",
   ];
 
   useEffect(() => {

@@ -2,6 +2,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { MaterialService } from "@/service/materialService";
 import { Material } from "@/types/material-types";
 import { MaterialDetailsError } from "@/components/material-details-page-components/MaterialDetailsError";
@@ -34,7 +35,7 @@ const MaterialDetailsPage = () => {
   useEffect(() => {
     if (materialId && !isNaN(materialId)) {
       loadMaterialDetails();
-    } else if (materialId === null || isNaN(materialId)) {
+    } else {
       setError("Invalid material ID");
       setLoading(false);
     }
@@ -49,7 +50,7 @@ const MaterialDetailsPage = () => {
       });
       if (response.code === 200 && response.data) {
         setMaterial(response.data);
-        if (response.data.colors && response.data.colors.length > 0) {
+        if (response.data.colors?.length > 0) {
           setSelectedColor(response.data.colors[0].colorName);
         }
       } else {
@@ -63,40 +64,62 @@ const MaterialDetailsPage = () => {
     }
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = () =>
     console.log("Add to cart:", material?.materialId);
-  };
-
-  const handleAddToFavorites = () => {
+  const handleAddToFavorites = () =>
     console.log("Add to favorites:", material?.materialId);
-  };
 
-  if (loading) {
-    return <MaterialDetailsSkeleton />;
-  }
-
-  if (error || !material) {
+  if (loading) return <MaterialDetailsSkeleton />;
+  if (error || !material)
     return <MaterialDetailsError error={error || "Material not found"} />;
-  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+    <div
+      className="min-h-screen relative"
+      style={{
+        background:
+          "linear-gradient(160deg, #FDFAF7 0%, #F7F5F2 40%, #FFF8F5 100%)",
+      }}
+    >
+      {/* Subtle decorative blobs */}
+      <div
+        className="fixed top-0 right-0 w-[500px] h-[500px] rounded-full pointer-events-none opacity-[0.04]"
+        style={{
+          background: "radial-gradient(circle, #FF5000 0%, transparent 70%)",
+          transform: "translate(30%, -30%)",
+        }}
+      />
+      <div
+        className="fixed bottom-0 left-0 w-[400px] h-[400px] rounded-full pointer-events-none opacity-[0.03]"
+        style={{
+          background: "radial-gradient(circle, #FF8C42 0%, transparent 70%)",
+          transform: "translate(-30%, 30%)",
+        }}
+      />
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
         <BackButton onClick={() => router.back()} />
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-          {/* Left Column - Images */}
-          <MaterialImageGallery
-            images={material.images}
-            materialName={material.materialName}
-            isPopular={material.isPopular}
-            isAvailable={material.isAvailable}
-            selectedImage={selectedImage}
-            onImageSelect={setSelectedImage}
-          />
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4 }}
+          className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16"
+        >
+          {/* Left Column — Images */}
+          <div className="lg:sticky lg:top-8 lg:self-start">
+            <MaterialImageGallery
+              images={material.images}
+              materialName={material.materialName}
+              isPopular={material.isPopular}
+              isAvailable={material.isAvailable}
+              selectedImage={selectedImage}
+              onImageSelect={setSelectedImage}
+            />
+          </div>
 
-          {/* Right Column - Details */}
-          <div className="space-y-6">
+          {/* Right Column — Details */}
+          <div className="space-y-7">
             <MaterialInfo
               name={material.materialName}
               type={material.materialType?.name}
@@ -112,16 +135,16 @@ const MaterialDetailsPage = () => {
               finish={material.finish}
             />
 
-            {material.properties && material.properties.length > 0 && (
-              <MaterialProperties properties={material.properties} />
-            )}
-
             <MaterialTags
               strength={material.strength}
               flexibility={material.flexibility}
             />
 
-            {material.colors && material.colors.length > 0 && (
+            {material.properties?.length > 0 && (
+              <MaterialProperties properties={material.properties} />
+            )}
+
+            {material.colors?.length > 0 && (
               <MaterialColors
                 colors={material.colors}
                 selectedColor={selectedColor}
@@ -139,14 +162,14 @@ const MaterialDetailsPage = () => {
 
             {/* <ShippingInfo /> */}
           </div>
-        </div>
-
-        {/* Lightbox Modal */}
-        <LightboxModal
-          imageUrl={selectedImage}
-          onClose={() => setSelectedImage(null)}
-        />
+        </motion.div>
       </div>
+
+      {/* Lightbox */}
+      <LightboxModal
+        imageUrl={selectedImage}
+        onClose={() => setSelectedImage(null)}
+      />
     </div>
   );
 };
