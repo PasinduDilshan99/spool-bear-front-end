@@ -2,7 +2,7 @@ export interface ActiveImagesType {
   imageId: number;
   imageName: string;
   imageDescription: string;
-  location: string;
+  material: string;
   imageLink: string;
   imageOwner: string;
   imageSource: string;

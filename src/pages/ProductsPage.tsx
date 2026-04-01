@@ -1,8 +1,13 @@
 // app/products/page.tsx
 "use client";
 
-import React, { useState, useEffect, useCallback, useMemo } from "react";
-import Image from "next/image";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
@@ -12,29 +17,31 @@ import {
   ChevronDown,
   ChevronUp,
   Loader2,
-  Package,
   Filter,
   Tag,
   Layers,
   DollarSign,
   Box,
-  Heart,
-  ShoppingCart,
-  Eye,
-  Grid3x3,
-  List,
-  ChevronLeft,
-  ChevronRight,
-  ArrowUpDown,
-  SortAsc,
-  SortDesc,
   AlertCircle,
 } from "lucide-react";
-import { spoolbearTheme } from "@/theme/spoolbear-theme";
-import { Product, ProductsFilterRequest } from "@/types/product-types";
-import { fetchProducts } from "@/service/productService";
+import { Product } from "@/types/product-types";
+import { useCart } from "@/context/CartContext";
+import { PLACE_HOLDER_IMAGE } from "@/utils/constant";
+import { useAuth } from "@/context/AuthContext";
+import { WishListService } from "@/service/wishListService";
+import { ColorSelectionModal } from "@/components/product-components/ColorSelectionModal";
+import { Toast } from "@/components/product-components/Toast";
+import { ProductToolbar } from "@/components/product-components/ProductToolbar";
+import { ProductCard } from "@/components/product-components/ProductCard";
+import { ProductListItem } from "@/components/product-components/ProductListItem";
+import { ProductPagination } from "@/components/product-components/ProductPagination";
+import { EmptyState } from "@/components/product-components/EmptyState";
+import { ProductService } from "@/service/productService";
+import { useCurrency } from "@/context/CurrencyContext";
+import ProductLoading from "@/components/product-components/ProductLoading";
+import { BrowserHistoryService } from "@/service/browserHistoryService";
+import { SHOP_PAGE_PATH } from "@/utils/urls";
 
-// Types for filter state
 interface FilterState {
   categoryId?: number;
   typeId?: number;
@@ -46,28 +53,108 @@ interface FilterState {
   sortBy: "price-asc" | "price-desc" | "name-asc" | "name-desc" | "newest";
 }
 
-// Types for filter options from API
 interface FilterOption {
   id: number;
   name: string;
   count?: number;
 }
-
 interface FilterOptions {
   categories: (FilterOption & { count: number })[];
   types: (FilterOption & { categoryId: number; count: number })[];
   materials: (FilterOption & { typeId: number; count: number })[];
-  priceRange: {
-    min: number;
-    max: number;
-  };
+  priceRange: { min: number; max: number };
 }
+
+/* ── Sidebar filter section ── */
+function FilterSection({
+  icon,
+  label,
+  expanded,
+  onToggle,
+  children,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  expanded: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="pb-4 mb-4 border-b border-gray-100 last:border-0 last:pb-0 last:mb-0">
+      <button
+        onClick={onToggle}
+        className="flex items-center justify-between w-full mb-3 group"
+      >
+        <span className="flex items-center gap-2 font-black text-sm text-[#101113] group-hover:text-[#FF5000] transition-colors duration-150">
+          <span className="text-[#FF5000]">{icon}</span>
+          {label}
+        </span>
+        {expanded ? (
+          <ChevronUp size={15} className="text-gray-400" />
+        ) : (
+          <ChevronDown size={15} className="text-gray-400" />
+        )}
+      </button>
+      {expanded && (
+        <div style={{ animation: "filterSectionIn 0.22s ease-out both" }}>
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── Filter option button ── */
+function FilterOptionButton({
+  label,
+  count,
+  active,
+  onClick,
+}: {
+  label: string;
+  count?: number;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="flex items-center justify-between w-full px-3 py-2 rounded-xl text-sm transition-all duration-150 hover:-translate-y-0.5"
+      style={{
+        background: active ? "rgba(255,80,0,0.10)" : "transparent",
+        color: active ? "#FF5000" : "#2b2e33",
+        fontWeight: active ? 700 : 500,
+        border: active
+          ? "1.5px solid rgba(255,80,0,0.25)"
+          : "1.5px solid transparent",
+      }}
+    >
+      <span className="truncate">{label}</span>
+      {count !== undefined && (
+        <span
+          className="text-xs ml-2 flex-shrink-0 font-bold"
+          style={{ color: active ? "#FF5000" : "#9ca3af" }}
+        >
+          {count}
+        </span>
+      )}
+    </button>
+  );
+}
+
+const inputClass =
+  "w-full px-3 py-2.5 text-sm text-[#101113] bg-gray-50 border border-gray-200 rounded-xl outline-none placeholder:text-gray-400 focus:border-[#FF5000] focus:ring-2 focus:ring-[#FF5000]/10 focus:bg-white transition-all duration-200 font-medium";
 
 const ProductsPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-
-  // State
+  const { user } = useAuth();
+  const { addToCart } = useCart();
+  const {
+    formatPrice: formatCurrencyPrice,
+    convertPrice,
+    currentCurrency,
+  } = useCurrency();
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -87,134 +174,199 @@ const ProductsPage = () => {
     materials: [],
     priceRange: { min: 0, max: 1000 },
   });
-
-  // Pagination state
+  const [addingToCart, setAddingToCart] = useState<number | null>(null);
+  const [togglingWishlist, setTogglingWishlist] = useState<number | null>(null);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "error" | "info";
+  } | null>(null);
+  const [selectedProductForColor, setSelectedProductForColor] =
+    useState<Product | null>(null);
+  const [isColorModalOpen, setIsColorModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(12);
+  const [itemsPerPage] = useState(12);
+  // Stagger animation
+  const [cardsVisible, setCardsVisible] = useState(false);
 
-  // Filter state from URL
   const [filters, setFilters] = useState<FilterState>(() => ({
-    categoryId: searchParams?.get("category") 
-      ? parseInt(searchParams.get("category")!) 
+    categoryId: searchParams?.get("category")
+      ? parseInt(searchParams.get("category")!)
       : undefined,
-    typeId: searchParams?.get("type") 
-      ? parseInt(searchParams.get("type")!) 
+    typeId: searchParams?.get("type")
+      ? parseInt(searchParams.get("type")!)
       : undefined,
-    materialId: searchParams?.get("material") 
-      ? parseInt(searchParams.get("material")!) 
+    materialId: searchParams?.get("material")
+      ? parseInt(searchParams.get("material")!)
       : undefined,
-    minPrice: searchParams?.get("minPrice") 
-      ? parseInt(searchParams.get("minPrice")!) 
+    minPrice: searchParams?.get("minPrice")
+      ? parseInt(searchParams.get("minPrice")!)
       : undefined,
-    maxPrice: searchParams?.get("maxPrice") 
-      ? parseInt(searchParams.get("maxPrice")!) 
+    maxPrice: searchParams?.get("maxPrice")
+      ? parseInt(searchParams.get("maxPrice")!)
       : undefined,
     inStock: searchParams?.get("inStock") === "true",
     name: searchParams?.get("search") || "",
     sortBy: (searchParams?.get("sort") as FilterState["sortBy"]) || "newest",
   }));
 
-  // Extract filter options from products
-  useEffect(() => {
-    if (products.length > 0) {
-      // Extract categories
-      const categoryMap = new Map<number, { name: string; count: number }>();
-      products.forEach(product => {
-        if (!categoryMap.has(product.categoryId)) {
-          categoryMap.set(product.categoryId, {
-            name: product.categoryName,
-            count: 1
-          });
-        } else {
-          const existing = categoryMap.get(product.categoryId)!;
-          existing.count += 1;
-        }
-      });
-      
-      const categories = Array.from(categoryMap.entries()).map(([id, data]) => ({
-        id,
-        name: data.name,
-        count: data.count
-      }));
+  const showToast = (message: string, type: "success" | "error" | "info") =>
+    setToast({ message, type });
+  const wishListService = useMemo(() => new WishListService(), []);
 
-      // Extract types
-      const typeMap = new Map<number, { name: string; categoryId: number; count: number }>();
-      products.forEach(product => {
-        if (product.typeId && !typeMap.has(product.typeId)) {
-          typeMap.set(product.typeId, {
-            name: product.typeName || `Type ${product.typeId}`,
-            categoryId: product.categoryId,
-            count: 1
-          });
-        } else if (product.typeId) {
-          const existing = typeMap.get(product.typeId)!;
-          existing.count += 1;
-        }
-      });
-      
-      const types = Array.from(typeMap.entries()).map(([id, data]) => ({
-        id,
-        name: data.name,
-        categoryId: data.categoryId,
-        count: data.count
-      }));
-
-      // Extract materials
-      const materialMap = new Map<number, { name: string; typeId: number; count: number }>();
-      products.forEach(product => {
-        if (product.materialId && product.materialName && !materialMap.has(product.materialId)) {
-          materialMap.set(product.materialId, {
-            name: product.materialName,
-            typeId: product.typeId || 0,
-            count: 1
-          });
-        } else if (product.materialId && product.materialName) {
-          const existing = materialMap.get(product.materialId)!;
-          existing.count += 1;
-        }
-      });
-      
-      const materials = Array.from(materialMap.entries()).map(([id, data]) => ({
-        id,
-        name: data.name,
-        typeId: data.typeId,
-        count: data.count
-      }));
-
-      // Calculate price range
-      const prices = products.map(p => p.price);
-      const minPrice = Math.min(...prices);
-      const maxPrice = Math.max(...prices);
-
-      setFilterOptions({
-        categories,
-        types,
-        materials,
-        priceRange: { min: minPrice, max: maxPrice },
-      });
+  const handleWishlistToggle = async (product: Product) => {
+    if (!user) {
+      showToast("Please login to manage wishlist", "info");
+      router.push("/login");
+      return;
     }
-  }, [products]);
+    setTogglingWishlist(product.productId);
+    try {
+      const response = await wishListService.addWishList({
+        productId: product.productId,
+      });
+      if (response.code === 200) {
+        setProducts((prev) =>
+          prev.map((p) =>
+            p.productId === product.productId ? { ...p, isWish: !p.isWish } : p,
+          ),
+        );
+        showToast(
+          `${product.productName} ${!product.isWish ? "added to" : "removed from"} wishlist`,
+          "success",
+        );
+      } else {
+        showToast("Failed to update wishlist", "error");
+      }
+    } catch {
+      showToast(`Failed to update wishlist`, "error");
+    } finally {
+      setTogglingWishlist(null);
+    }
+  };
 
-  // Load products
+  const handleDetailsPageNavgation = async (product: Product) => {
+    try {
+      const browserHistoryService = new BrowserHistoryService();
+
+      await browserHistoryService.addBrowserHistory({
+        productId: product.productId,
+        name: product.productName,
+      });
+      router.push(
+        `${SHOP_PAGE_PATH}/${product.productId}?name=${product.productName}`,
+      );
+    } catch (error) {
+      console.error("Failed to add browser history", error);
+    }
+  };
+
+  const openColorSelection = (product: Product) => {
+    if (!user) {
+      showToast("Please login to add items to cart", "info");
+      router.push("/login");
+      return;
+    }
+    setSelectedProductForColor(product);
+    setIsColorModalOpen(true);
+  };
+
+  const handleAddToCartWithColor = async (
+    color: string,
+    colorCode: string,
+    quantity: number = 1,
+  ) => {
+    if (!selectedProductForColor) return;
+    setAddingToCart(selectedProductForColor.productId);
+    try {
+      await addToCart({
+        productId: selectedProductForColor.productId,
+        name: selectedProductForColor.productName,
+        price: selectedProductForColor.price,
+        quantity: quantity,
+        material: selectedProductForColor.materialName || "Default Material",
+        materialId: selectedProductForColor.materialId || 0,
+        type: selectedProductForColor.typeName || "Default Type",
+        typeId: selectedProductForColor.typeId || 0,
+        color,
+        colorCode,
+      });
+      showToast(
+        `${selectedProductForColor.productName} (${color}) added to cart!`,
+        "success",
+      );
+      setIsColorModalOpen(false);
+      setSelectedProductForColor(null);
+    } catch {
+      showToast(
+        `Failed to add ${selectedProductForColor.productName} to cart`,
+        "error",
+      );
+    } finally {
+      setAddingToCart(null);
+    }
+  };
+
+  // Build filter options from products
   useEffect(() => {
-    loadProducts();
-  }, []);
+    if (!products.length) return;
+    const catMap = new Map<number, { name: string; count: number }>();
+    const typeMap = new Map<
+      number,
+      { name: string; categoryId: number; count: number }
+    >();
+    const matMap = new Map<
+      number,
+      { name: string; typeId: number; count: number }
+    >();
+
+    products.forEach((p) => {
+      if (!catMap.has(p.categoryId))
+        catMap.set(p.categoryId, { name: p.categoryName, count: 1 });
+      else catMap.get(p.categoryId)!.count++;
+
+      if (p.typeId) {
+        if (!typeMap.has(p.typeId))
+          typeMap.set(p.typeId, {
+            name: p.typeName || `Type ${p.typeId}`,
+            categoryId: p.categoryId,
+            count: 1,
+          });
+        else typeMap.get(p.typeId)!.count++;
+      }
+
+      if (p.materialId && p.materialName) {
+        if (!matMap.has(p.materialId))
+          matMap.set(p.materialId, {
+            name: p.materialName,
+            typeId: p.typeId || 0,
+            count: 1,
+          });
+        else matMap.get(p.materialId)!.count++;
+      }
+    });
+
+    const prices = products.map((p) => p.price);
+    setFilterOptions({
+      categories: Array.from(catMap.entries()).map(([id, d]) => ({ id, ...d })),
+      types: Array.from(typeMap.entries()).map(([id, d]) => ({ id, ...d })),
+      materials: Array.from(matMap.entries()).map(([id, d]) => ({ id, ...d })),
+      priceRange: { min: Math.min(...prices), max: Math.max(...prices) },
+    });
+  }, [products]);
 
   const loadProducts = async () => {
     try {
       setInitialLoading(true);
       setLoading(true);
       setError(null);
-      
-      const response = await fetchProducts({});
-      
+      const productService = new ProductService();
+      const response = await productService.fetchProducts({});
       if (response.code === 200 && response.data) {
         setProducts(response.data);
       } else {
         setError(response.message || "Failed to load products");
       }
-    } catch (err) {
-      console.error("Error loading products:", err);
+    } catch {
       setError("An error occurred while loading products");
     } finally {
       setLoading(false);
@@ -222,51 +374,35 @@ const ProductsPage = () => {
     }
   };
 
-  // Apply filters
+  useEffect(() => {
+    loadProducts();
+  }, []);
+
   const applyFilters = useCallback(() => {
     setLoading(true);
-    
+    setCardsVisible(false);
     let filtered = [...products];
 
-    // Filter by name/search
     if (filters.name) {
-      const searchLower = filters.name.toLowerCase();
+      const s = filters.name.toLowerCase();
       filtered = filtered.filter(
         (p) =>
-          p.productName.toLowerCase().includes(searchLower) ||
-          p.productDescription.toLowerCase().includes(searchLower)
+          p.productName.toLowerCase().includes(s) ||
+          p.productDescription.toLowerCase().includes(s),
       );
     }
-
-    // Filter by category
-    if (filters.categoryId) {
+    if (filters.categoryId)
       filtered = filtered.filter((p) => p.categoryId === filters.categoryId);
-    }
-
-    // Filter by type
-    if (filters.typeId) {
+    if (filters.typeId)
       filtered = filtered.filter((p) => p.typeId === filters.typeId);
-    }
-
-    // Filter by material
-    if (filters.materialId) {
+    if (filters.materialId)
       filtered = filtered.filter((p) => p.materialId === filters.materialId);
-    }
-
-    // Filter by price range
-    if (filters.minPrice !== undefined) {
+    if (filters.minPrice !== undefined)
       filtered = filtered.filter((p) => p.price >= filters.minPrice!);
-    }
-    if (filters.maxPrice !== undefined) {
+    if (filters.maxPrice !== undefined)
       filtered = filtered.filter((p) => p.price <= filters.maxPrice!);
-    }
+    if (filters.inStock) filtered = filtered.filter((p) => p.stockQuantity > 0);
 
-    // Filter by stock
-    if (filters.inStock) {
-      filtered = filtered.filter((p) => p.stockQuantity > 0);
-    }
-
-    // Apply sorting
     filtered.sort((a, b) => {
       switch (filters.sortBy) {
         case "price-asc":
@@ -277,62 +413,83 @@ const ProductsPage = () => {
           return a.productName.localeCompare(b.productName);
         case "name-desc":
           return b.productName.localeCompare(a.productName);
-        case "newest":
         default:
           return b.productId - a.productId;
       }
     });
 
     setFilteredProducts(filtered);
-    setCurrentPage(1); // Reset to first page when filters change
+    setCurrentPage(1);
     setLoading(false);
+    setTimeout(() => setCardsVisible(true), 60);
   }, [products, filters]);
 
-  // Update filters when they change
   useEffect(() => {
     applyFilters();
-    
-    // Update URL params
     const params = new URLSearchParams();
-    if (filters.categoryId) params.set("category", filters.categoryId.toString());
+    if (filters.categoryId)
+      params.set("category", filters.categoryId.toString());
     if (filters.typeId) params.set("type", filters.typeId.toString());
-    if (filters.materialId) params.set("material", filters.materialId.toString());
+    if (filters.materialId)
+      params.set("material", filters.materialId.toString());
     if (filters.minPrice) params.set("minPrice", filters.minPrice.toString());
     if (filters.maxPrice) params.set("maxPrice", filters.maxPrice.toString());
     if (filters.inStock) params.set("inStock", "true");
     if (filters.name) params.set("search", filters.name);
     if (filters.sortBy !== "newest") params.set("sort", filters.sortBy);
-    
-    const queryString = params.toString();
-    router.push(queryString ? `?${queryString}` : "/shop", { scroll: false });
+    const qs = params.toString();
+    router.push(qs ? `?${qs}` : "/shop", { scroll: false });
   }, [filters, applyFilters, router]);
 
-  // Handle filter changes
   const handleFilterChange = <K extends keyof FilterState>(
     key: K,
-    value: FilterState[K]
-  ) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
-  };
+    value: FilterState[K],
+  ) => setFilters((prev) => ({ ...prev, [key]: value }));
 
-  // Clear a specific filter
+  // const clearFilter = (key: keyof FilterState) => {
+  //   setFilters((prev) => {
+  //     const n = { ...prev };
+  //     if (
+  //       [
+  //         "categoryId",
+  //         "typeId",
+  //         "materialId",
+  //         "minPrice",
+  //         "maxPrice",
+  //         "name",
+  //       ].includes(key)
+  //     )
+  //       (n as any)[key] = undefined;
+  //     else if (key === "inStock") n.inStock = false;
+  //     else if (key === "sortBy") n.sortBy = "newest";
+  //     return n;
+  //   });
+  // };
   const clearFilter = (key: keyof FilterState) => {
     setFilters((prev) => {
-      const newFilters = { ...prev };
-      if (key === "categoryId" || key === "typeId" || key === "materialId" || 
-          key === "minPrice" || key === "maxPrice" || key === "name") {
-        newFilters[key] = undefined;
+      const n = { ...prev };
+      if (
+        [
+          "categoryId",
+          "typeId",
+          "materialId",
+          "minPrice",
+          "maxPrice",
+          "name",
+        ].includes(key)
+      ) {
+        (n as Record<typeof key, FilterState[typeof key] | undefined>)[key] =
+          undefined;
       } else if (key === "inStock") {
-        newFilters[key] = false;
+        n.inStock = false;
       } else if (key === "sortBy") {
-        newFilters[key] = "newest";
+        n.sortBy = "newest";
       }
-      return newFilters;
+      return n;
     });
   };
 
-  // Clear all filters
-  const clearAllFilters = () => {
+  const clearAllFilters = () =>
     setFilters({
       categoryId: undefined,
       typeId: undefined,
@@ -343,154 +500,116 @@ const ProductsPage = () => {
       name: "",
       sortBy: "newest",
     });
-  };
 
-  // Toggle filter section expansion
-  const toggleSection = (section: keyof typeof expandedSections) => {
-    setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }));
-  };
+  const toggleSection = (s: keyof typeof expandedSections) =>
+    setExpandedSections((prev) => ({ ...prev, [s]: !prev[s] }));
 
-  // Get active filter count
-  const getActiveFilterCount = useCallback(() => {
-    let count = 0;
-    if (filters.categoryId) count++;
-    if (filters.typeId) count++;
-    if (filters.materialId) count++;
-    if (filters.minPrice || filters.maxPrice) count++;
-    if (filters.inStock) count++;
-    if (filters.name) count++;
-    if (filters.sortBy !== "newest") count++;
-    return count;
+  const activeFilterCount = useMemo(() => {
+    let c = 0;
+    if (filters.categoryId) c++;
+    if (filters.typeId) c++;
+    if (filters.materialId) c++;
+    if (filters.minPrice || filters.maxPrice) c++;
+    if (filters.inStock) c++;
+    if (filters.name) c++;
+    if (filters.sortBy !== "newest") c++;
+    return c;
   }, [filters]);
 
-  // Get active filters for display
-  const getActiveFilters = useCallback(() => {
-    const active: { key: keyof FilterState; label: string; value: string }[] = [];
-    
+  const activeFilters = useMemo(() => {
+    const active: { key: keyof FilterState; label: string; value: string }[] =
+      [];
     if (filters.categoryId) {
-      const category = filterOptions.categories.find(c => c.id === filters.categoryId);
-      if (category) {
-        active.push({ key: "categoryId", label: "Category", value: category.name });
-      }
+      const c = filterOptions.categories.find(
+        (c) => c.id === filters.categoryId,
+      );
+      if (c)
+        active.push({ key: "categoryId", label: "Category", value: c.name });
     }
-    
     if (filters.typeId) {
-      const type = filterOptions.types.find(t => t.id === filters.typeId);
-      if (type) {
-        active.push({ key: "typeId", label: "Type", value: type.name });
-      }
+      const t = filterOptions.types.find((t) => t.id === filters.typeId);
+      if (t) active.push({ key: "typeId", label: "Type", value: t.name });
     }
-    
     if (filters.materialId) {
-      const material = filterOptions.materials.find(m => m.id === filters.materialId);
-      if (material) {
-        active.push({ key: "materialId", label: "Material", value: material.name });
-      }
+      const m = filterOptions.materials.find(
+        (m) => m.id === filters.materialId,
+      );
+      if (m)
+        active.push({ key: "materialId", label: "Material", value: m.name });
     }
-    
     if (filters.minPrice || filters.maxPrice) {
-      let priceLabel = "";
-      if (filters.minPrice && filters.maxPrice) {
-        priceLabel = `$${filters.minPrice} - $${filters.maxPrice}`;
-      } else if (filters.minPrice) {
-        priceLabel = `≥ $${filters.minPrice}`;
-      } else if (filters.maxPrice) {
-        priceLabel = `≤ $${filters.maxPrice}`;
-      }
-      active.push({ key: "minPrice", label: "Price", value: priceLabel });
+      const label =
+        filters.minPrice && filters.maxPrice
+          ? `$${filters.minPrice} – $${filters.maxPrice}`
+          : filters.minPrice
+            ? `≥ $${filters.minPrice}`
+            : `≤ $${filters.maxPrice}`;
+      active.push({ key: "minPrice", label: "Price", value: label });
     }
-    
-    if (filters.inStock) {
+    if (filters.inStock)
       active.push({ key: "inStock", label: "Stock", value: "In Stock Only" });
-    }
-    
-    if (filters.name) {
+    if (filters.name)
       active.push({ key: "name", label: "Search", value: `"${filters.name}"` });
-    }
-
     if (filters.sortBy !== "newest") {
-      let sortLabel = "";
-      switch (filters.sortBy) {
-        case "price-asc": sortLabel = "Price: Low to High"; break;
-        case "price-desc": sortLabel = "Price: High to Low"; break;
-        case "name-asc": sortLabel = "Name: A to Z"; break;
-        case "name-desc": sortLabel = "Name: Z to A"; break;
-      }
-      active.push({ key: "sortBy", label: "Sort", value: sortLabel });
+      const sortLabels: Record<string, string> = {
+        "price-asc": "Price: Low → High",
+        "price-desc": "Price: High → Low",
+        "name-asc": "Name: A → Z",
+        "name-desc": "Name: Z → A",
+      };
+      active.push({
+        key: "sortBy",
+        label: "Sort",
+        value: sortLabels[filters.sortBy] || "",
+      });
     }
-    
     return active;
   }, [filters, filterOptions]);
 
-  // Get product image URL
   const getProductImage = (product: Product) => {
-    const primaryImage = product.images?.find((img) => img.isPrimary);
-    if (primaryImage?.imageUrl) {
-      return primaryImage.imageUrl.startsWith("http")
-        ? primaryImage.imageUrl
-        : `http://localhost:8080${primaryImage.imageUrl}`;
-    }
-    if (product.images?.[0]?.imageUrl) {
+    const primary = product.images?.find((img) => img.isPrimary);
+    if (primary?.imageUrl)
+      return primary.imageUrl.startsWith("http")
+        ? primary.imageUrl
+        : `http://localhost:8080${primary.imageUrl}`;
+    if (product.images?.[0]?.imageUrl)
       return product.images[0].imageUrl.startsWith("http")
         ? product.images[0].imageUrl
         : `http://localhost:8080${product.images[0].imageUrl}`;
-    }
-    return "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80";
+    return PLACE_HOLDER_IMAGE;
   };
 
-  // Format price
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-    }).format(price);
+    return currentCurrency.symbol + convertPrice(price).toFixed(2);
   };
 
-  // Pagination
   const paginatedProducts = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    return filteredProducts.slice(startIndex, startIndex + itemsPerPage);
+    const start = (currentPage - 1) * itemsPerPage;
+    return filteredProducts.slice(start, start + itemsPerPage);
   }, [filteredProducts, currentPage, itemsPerPage]);
 
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
 
-  const activeFilterCount = getActiveFilterCount();
-  const activeFilters = getActiveFilters();
-
-  // Sort options
-  const sortOptions = [
-    { value: "newest", label: "Newest First", icon: <ArrowUpDown className="w-4 h-4" /> },
-    { value: "price-asc", label: "Price: Low to High", icon: <SortAsc className="w-4 h-4" /> },
-    { value: "price-desc", label: "Price: High to Low", icon: <SortDesc className="w-4 h-4" /> },
-    { value: "name-asc", label: "Name: A to Z", icon: <SortAsc className="w-4 h-4" /> },
-    { value: "name-desc", label: "Name: Z to A", icon: <SortDesc className="w-4 h-4" /> },
-  ];
-
+  // ── Initial loading ──
   if (initialLoading) {
-    return (
-      <div className="min-h-screen bg-[#e4e7ec] flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4" style={{ color: spoolbearTheme.colors.accent }} />
-          <p className="text-lg" style={{ color: spoolbearTheme.colors.text }}>Loading products...</p>
-        </div>
-      </div>
-    );
+    return <ProductLoading />;
   }
-
+  // ── Error ──
   if (error) {
     return (
-      <div className="min-h-screen bg-[#e4e7ec] flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto">
-          <AlertCircle className="w-16 h-16 mx-auto mb-4" style={{ color: spoolbearTheme.colors.accent }} />
-          <p className="text-lg font-medium mb-2" style={{ color: spoolbearTheme.colors.text }}>Oops! Something went wrong</p>
-          <p className="mb-6" style={{ color: spoolbearTheme.colors.muted }}>{error}</p>
+      <div className="min-h-screen bg-[#e4e7ec] flex items-center justify-center p-6">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-xl p-8 max-w-sm w-full text-center relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-[#FF5000]" />
+          <div className="w-14 h-14 rounded-2xl bg-orange-50 flex items-center justify-center mx-auto mb-4 border border-orange-100">
+            <AlertCircle size={26} className="text-[#FF5000]" />
+          </div>
+          <h3 className="font-black text-[#101113] mb-2">
+            Something went wrong
+          </h3>
+          <p className="text-sm text-gray-500 mb-6">{error}</p>
           <button
             onClick={loadProducts}
-            className="px-6 py-3 text-white rounded-lg transition-colors"
-            style={{ backgroundColor: spoolbearTheme.colors.accent }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#e64800")}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = spoolbearTheme.colors.accent)}
+            className="w-full py-3 bg-[#FF5000] text-white rounded-xl font-bold text-sm hover:bg-[#CC4000] transition-colors"
           >
             Try Again
           </button>
@@ -499,770 +618,483 @@ const ProductsPage = () => {
     );
   }
 
+  const FilterSidebar = (
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      {/* Header */}
+      <div className="h-1 bg-[#FF5000]" />
+      <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-orange-50 flex items-center justify-center">
+            <Filter size={14} className="text-[#FF5000]" />
+          </div>
+          <h2 className="font-black text-sm text-[#101113]">Filters</h2>
+          {activeFilterCount > 0 && (
+            <span className="flex items-center justify-center w-5 h-5 rounded-full bg-[#FF5000] text-[9px] font-black text-white">
+              {activeFilterCount}
+            </span>
+          )}
+        </div>
+        {activeFilterCount > 0 && (
+          <button
+            onClick={clearAllFilters}
+            className="text-xs font-bold text-[#FF5000] hover:underline"
+          >
+            Clear All
+          </button>
+        )}
+      </div>
+
+      <div className="p-4 space-y-0">
+        {/* Search */}
+        <div className="pb-4 mb-4 border-b border-gray-100">
+          <div className="relative">
+            <Search
+              size={14}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            />
+            <input
+              type="text"
+              value={filters.name || ""}
+              onChange={(e) => handleFilterChange("name", e.target.value)}
+              placeholder="Search products…"
+              className={`${inputClass} pl-9`}
+            />
+          </div>
+        </div>
+
+        {/* Categories */}
+        {filterOptions.categories.length > 0 && (
+          <FilterSection
+            icon={<Tag size={14} />}
+            label="Categories"
+            expanded={expandedSections.categories}
+            onToggle={() => toggleSection("categories")}
+          >
+            <div className="space-y-1 max-h-56 overflow-y-auto">
+              {filterOptions.categories.map((c) => (
+                <FilterOptionButton
+                  key={c.id}
+                  label={c.name}
+                  count={c.count}
+                  active={filters.categoryId === c.id}
+                  onClick={() =>
+                    handleFilterChange(
+                      "categoryId",
+                      filters.categoryId === c.id ? undefined : c.id,
+                    )
+                  }
+                />
+              ))}
+            </div>
+          </FilterSection>
+        )}
+
+        {/* Types */}
+        {filterOptions.types.length > 0 && (
+          <FilterSection
+            icon={<Layers size={14} />}
+            label="Types"
+            expanded={expandedSections.types}
+            onToggle={() => toggleSection("types")}
+          >
+            <div className="space-y-1 max-h-56 overflow-y-auto">
+              {filterOptions.types
+                .filter(
+                  (t) =>
+                    !filters.categoryId || t.categoryId === filters.categoryId,
+                )
+                .map((t) => (
+                  <FilterOptionButton
+                    key={t.id}
+                    label={t.name}
+                    count={t.count}
+                    active={filters.typeId === t.id}
+                    onClick={() =>
+                      handleFilterChange(
+                        "typeId",
+                        filters.typeId === t.id ? undefined : t.id,
+                      )
+                    }
+                  />
+                ))}
+            </div>
+          </FilterSection>
+        )}
+
+        {/* Materials */}
+        {filterOptions.materials.length > 0 && (
+          <FilterSection
+            icon={<Box size={14} />}
+            label="Materials"
+            expanded={expandedSections.materials}
+            onToggle={() => toggleSection("materials")}
+          >
+            <div className="space-y-1 max-h-56 overflow-y-auto">
+              {filterOptions.materials
+                .filter((m) => !filters.typeId || m.typeId === filters.typeId)
+                .map((m) => (
+                  <FilterOptionButton
+                    key={m.id}
+                    label={m.name}
+                    count={m.count}
+                    active={filters.materialId === m.id}
+                    onClick={() =>
+                      handleFilterChange(
+                        "materialId",
+                        filters.materialId === m.id ? undefined : m.id,
+                      )
+                    }
+                  />
+                ))}
+            </div>
+          </FilterSection>
+        )}
+
+        {/* Price */}
+        <FilterSection
+          icon={<DollarSign size={14} />}
+          label="Price Range"
+          expanded={expandedSections.price}
+          onToggle={() => toggleSection("price")}
+        >
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1 block">
+                Min
+              </label>
+              <input
+                type="number"
+                value={filters.minPrice || ""}
+                placeholder={`$${filterOptions.priceRange.min}`}
+                onChange={(e) =>
+                  handleFilterChange(
+                    "minPrice",
+                    e.target.value ? parseInt(e.target.value) : undefined,
+                  )
+                }
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1 block">
+                Max
+              </label>
+              <input
+                type="number"
+                value={filters.maxPrice || ""}
+                placeholder={`$${filterOptions.priceRange.max}`}
+                onChange={(e) =>
+                  handleFilterChange(
+                    "maxPrice",
+                    e.target.value ? parseInt(e.target.value) : undefined,
+                  )
+                }
+                className={inputClass}
+              />
+            </div>
+          </div>
+        </FilterSection>
+
+        {/* In Stock */}
+        <div>
+          <label className="flex items-center gap-3 cursor-pointer group py-2">
+            <div
+              className="relative w-9 h-5 rounded-full transition-colors duration-200 flex-shrink-0"
+              style={{ background: filters.inStock ? "#FF5000" : "#e5e7eb" }}
+              onClick={() => handleFilterChange("inStock", !filters.inStock)}
+            >
+              <div
+                className="absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200"
+                style={{
+                  transform: filters.inStock
+                    ? "translateX(18px)"
+                    : "translateX(2px)",
+                }}
+              />
+            </div>
+            <span className="text-sm font-semibold text-[#2b2e33] group-hover:text-[#101113] transition-colors">
+              In Stock Only
+            </span>
+          </label>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="min-h-screen bg-[#e4e7ec] relative">
-      {/* Decorative Grid Pattern */}
-      <div 
-        className="absolute inset-0 opacity-[0.02] pointer-events-none"
+    <div className="min-h-screen bg-[#e4e7ec] relative overflow-x-hidden">
+      {/* Modals */}
+      {selectedProductForColor && (
+        <ColorSelectionModal
+          product={selectedProductForColor}
+          isOpen={isColorModalOpen}
+          onClose={() => {
+            setIsColorModalOpen(false);
+            setSelectedProductForColor(null);
+          }}
+          onConfirm={handleAddToCartWithColor}
+          isLoading={addingToCart === selectedProductForColor.productId}
+        />
+      )}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+
+      {/* Grid texture */}
+      <div
+        className="fixed inset-0 pointer-events-none z-0"
         style={{
-          backgroundImage: `linear-gradient(${spoolbearTheme.colors.accent}1a 1px, transparent 1px), 
-                           linear-gradient(90deg, ${spoolbearTheme.colors.accent}1a 1px, transparent 1px)`,
-          backgroundSize: '44px 44px',
+          backgroundImage:
+            "linear-gradient(rgba(255,80,0,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,80,0,0.04) 1px, transparent 1px)",
+          backgroundSize: "44px 44px",
         }}
       />
 
-      <div className="container mx-auto px-4 py-8 relative z-10">
-        {/* Header */}
+      {/* Mobile filter overlay */}
+      {showMobileFilters && (
+        <div className="fixed inset-0 z-50 flex">
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowMobileFilters(false)}
+          />
+          <div
+            className="relative ml-auto w-80 max-w-[85vw] h-full bg-[#e4e7ec] overflow-y-auto p-4"
+            style={{
+              animation:
+                "slideInRight 0.3s cubic-bezier(0.34,1.56,0.64,1) both",
+            }}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-black text-[#101113] text-lg">Filters</h2>
+              <button
+                onClick={() => setShowMobileFilters(false)}
+                className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-gray-500 hover:text-gray-800 shadow-sm"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            {FilterSidebar}
+            <button
+              onClick={() => setShowMobileFilters(false)}
+              className="w-full mt-4 py-3 bg-[#FF5000] text-white rounded-xl font-bold text-sm hover:bg-[#CC4000] transition-colors shadow-md shadow-orange-200"
+            >
+              Apply Filters
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div
+        className="container mx-auto relative z-10"
+        style={{
+          maxWidth: "1400px",
+          padding: "clamp(24px, 4vw, 48px) clamp(16px, 4vw, 64px)",
+        }}
+      >
+        {/* Page header */}
         <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-black mb-4" style={{ color: spoolbearTheme.colors.text }}>
+          <div className="flex items-center gap-2 mb-2">
+            <div
+              className="h-[2px] rounded-full bg-[#FF5000]"
+              style={{ width: "clamp(20px, 3vw, 36px)" }}
+            />
+            <span
+              className="font-black uppercase tracking-[0.2em] text-[#FF5000]"
+              style={{ fontSize: "clamp(9px, 1vw, 12px)" }}
+            >
+              Shop
+            </span>
+          </div>
+          <h1
+            className="font-black text-[#101113] tracking-tight"
+            style={{
+              fontSize: "clamp(24px, 4vw, 48px)",
+              letterSpacing: "-0.03em",
+            }}
+          >
             Our Products
           </h1>
-          <p className="text-lg" style={{ color: spoolbearTheme.colors.muted }}>
-            Discover our collection of premium 3D printing materials and accessories
+          <p
+            className="font-medium text-[#2b2e33] mt-1"
+            style={{ fontSize: "clamp(13px, 1.4vw, 16px)" }}
+          >
+            Discover our collection of premium 3D printing materials and
+            accessories
           </p>
         </div>
 
-        {/* Mobile Filter Button */}
+        {/* Mobile filter button */}
         <div className="lg:hidden mb-4">
           <button
             onClick={() => setShowMobileFilters(true)}
-            className="w-full px-4 py-3 rounded-lg flex items-center justify-between border"
-            style={{ 
-              backgroundColor: 'white',
-              borderColor: `${spoolbearTheme.colors.accent}30`
-            }}
+            className="flex items-center gap-2.5 px-4 py-3 bg-white rounded-xl border border-gray-100 shadow-sm font-bold text-sm text-[#101113] hover:border-orange-200 transition-colors duration-200"
           >
-            <span className="flex items-center gap-2" style={{ color: spoolbearTheme.colors.text }}>
-              <SlidersHorizontal className="w-5 h-5" style={{ color: spoolbearTheme.colors.accent }} />
-              Filters & Sort
-            </span>
+            <SlidersHorizontal size={16} className="text-[#FF5000]" />
+            Filters & Sort
             {activeFilterCount > 0 && (
-              <span className="text-sm px-2 py-1 rounded-full" style={{ 
-                backgroundColor: spoolbearTheme.colors.accent,
-                color: 'white'
-              }}>
+              <span className="w-5 h-5 rounded-full bg-[#FF5000] text-[9px] font-black text-white flex items-center justify-center">
                 {activeFilterCount}
               </span>
             )}
           </button>
         </div>
 
-        {/* Active Filters Bar */}
+        {/* Active filter chips */}
         {activeFilterCount > 0 && (
-          <div className="mb-6 p-4 bg-white/80 backdrop-blur-sm rounded-2xl border flex flex-wrap items-center gap-3" style={{ borderColor: `${spoolbearTheme.colors.accent}20` }}>
-            <span className="text-sm font-medium" style={{ color: spoolbearTheme.colors.text }}>Active Filters:</span>
-            {activeFilters.map((filter) => (
-              <span
-                key={filter.key}
-                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm"
-                style={{ 
-                  backgroundColor: `${spoolbearTheme.colors.accent}10`,
-                  color: spoolbearTheme.colors.text
+          <div
+            className="mb-5 flex flex-wrap items-center gap-2"
+            style={{ animation: "filterSectionIn 0.2s ease-out both" }}
+          >
+            <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
+              Active:
+            </span>
+            {activeFilters.map((f) => (
+              <button
+                key={f.key}
+                onClick={() => clearFilter(f.key)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-150 hover:scale-[1.03]"
+                style={{
+                  background: "rgba(255,80,0,0.10)",
+                  color: "#FF5000",
+                  border: "1.5px solid rgba(255,80,0,0.25)",
                 }}
               >
-                <span className="font-medium" style={{ color: spoolbearTheme.colors.accent }}>{filter.label}:</span>
-                {filter.value}
-                <button
-                  onClick={() => clearFilter(filter.key)}
-                  className="hover:opacity-75"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
+                <span className="font-black">{f.label}:</span>
+                {f.value}
+                <X size={11} />
+              </button>
             ))}
             <button
               onClick={clearAllFilters}
-              className="text-sm ml-auto hover:underline"
-              style={{ color: spoolbearTheme.colors.accent }}
+              className="text-xs font-bold text-gray-400 hover:text-[#FF5000] transition-colors ml-1"
             >
-              Clear All
+              Clear all
             </button>
           </div>
         )}
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Filters Sidebar */}
-          <div className={`
-            lg:w-80 flex-shrink-0
-            ${showMobileFilters 
-              ? 'fixed inset-0 z-50 bg-[#e4e7ec] overflow-auto' 
-              : 'hidden lg:block'
-            }
-          `}>
-            {/* Mobile Filter Header */}
-            {showMobileFilters && (
-              <div className="sticky top-0 z-10 p-4 border-b bg-[#e4e7ec]" style={{ borderColor: `${spoolbearTheme.colors.accent}20` }}>
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-bold" style={{ color: spoolbearTheme.colors.text }}>Filters</h2>
-                  <button
-                    onClick={() => setShowMobileFilters(false)}
-                    className="p-2 rounded-lg"
-                    style={{ color: spoolbearTheme.colors.muted }}
-                  >
-                    <X className="w-6 h-6" />
-                  </button>
-                </div>
-              </div>
-            )}
-
-            <div className="p-4 lg:p-0">
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border" style={{ borderColor: `${spoolbearTheme.colors.accent}20` }}>
-                {/* Header */}
-                <div className="flex items-center justify-between mb-6 pb-4 border-b" style={{ borderColor: `${spoolbearTheme.colors.accent}20` }}>
-                  <div className="flex items-center gap-2">
-                    <Filter className="w-5 h-5" style={{ color: spoolbearTheme.colors.accent }} />
-                    <h2 className="text-xl font-bold" style={{ color: spoolbearTheme.colors.text }}>Filters</h2>
-                  </div>
-                  {activeFilterCount > 0 && (
-                    <button
-                      onClick={clearAllFilters}
-                      className="text-sm px-3 py-1 rounded-lg transition-colors"
-                      style={{ color: spoolbearTheme.colors.accent }}
-                    >
-                      Clear All
-                    </button>
-                  )}
-                </div>
-
-                {/* Search */}
-                <div className="mb-6">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" style={{ color: spoolbearTheme.colors.muted }} />
-                    <input
-                      type="text"
-                      value={filters.name || ""}
-                      onChange={(e) => handleFilterChange("name", e.target.value)}
-                      placeholder="Search products..."
-                      className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#ff5000] focus:border-transparent"
-                      style={{ 
-                        borderColor: `${spoolbearTheme.colors.muted}30`,
-                        color: spoolbearTheme.colors.text
-                      }}
-                    />
-                  </div>
-                </div>
-
-                {/* Categories */}
-                {filterOptions.categories.length > 0 && (
-                  <div className="mb-4 border-b pb-4" style={{ borderColor: `${spoolbearTheme.colors.accent}20` }}>
-                    <button
-                      onClick={() => toggleSection("categories")}
-                      className="flex items-center justify-between w-full mb-3"
-                    >
-                      <span className="font-semibold flex items-center gap-2" style={{ color: spoolbearTheme.colors.text }}>
-                        <Tag className="w-4 h-4" style={{ color: spoolbearTheme.colors.accent }} />
-                        Categories
-                      </span>
-                      {expandedSections.categories ? (
-                        <ChevronUp className="w-4 h-4" style={{ color: spoolbearTheme.colors.muted }} />
-                      ) : (
-                        <ChevronDown className="w-4 h-4" style={{ color: spoolbearTheme.colors.muted }} />
-                      )}
-                    </button>
-                    {expandedSections.categories && (
-                      <div className="space-y-2 max-h-64 overflow-y-auto">
-                        {filterOptions.categories.map((category) => (
-                          <button
-                            key={category.id}
-                            onClick={() => handleFilterChange("categoryId", 
-                              filters.categoryId === category.id ? undefined : category.id
-                            )}
-                            className="flex items-center justify-between w-full px-2 py-1.5 rounded-lg transition-colors"
-                            style={{
-                              backgroundColor: filters.categoryId === category.id 
-                                ? `${spoolbearTheme.colors.accent}15`
-                                : 'transparent',
-                              color: spoolbearTheme.colors.text
-                            }}
-                            onMouseEnter={(e) => {
-                              if (filters.categoryId !== category.id) {
-                                e.currentTarget.style.backgroundColor = `${spoolbearTheme.colors.accent}10`;
-                              }
-                            }}
-                            onMouseLeave={(e) => {
-                              if (filters.categoryId !== category.id) {
-                                e.currentTarget.style.backgroundColor = 'transparent';
-                              }
-                            }}
-                          >
-                            <span>{category.name}</span>
-                            <span className="text-sm" style={{ color: spoolbearTheme.colors.muted }}>({category.count})</span>
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Types */}
-                {filterOptions.types.length > 0 && (
-                  <div className="mb-4 border-b pb-4" style={{ borderColor: `${spoolbearTheme.colors.accent}20` }}>
-                    <button
-                      onClick={() => toggleSection("types")}
-                      className="flex items-center justify-between w-full mb-3"
-                    >
-                      <span className="font-semibold flex items-center gap-2" style={{ color: spoolbearTheme.colors.text }}>
-                        <Layers className="w-4 h-4" style={{ color: spoolbearTheme.colors.accent }} />
-                        Types
-                      </span>
-                      {expandedSections.types ? (
-                        <ChevronUp className="w-4 h-4" style={{ color: spoolbearTheme.colors.muted }} />
-                      ) : (
-                        <ChevronDown className="w-4 h-4" style={{ color: spoolbearTheme.colors.muted }} />
-                      )}
-                    </button>
-                    {expandedSections.types && (
-                      <div className="space-y-2 max-h-64 overflow-y-auto">
-                        {filterOptions.types
-                          .filter(t => !filters.categoryId || t.categoryId === filters.categoryId)
-                          .map((type) => (
-                            <button
-                              key={type.id}
-                              onClick={() => handleFilterChange("typeId", 
-                                filters.typeId === type.id ? undefined : type.id
-                              )}
-                              className="flex items-center justify-between w-full px-2 py-1.5 rounded-lg transition-colors"
-                              style={{
-                                backgroundColor: filters.typeId === type.id 
-                                  ? `${spoolbearTheme.colors.accent}15`
-                                  : 'transparent',
-                                color: spoolbearTheme.colors.text
-                              }}
-                              onMouseEnter={(e) => {
-                                if (filters.typeId !== type.id) {
-                                  e.currentTarget.style.backgroundColor = `${spoolbearTheme.colors.accent}10`;
-                                }
-                              }}
-                              onMouseLeave={(e) => {
-                                if (filters.typeId !== type.id) {
-                                  e.currentTarget.style.backgroundColor = 'transparent';
-                                }
-                              }}
-                            >
-                              <span>{type.name}</span>
-                              <span className="text-sm" style={{ color: spoolbearTheme.colors.muted }}>({type.count})</span>
-                            </button>
-                          ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Materials */}
-                {filterOptions.materials.length > 0 && (
-                  <div className="mb-4 border-b pb-4" style={{ borderColor: `${spoolbearTheme.colors.accent}20` }}>
-                    <button
-                      onClick={() => toggleSection("materials")}
-                      className="flex items-center justify-between w-full mb-3"
-                    >
-                      <span className="font-semibold flex items-center gap-2" style={{ color: spoolbearTheme.colors.text }}>
-                        <Box className="w-4 h-4" style={{ color: spoolbearTheme.colors.accent }} />
-                        Materials
-                      </span>
-                      {expandedSections.materials ? (
-                        <ChevronUp className="w-4 h-4" style={{ color: spoolbearTheme.colors.muted }} />
-                      ) : (
-                        <ChevronDown className="w-4 h-4" style={{ color: spoolbearTheme.colors.muted }} />
-                      )}
-                    </button>
-                    {expandedSections.materials && (
-                      <div className="space-y-2 max-h-64 overflow-y-auto">
-                        {filterOptions.materials
-                          .filter(m => !filters.typeId || m.typeId === filters.typeId)
-                          .map((material) => (
-                            <button
-                              key={material.id}
-                              onClick={() => handleFilterChange("materialId", 
-                                filters.materialId === material.id ? undefined : material.id
-                              )}
-                              className="flex items-center justify-between w-full px-2 py-1.5 rounded-lg transition-colors"
-                              style={{
-                                backgroundColor: filters.materialId === material.id 
-                                  ? `${spoolbearTheme.colors.accent}15`
-                                  : 'transparent',
-                                color: spoolbearTheme.colors.text
-                              }}
-                              onMouseEnter={(e) => {
-                                if (filters.materialId !== material.id) {
-                                  e.currentTarget.style.backgroundColor = `${spoolbearTheme.colors.accent}10`;
-                                }
-                              }}
-                              onMouseLeave={(e) => {
-                                if (filters.materialId !== material.id) {
-                                  e.currentTarget.style.backgroundColor = 'transparent';
-                                }
-                              }}
-                            >
-                              <span>{material.name}</span>
-                              <span className="text-sm" style={{ color: spoolbearTheme.colors.muted }}>({material.count})</span>
-                            </button>
-                          ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Price Range */}
-                <div className="mb-4 border-b pb-4" style={{ borderColor: `${spoolbearTheme.colors.accent}20` }}>
-                  <button
-                    onClick={() => toggleSection("price")}
-                    className="flex items-center justify-between w-full mb-3"
-                  >
-                    <span className="font-semibold flex items-center gap-2" style={{ color: spoolbearTheme.colors.text }}>
-                      <DollarSign className="w-4 h-4" style={{ color: spoolbearTheme.colors.accent }} />
-                      Price Range
-                    </span>
-                    {expandedSections.price ? (
-                      <ChevronUp className="w-4 h-4" style={{ color: spoolbearTheme.colors.muted }} />
-                    ) : (
-                      <ChevronDown className="w-4 h-4" style={{ color: spoolbearTheme.colors.muted }} />
-                    )}
-                  </button>
-                  {expandedSections.price && (
-                    <div className="space-y-4">
-                      <div className="flex gap-2">
-                        <input
-                          type="number"
-                          value={filters.minPrice || ""}
-                          onChange={(e) => handleFilterChange("minPrice", 
-                            e.target.value ? parseInt(e.target.value) : undefined
-                          )}
-                          placeholder={`Min $${filterOptions.priceRange.min}`}
-                          min={filterOptions.priceRange.min}
-                          max={filterOptions.priceRange.max}
-                          className="w-1/2 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#ff5000] focus:border-transparent"
-                          style={{ 
-                            borderColor: `${spoolbearTheme.colors.muted}30`,
-                            color: spoolbearTheme.colors.text
-                          }}
-                        />
-                        <input
-                          type="number"
-                          value={filters.maxPrice || ""}
-                          onChange={(e) => handleFilterChange("maxPrice", 
-                            e.target.value ? parseInt(e.target.value) : undefined
-                          )}
-                          placeholder={`Max $${filterOptions.priceRange.max}`}
-                          min={filterOptions.priceRange.min}
-                          max={filterOptions.priceRange.max}
-                          className="w-1/2 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#ff5000] focus:border-transparent"
-                          style={{ 
-                            borderColor: `${spoolbearTheme.colors.muted}30`,
-                            color: spoolbearTheme.colors.text
-                          }}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* In Stock Only */}
-                <div className="mb-4">
-                  <label className="flex items-center gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={filters.inStock || false}
-                      onChange={(e) => handleFilterChange("inStock", e.target.checked)}
-                      className="w-4 h-4 rounded focus:ring-[#ff5000]"
-                      style={{ accentColor: spoolbearTheme.colors.accent }}
-                    />
-                    <span style={{ color: spoolbearTheme.colors.text }}>In Stock Only</span>
-                  </label>
-                </div>
-
-                {/* Apply Filters Button (Mobile) */}
-                {showMobileFilters && (
-                  <button
-                    onClick={() => setShowMobileFilters(false)}
-                    className="w-full mt-6 py-3 text-white rounded-lg font-medium"
-                    style={{ backgroundColor: spoolbearTheme.colors.accent }}
-                  >
-                    Apply Filters
-                  </button>
-                )}
-              </div>
-            </div>
+        <div className="flex gap-6 lg:gap-8">
+          {/* Desktop sidebar */}
+          <div
+            className="hidden lg:block flex-shrink-0"
+            style={{ width: "clamp(220px, 22vw, 280px)" }}
+          >
+            <div className="sticky top-6">{FilterSidebar}</div>
           </div>
 
-          {/* Products Grid */}
-          <div className="flex-1">
-            {/* Toolbar */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-4 mb-6 border flex flex-wrap items-center justify-between gap-4" style={{ borderColor: `${spoolbearTheme.colors.accent}20` }}>
-              <div className="flex items-center gap-4">
-                <span className="text-sm" style={{ color: spoolbearTheme.colors.muted }}>
-                  <span className="font-semibold" style={{ color: spoolbearTheme.colors.text }}>{filteredProducts.length}</span> products found
-                </span>
-                
-                {/* View Mode Toggle */}
-                <div className="flex items-center gap-1 border-l pl-4" style={{ borderColor: `${spoolbearTheme.colors.muted}30` }}>
-                  <button
-                    onClick={() => setViewMode("grid")}
-                    className={`p-2 rounded-lg transition-colors ${
-                      viewMode === "grid" ? 'bg-[#ff5000]/10' : ''
-                    }`}
-                    style={{ color: viewMode === "grid" ? spoolbearTheme.colors.accent : spoolbearTheme.colors.muted }}
-                  >
-                    <Grid3x3 className="w-5 h-5" />
-                  </button>
-                  <button
-                    onClick={() => setViewMode("list")}
-                    className={`p-2 rounded-lg transition-colors ${
-                      viewMode === "list" ? 'bg-[#ff5000]/10' : ''
-                    }`}
-                    style={{ color: viewMode === "list" ? spoolbearTheme.colors.accent : spoolbearTheme.colors.muted }}
-                  >
-                    <List className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
+          {/* Products area */}
+          <div className="flex-1 min-w-0">
+            <ProductToolbar
+              totalProducts={filteredProducts.length}
+              viewMode={viewMode}
+              onViewModeChange={setViewMode}
+              sortBy={filters.sortBy}
+              onSortChange={(v) =>
+                handleFilterChange("sortBy", v as FilterState["sortBy"])
+              }
+            />
 
-              {/* Sort Dropdown */}
-              <div className="flex items-center gap-2">
-                <span className="text-sm" style={{ color: spoolbearTheme.colors.muted }}>Sort by:</span>
-                <select
-                  value={filters.sortBy}
-                  onChange={(e) => handleFilterChange("sortBy", e.target.value as FilterState["sortBy"])}
-                  className="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#ff5000] focus:border-transparent bg-white min-w-[160px]"
-                  style={{ 
-                    borderColor: `${spoolbearTheme.colors.muted}30`,
-                    color: spoolbearTheme.colors.text
-                  }}
-                >
-                  <option value="newest">Newest First</option>
-                  <option value="price-asc">Price: Low to High</option>
-                  <option value="price-desc">Price: High to Low</option>
-                  <option value="name-asc">Name: A to Z</option>
-                  <option value="name-desc">Name: Z to A</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Loading State */}
-            {loading && (
-              <div className="flex justify-center py-12">
-                <Loader2 className="w-8 h-8 animate-spin" style={{ color: spoolbearTheme.colors.accent }} />
-              </div>
-            )}
-
-            {/* Products Grid/List */}
-            {!loading && filteredProducts.length === 0 ? (
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-12 text-center border" style={{ borderColor: `${spoolbearTheme.colors.accent}20` }}>
-                <Package className="w-16 h-16 mx-auto mb-4" style={{ color: spoolbearTheme.colors.muted }} />
-                <h3 className="text-xl font-bold mb-2" style={{ color: spoolbearTheme.colors.text }}>No products found</h3>
-                <p className="mb-6" style={{ color: spoolbearTheme.colors.muted }}>Try adjusting your filters or search criteria</p>
-                <button
-                  onClick={clearAllFilters}
-                  className="px-6 py-3 text-white rounded-lg transition-colors"
-                  style={{ backgroundColor: spoolbearTheme.colors.accent }}
-                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#e64800")}
-                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = spoolbearTheme.colors.accent)}
-                >
-                  Clear Filters
-                </button>
-              </div>
+            {loading ? (
+              <ProductLoading />
+            ) : filteredProducts.length === 0 ? (
+              <EmptyState onClearFilters={clearAllFilters} />
             ) : (
-              !loading && (
-                <>
-                  {viewMode === "grid" ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {paginatedProducts.map((product) => (
-                        <ProductCard key={product.productId} product={product} formatPrice={formatPrice} getProductImage={getProductImage} />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {paginatedProducts.map((product) => (
-                        <ProductListItem key={product.productId} product={product} formatPrice={formatPrice} getProductImage={getProductImage} />
-                      ))}
-                    </div>
-                  )}
+              <>
+                {viewMode === "grid" ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
+                    {paginatedProducts.map((product, i) => (
+                      <div
+                        key={product.productId}
+                        style={{
+                          opacity: cardsVisible ? 1 : 0,
+                          transform: cardsVisible ? "none" : "translateY(16px)",
+                          transition: `opacity 0.4s ${i * 45}ms ease-out, transform 0.4s ${i * 45}ms ease-out`,
+                        }}
+                      >
+                        <ProductCard
+                          product={product}
+                          formatPrice={formatPrice}
+                          getProductImage={getProductImage}
+                          onAddToCart={openColorSelection}
+                          onWishlistToggle={handleWishlistToggle}
+                          handleDetailsPageNavgation={
+                            handleDetailsPageNavgation
+                          }
+                          isAddingToCart={addingToCart === product.productId}
+                          isTogglingWishlist={
+                            togglingWishlist === product.productId
+                          }
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {paginatedProducts.map((product, i) => (
+                      <div
+                        key={product.productId}
+                        style={{
+                          opacity: cardsVisible ? 1 : 0,
+                          transform: cardsVisible
+                            ? "none"
+                            : "translateX(-12px)",
+                          transition: `opacity 0.4s ${i * 40}ms ease-out, transform 0.4s ${i * 40}ms ease-out`,
+                        }}
+                      >
+                        <ProductListItem
+                          product={product}
+                          formatPrice={formatPrice}
+                          getProductImage={getProductImage}
+                          onAddToCart={openColorSelection}
+                          onWishlistToggle={handleWishlistToggle}
+                          handleDetailsPageNavgation={
+                            handleDetailsPageNavgation
+                          }
+                          isAddingToCart={addingToCart === product.productId}
+                          isTogglingWishlist={
+                            togglingWishlist === product.productId
+                          }
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
 
-                  {/* Pagination */}
-                  {totalPages > 1 && (
-                    <div className="mt-8 flex items-center justify-center gap-2">
-                      <button
-                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                        disabled={currentPage === 1}
-                        className="p-2 rounded-lg border disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#ff5000]/10 transition-colors"
-                        style={{ borderColor: `${spoolbearTheme.colors.muted}30` }}
-                      >
-                        <ChevronLeft className="w-5 h-5" />
-                      </button>
-                      
-                      {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                        let pageNum;
-                        if (totalPages <= 5) {
-                          pageNum = i + 1;
-                        } else if (currentPage <= 3) {
-                          pageNum = i + 1;
-                        } else if (currentPage >= totalPages - 2) {
-                          pageNum = totalPages - 4 + i;
-                        } else {
-                          pageNum = currentPage - 2 + i;
-                        }
-                        
-                        return (
-                          <button
-                            key={i}
-                            onClick={() => setCurrentPage(pageNum)}
-                            className={`w-10 h-10 rounded-lg transition-colors ${
-                              currentPage === pageNum
-                                ? 'text-white'
-                                : 'hover:bg-[#ff5000]/10'
-                            }`}
-                            style={{
-                              backgroundColor: currentPage === pageNum ? spoolbearTheme.colors.accent : 'transparent',
-                              color: currentPage === pageNum ? 'white' : spoolbearTheme.colors.text
-                            }}
-                          >
-                            {pageNum}
-                          </button>
-                        );
-                      })}
-                      
-                      <button
-                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                        disabled={currentPage === totalPages}
-                        className="p-2 rounded-lg border disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#ff5000]/10 transition-colors"
-                        style={{ borderColor: `${spoolbearTheme.colors.muted}30` }}
-                      >
-                        <ChevronRight className="w-5 h-5" />
-                      </button>
-                    </div>
-                  )}
-                </>
-              )
+                <ProductPagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                />
+              </>
             )}
           </div>
         </div>
       </div>
-    </div>
-  );
-};
 
-// Product Card Component (Grid View)
-interface ProductCardProps {
-  product: Product;
-  formatPrice: (price: number) => string;
-  getProductImage: (product: Product) => string;
-}
-
-const ProductCard: React.FC<ProductCardProps> = ({ product, formatPrice, getProductImage }) => {
-  const [isHovered, setIsHovered] = useState(false);
-
-  return (
-    <div
-      className="group bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden border hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 cursor-pointer"
-      style={{ borderColor: `${spoolbearTheme.colors.accent}20` }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      {/* Image Container */}
-      <div className="relative h-64 overflow-hidden">
-        <img
-          src={getProductImage(product)}
-          alt={product.productName}
-          className={`w-full h-full object-cover transition-transform duration-700 ${
-            isHovered ? 'scale-110' : 'scale-100'
-          }`}
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80';
-          }}
-        />
-        
-        {/* Overlay */}
-        <div className={`absolute inset-0 bg-gradient-to-t from-[#101113]/80 via-transparent to-transparent transition-opacity duration-500 ${
-          isHovered ? 'opacity-100' : 'opacity-0'
-        }`} />
-
-        {/* Category Badge */}
-        <div className="absolute top-4 left-4">
-          <span 
-            className="px-3 py-1 text-white text-xs font-semibold rounded-full shadow-lg"
-            style={{ backgroundColor: spoolbearTheme.colors.accent }}
-          >
-            {product.categoryName}
-          </span>
-        </div>
-
-        {/* Stock Badge */}
-        <div className="absolute top-4 right-4">
-          <span 
-            className={`px-3 py-1 text-xs font-semibold rounded-full shadow-lg ${
-              product.stockQuantity > 0 
-                ? 'bg-green-500 text-white' 
-                : 'bg-gray-500 text-white'
-            }`}
-          >
-            {product.stockQuantity > 0 ? 'In Stock' : 'Out of Stock'}
-          </span>
-        </div>
-
-        {/* Quick Actions */}
-        <div className={`absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 transition-all duration-500 ${
-          isHovered ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
-        }`}>
-          <Link href={`/products/${product.productId}`}>
-            <button 
-              className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-[#ff5000] hover:text-white transition-colors shadow-lg"
-              style={{ color: spoolbearTheme.colors.text }}
-            >
-              <Eye className="w-5 h-5" />
-            </button>
-          </Link>
-          <button 
-            className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-[#ff5000] hover:text-white transition-colors shadow-lg"
-            style={{ color: spoolbearTheme.colors.text }}
-          >
-            <Heart className="w-5 h-5" />
-          </button>
-          <button 
-            className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-[#ff5000] hover:text-white transition-colors shadow-lg"
-            style={{ color: spoolbearTheme.colors.text }}
-          >
-            <ShoppingCart className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="p-6">
-        <Link href={`/products/${product.productId}`} className="block">
-          <h3 className="text-xl font-bold mb-2 hover:text-[#ff5000] transition-colors" style={{ color: spoolbearTheme.colors.text }}>
-            {product.productName}
-          </h3>
-        </Link>
-        <p className="text-sm mb-4 line-clamp-2" style={{ color: spoolbearTheme.colors.muted }}>
-          {product.productDescription}
-        </p>
-        
-        <div className="flex items-center justify-between">
-          <div>
-            <span className="text-2xl font-black" style={{ color: spoolbearTheme.colors.accent }}>
-              {formatPrice(product.price)}
-            </span>
-          </div>
-          <button 
-            className="px-4 py-2 bg-[#ff5000] text-white rounded-lg hover:bg-[#e64800] transition-colors flex items-center gap-2"
-          >
-            <ShoppingCart className="w-4 h-4" />
-            Add to Cart
-          </button>
-        </div>
-
-        {/* Material Info */}
-        {product.materialName && (
-          <div className="mt-4 pt-4 border-t flex items-center gap-2" style={{ borderColor: `${spoolbearTheme.colors.accent}20` }}>
-            <Box className="w-4 h-4" style={{ color: spoolbearTheme.colors.accent }} />
-            <span className="text-sm" style={{ color: spoolbearTheme.colors.muted }}>{product.materialName}</span>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-// Product List Item Component (List View)
-const ProductListItem: React.FC<ProductCardProps> = ({ product, formatPrice, getProductImage }) => {
-  return (
-    <div 
-      className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden border hover:shadow-2xl transition-all duration-300"
-      style={{ borderColor: `${spoolbearTheme.colors.accent}20` }}
-    >
-      <div className="flex flex-col md:flex-row">
-        {/* Image */}
-        <Link href={`/products/${product.productId}`} className="md:w-48 h-48 relative overflow-hidden block">
-          <img
-            src={getProductImage(product)}
-            alt={product.productName}
-            className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80';
-            }}
-          />
-        </Link>
-
-        {/* Content */}
-        <div className="flex-1 p-6">
-          <div className="flex flex-wrap items-start justify-between gap-4 mb-2">
-            <div>
-              <Link href={`/products/${product.productId}`}>
-                <h3 className="text-xl font-bold hover:text-[#ff5000] transition-colors" style={{ color: spoolbearTheme.colors.text }}>
-                  {product.productName}
-                </h3>
-              </Link>
-              <div className="flex items-center gap-3 mt-1">
-                <span 
-                  className="px-2 py-1 text-xs rounded-full"
-                  style={{ 
-                    backgroundColor: `${spoolbearTheme.colors.accent}10`,
-                    color: spoolbearTheme.colors.accent
-                  }}
-                >
-                  {product.categoryName}
-                </span>
-                {product.typeName && (
-                  <span className="text-sm" style={{ color: spoolbearTheme.colors.muted }}>
-                    {product.typeName}
-                  </span>
-                )}
-                {product.materialName && (
-                  <span className="text-sm" style={{ color: spoolbearTheme.colors.muted }}>
-                    • {product.materialName}
-                  </span>
-                )}
-              </div>
-            </div>
-            <span className="text-2xl font-black" style={{ color: spoolbearTheme.colors.accent }}>
-              {formatPrice(product.price)}
-            </span>
-          </div>
-
-          <p className="mb-4 line-clamp-2" style={{ color: spoolbearTheme.colors.muted }}>
-            {product.productDescription}
-          </p>
-
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              {/* Stock Status */}
-              <div className="flex items-center gap-2">
-                <div className={`w-2 h-2 rounded-full ${
-                  product.stockQuantity > 0 ? 'bg-green-500' : 'bg-gray-400'
-                }`} />
-                <span className="text-sm" style={{ color: spoolbearTheme.colors.muted }}>
-                  {product.stockQuantity > 0 ? `${product.stockQuantity} in stock` : 'Out of stock'}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex gap-2">
-              <button 
-                className="w-10 h-10 rounded-full flex items-center justify-center border transition-colors"
-                style={{ 
-                  borderColor: `${spoolbearTheme.colors.muted}30`,
-                  color: spoolbearTheme.colors.muted
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = `${spoolbearTheme.colors.accent}10`;
-                  e.currentTarget.style.color = spoolbearTheme.colors.accent;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = spoolbearTheme.colors.muted;
-                }}
-              >
-                <Heart className="w-4 h-4" />
-              </button>
-              <button 
-                className="px-4 py-2 bg-[#ff5000] text-white rounded-lg hover:bg-[#e64800] transition-colors flex items-center gap-2"
-              >
-                <ShoppingCart className="w-4 h-4" />
-                Add to Cart
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <style jsx global>{`
+        @keyframes filterSectionIn {
+          from {
+            opacity: 0;
+            transform: translateY(8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes slideInRight {
+          from {
+            transform: translateX(100%);
+          }
+          to {
+            transform: translateX(0);
+          }
+        }
+      `}</style>
     </div>
   );
 };

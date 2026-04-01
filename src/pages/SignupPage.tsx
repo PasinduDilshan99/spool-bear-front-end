@@ -1,789 +1,1253 @@
-"use client"
-import React, { JSX, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import Image from 'next/image'
-import { SignupData, useAuth } from '@/context/AuthContext'
+"use client";
 
-const SignupPage = () => {
-  const { signup } = useAuth()
-  const router = useRouter()
-  
-  const [formData, setFormData] = useState<SignupData>({
-    username: '',
-    password: '',
-    confirmPassword: '',
-    firstName: '',
-    middleName: '',
-    lastName: '',
-    email: '',
-    mobileNumber1: '',
-    mobileNumber2: '',
-  })
-  
-  const [errors, setErrors] = useState<{
-    [key in keyof SignupData | 'confirmPassword' | 'terms' | 'general']?: string
-  }>({})
-  
-  const [isLoading, setIsLoading] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [acceptTerms, setAcceptTerms] = useState(false)
+import { useRouter } from "next/navigation";
+import React, { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
+import Link from "next/link";
 
-  const validateForm = () => {
-    const newErrors: typeof errors = {}
-    
-    // Required fields
-    const requiredFields: (keyof SignupData)[] = [
-      'username', 'password', 'firstName', 'lastName', 
-      'email', 'mobileNumber1'
-    ]
-    
-    requiredFields.forEach(field => {
-      if (!formData[field]?.toString().trim()) {
-        newErrors[field] = `${field.charAt(0).toUpperCase() + field.slice(1)} is required`
-      }
-    })
-    
-    // Username validation
-    if (formData.username && formData.username.length < 3) {
-      newErrors.username = 'Username must be at least 3 characters'
-    }
-    
-    // Password validation
-    if (formData.password) {
-      if (formData.password.length < 8) {
-        newErrors.password = 'Password must be at least 8 characters'
-      } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
-        newErrors.password = 'Password must contain uppercase, lowercase, and numbers'
-      }
-    }
-    
-    // Confirm password
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match'
-    }
-    
-    // Email validation
-    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address'
-    }
-    
-    // Phone validation
-    if (formData.mobileNumber1 && !/^\d{10}$/.test(formData.mobileNumber1.replace(/\D/g, ''))) {
-      newErrors.mobileNumber1 = 'Please enter a valid 10-digit phone number'
-    }
-    
-    if (formData.mobileNumber2 && !/^\d{10}$/.test(formData.mobileNumber2.replace(/\D/g, ''))) {
-      newErrors.mobileNumber2 = 'Please enter a valid 10-digit phone number'
-    }
-    
-    // Terms acceptance
-    if (!acceptTerms) {
-      newErrors.terms = 'You must accept the terms and conditions'
-    }
-    
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+/* ══════════════════════════════════════════
+   ICON HELPERS
+══════════════════════════════════════════ */
+const EyeOpen = () => (
+  <svg
+    className="h-5 w-5"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+    strokeWidth={2}
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+    />
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+    />
+  </svg>
+);
+const EyeOff = () => (
+  <svg
+    className="h-5 w-5"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+    strokeWidth={2}
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+    />
+  </svg>
+);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    if (!validateForm()) {
-      return
-    }
-    
-    setIsLoading(true)
-    setErrors({})
-    
-    try {
-      // Prepare signup data (remove confirmPassword as it's not part of SignupData type)
-      const { confirmPassword, ...signupData } = formData
-      
-      await signup(signupData as SignupData)
-      
-      // Redirect to login page with success message
-      router.push('/login?signup=success')
-    } catch (error) {
-      console.error('Signup error:', error)
-      setErrors({
-        general: error instanceof Error ? error.message : 'Signup failed. Please try again.'
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
-    
-    // Clear error when user starts typing
-    if (errors[name as keyof typeof errors]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: undefined
-      }))
-    }
-  }
-
-  const formatPhoneNumber = (value: string) => {
-    const numbers = value.replace(/\D/g, '')
-    if (numbers.length <= 3) return numbers
-    if (numbers.length <= 6) return `(${numbers.slice(0,3)}) ${numbers.slice(3)}`
-    return `(${numbers.slice(0,3)}) ${numbers.slice(3,6)}-${numbers.slice(6,10)}`
-  }
-
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    const formatted = formatPhoneNumber(value)
-    handleChange({
-      ...e,
-      target: { ...e.target, name, value: formatted }
-    })
-  }
-
-  const formSections = [
-    {
-      title: 'Account Information',
-      fields: [
-        {
-          name: 'username',
-          label: 'Username',
-          type: 'text',
-          placeholder: 'Enter your username',
-          icon: 'user',
-          description: 'Choose a unique username (3+ characters)'
-        },
-        {
-          name: 'email',
-          label: 'Email Address',
-          type: 'email',
-          placeholder: 'Enter your email',
-          icon: 'mail',
-          description: 'We\'ll send a verification email'
-        },
-        {
-          name: 'password',
-          label: 'Password',
-          type: 'password',
-          placeholder: 'Create a strong password',
-          icon: 'lock',
-          description: 'Minimum 8 characters with uppercase, lowercase, and numbers'
-        },
-        {
-          name: 'confirmPassword',
-          label: 'Confirm Password',
-          type: 'password',
-          placeholder: 'Re-enter your password',
-          icon: 'lock',
-          description: 'Must match the password above'
-        }
-      ]
-    },
-    {
-      title: 'Personal Information',
-      fields: [
-        {
-          name: 'firstName',
-          label: 'First Name',
-          type: 'text',
-          placeholder: 'Enter your first name',
-          icon: 'user-circle'
-        },
-        {
-          name: 'middleName',
-          label: 'Middle Name (Optional)',
-          type: 'text',
-          placeholder: 'Enter your middle name',
-          icon: 'user-circle'
-        },
-        {
-          name: 'lastName',
-          label: 'Last Name',
-          type: 'text',
-          placeholder: 'Enter your last name',
-          icon: 'user-circle'
-        },
-        {
-          name: 'mobileNumber1',
-          label: 'Primary Phone Number',
-          type: 'tel',
-          placeholder: '(123) 456-7890',
-          icon: 'phone',
-          description: 'Your primary contact number'
-        },
-        {
-          name: 'mobileNumber2',
-          label: 'Secondary Phone Number (Optional)',
-          type: 'tel',
-          placeholder: '(123) 456-7890',
-          icon: 'phone',
-          description: 'Optional secondary contact number'
-        }
-      ]
-    }
-  ]
-
-  const getIcon = (iconName: string) => {
-    const icons: Record<string, JSX.Element> = {
-      user: (
-        <svg style={{ width: '1.25rem', height: '1.25rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-        </svg>
-      ),
-      mail: (
-        <svg style={{ width: '1.25rem', height: '1.25rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-        </svg>
-      ),
-      lock: (
-        <svg style={{ width: '1.25rem', height: '1.25rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-        </svg>
-      ),
-      'user-circle': (
-        <svg style={{ width: '1.25rem', height: '1.25rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      ),
-      phone: (
-        <svg style={{ width: '1.25rem', height: '1.25rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-        </svg>
-      )
-    }
-    return icons[iconName] || icons.user
-  }
-
+/* ══════════════════════════════════════════
+   SIGNUP ANIMATION
+   A 3D printer nozzle building a person
+   silhouette layer-by-layer — "creating
+   your account" metaphor.
+══════════════════════════════════════════ */
+function SignupAnimation() {
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: '#f8fafc',
-      padding: '1rem'
-    }}>
-      <div style={{
-        width: '100%',
-        maxWidth: '48rem',
-        backgroundColor: 'white',
-        borderRadius: '1rem',
-        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-        overflow: 'hidden'
-      }}>
-        {/* Header */}
-        <div style={{
-          backgroundColor: '#7c3aed',
-          padding: '2rem',
-          textAlign: 'center'
-        }}>
-          <Link href="/" style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            textDecoration: 'none',
-            marginBottom: '1rem'
-          }}>
-            <div style={{
-              position: 'relative',
-              width: '3rem',
-              height: '3rem',
-              marginRight: '0.75rem'
-            }}>
-              <Image
-                src="/logo.svg"
-                alt="3DPrintHub Logo"
-                fill
-                style={{ objectFit: 'contain' }}
-              />
-            </div>
-            <span style={{
-              fontSize: '1.875rem',
-              fontWeight: 700,
-              color: 'white'
-            }}>
-              3DPrintHub
-            </span>
-          </Link>
-          <h2 style={{
-            fontSize: '1.5rem',
-            fontWeight: 600,
-            color: 'white',
-            margin: 0
-          }}>
-            Create Your Account
-          </h2>
-          <p style={{
-            color: '#ddd6fe',
-            marginTop: '0.5rem',
-            fontSize: '0.875rem'
-          }}>
-            Join our 3D printing community today
-          </p>
-        </div>
+    <svg
+      viewBox="0 0 260 280"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="w-72 h-80"
+      aria-hidden="true"
+    >
+      {/* ── Print frame / gantry rails ── */}
+      {/* Left vertical rail */}
+      <rect
+        x="28"
+        y="20"
+        width="6"
+        height="200"
+        rx="3"
+        fill="rgba(255,80,0,0.20)"
+      />
+      {/* Right vertical rail */}
+      <rect
+        x="226"
+        y="20"
+        width="6"
+        height="200"
+        rx="3"
+        fill="rgba(255,80,0,0.20)"
+      />
+      {/* Top horizontal bar */}
+      <rect
+        x="24"
+        y="18"
+        width="212"
+        height="8"
+        rx="4"
+        fill="rgba(255,80,0,0.35)"
+      />
 
-        {/* Form */}
-        <div style={{ padding: '2rem' }}>
-          {errors.general && (
-            <div style={{
-              backgroundColor: '#fef2f2',
-              border: '1px solid #fecaca',
-              color: '#dc2626',
-              padding: '0.75rem 1rem',
-              borderRadius: '0.5rem',
-              marginBottom: '1.5rem',
-              fontSize: '0.875rem'
-            }}>
-              {errors.general}
-            </div>
-          )}
+      {/* ── X-axis carriage (moves left↔right) ── */}
+      <g style={{ animation: "carriageSlide 2.8s ease-in-out infinite" }}>
+        {/* Carriage beam */}
+        <rect
+          x="34"
+          y="38"
+          width="192"
+          height="5"
+          rx="2.5"
+          fill="rgba(255,80,0,0.50)"
+        />
+        {/* Nozzle block */}
+        <rect
+          x="116"
+          y="40"
+          width="28"
+          height="16"
+          rx="4"
+          fill="#ff5000"
+          opacity="0.95"
+        />
+        {/* Nozzle tip */}
+        <path d="M 126 56 L 122 68 L 130 68 Z" fill="#ff5000" opacity="0.95" />
+        {/* Extruder motor detail */}
+        <circle cx="130" cy="44" r="5" fill="rgba(255,255,255,0.20)" />
+        {/* Heating glow */}
+        <circle
+          cx="130"
+          cy="66"
+          r="3"
+          fill="#ffb347"
+          opacity="0.9"
+          style={{ animation: "heatPulse 1.2s ease-in-out infinite" }}
+        />
+      </g>
 
-          <form onSubmit={handleSubmit}>
-            {formSections.map((section, sectionIndex) => (
-              <div key={sectionIndex} style={{
-                marginBottom: sectionIndex === 0 ? '2rem' : '2.5rem'
-              }}>
-                <h3 style={{
-                  fontSize: '1.125rem',
-                  fontWeight: 600,
-                  color: '#374151',
-                  marginBottom: '1rem',
-                  paddingBottom: '0.5rem',
-                  borderBottom: '2px solid #e5e7eb'
-                }}>
-                  {section.title}
-                </h3>
-                
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-                  gap: '1rem'
-                }}>
-                  {section.fields.map((field) => (
-                    <div key={field.name} style={{
-                      marginBottom: '1rem'
-                    }}>
-                      <label htmlFor={field.name} style={{
-                        display: 'block',
-                        fontSize: '0.875rem',
-                        fontWeight: 500,
-                        color: '#374151',
-                        marginBottom: '0.25rem'
-                      }}>
-                        {field.label}
-                      </label>
-                      
-                      <div style={{ position: 'relative' }}>
-                        <div style={{
-                          position: 'absolute',
-                          left: '0.75rem',
-                          top: '50%',
-                          transform: 'translateY(-50%)',
-                          color: errors[field.name as keyof typeof errors] ? '#f87171' : '#9ca3af'
-                        }}>
-                          {getIcon(field.icon)}
-                        </div>
-                        
-                        <input
-                          id={field.name}
-                          name={field.name}
-                          type={
-                            field.type === 'password' 
-                              ? (field.name === 'password' ? (showPassword ? 'text' : 'password') : (showConfirmPassword ? 'text' : 'password'))
-                              : field.type
-                          }
-                          value={formData[field.name as keyof typeof formData] || ''}
-                          onChange={field.name.includes('mobileNumber') ? handlePhoneChange : handleChange}
-                          style={{
-                            width: '100%',
-                            padding: '0.75rem 2.5rem 0.75rem 2.5rem',
-                            border: `1px solid ${errors[field.name as keyof typeof errors] ? '#f87171' : '#d1d5db'}`,
-                            borderRadius: '0.5rem',
-                            fontSize: '0.875rem',
-                            color: '#111827',
-                            backgroundColor: 'white',
-                            transition: 'all 0.2s ease'
-                          }}
-                          onFocus={(e) => {
-                            e.target.style.borderColor = errors[field.name as keyof typeof errors] ? '#f87171' : '#7c3aed'
-                            e.target.style.boxShadow = '0 0 0 3px rgba(124, 58, 237, 0.1)'
-                          }}
-                          onBlur={(e) => {
-                            e.target.style.borderColor = errors[field.name as keyof typeof errors] ? '#f87171' : '#d1d5db'
-                            e.target.style.boxShadow = 'none'
-                          }}
-                          placeholder={field.placeholder}
-                          disabled={isLoading}
-                        />
-                        
-                        {(field.name === 'password' || field.name === 'confirmPassword') && (
-                          <button
-                            type="button"
-                            onClick={() => field.name === 'password' 
-                              ? setShowPassword(!showPassword)
-                              : setShowConfirmPassword(!showConfirmPassword)
-                            }
-                            style={{
-                              position: 'absolute',
-                              right: '0.75rem',
-                              top: '50%',
-                              transform: 'translateY(-50%)',
-                              color: '#9ca3af',
-                              backgroundColor: 'transparent',
-                              border: 'none',
-                              cursor: 'pointer',
-                              padding: '0.25rem',
-                              borderRadius: '0.25rem',
-                              transition: 'all 0.2s ease'
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.backgroundColor = '#f3f4f6'
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.backgroundColor = 'transparent'
-                            }}
-                          >
-                            {field.name === 'password' ? (
-                              showPassword ? (
-                                <svg style={{ width: '1.25rem', height: '1.25rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L6.59 6.59m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                                </svg>
-                              ) : (
-                                <svg style={{ width: '1.25rem', height: '1.25rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                              )
-                            ) : (
-                              showConfirmPassword ? (
-                                <svg style={{ width: '1.25rem', height: '1.25rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L6.59 6.59m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                                </svg>
-                              ) : (
-                                <svg style={{ width: '1.25rem', height: '1.25rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                              )
-                            )}
-                          </button>
-                        )}
-                      </div>
-                      
-                      {field.description && (
-                        <p style={{
-                          color: '#6b7280',
-                          fontSize: '0.75rem',
-                          marginTop: '0.25rem'
-                        }}>
-                          {field.description}
-                        </p>
-                      )}
-                      
-                      {errors[field.name as keyof typeof errors] && (
-                        <p style={{
-                          color: '#dc2626',
-                          fontSize: '0.75rem',
-                          marginTop: '0.25rem'
-                        }}>
-                          {errors[field.name as keyof typeof errors]}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
+      {/* ── Build plate ── */}
+      <rect
+        x="46"
+        y="222"
+        width="168"
+        height="8"
+        rx="4"
+        fill="rgba(255,80,0,0.30)"
+      />
+      {/* Plate grid lines */}
+      {[0, 1, 2, 3, 4, 5].map((i) => (
+        <line
+          key={`v${i}`}
+          x1={60 + i * 28}
+          y1="222"
+          x2={60 + i * 28}
+          y2="230"
+          stroke="rgba(255,80,0,0.15)"
+          strokeWidth="1"
+        />
+      ))}
+      {/* Platform legs */}
+      <rect
+        x="70"
+        y="230"
+        width="6"
+        height="16"
+        rx="3"
+        fill="rgba(255,80,0,0.20)"
+      />
+      <rect
+        x="184"
+        y="230"
+        width="6"
+        height="16"
+        rx="3"
+        fill="rgba(255,80,0,0.20)"
+      />
 
-            {/* Terms and Conditions */}
-            <div style={{ marginBottom: '1.5rem' }}>
-              <label style={{ display: 'flex', alignItems: 'flex-start', cursor: 'pointer' }}>
-                <input
-                  type="checkbox"
-                  checked={acceptTerms}
-                  onChange={(e) => {
-                    setAcceptTerms(e.target.checked)
-                    if (errors.terms) {
-                      setErrors(prev => ({ ...prev, terms: undefined }))
-                    }
-                  }}
-                  style={{
-                    marginTop: '0.25rem',
-                    marginRight: '0.5rem',
-                    width: '1rem',
-                    height: '1rem',
-                    borderRadius: '0.25rem',
-                    border: `1px solid ${errors.terms ? '#f87171' : '#d1d5db'}`,
-                    backgroundColor: acceptTerms ? '#7c3aed' : 'white',
-                    cursor: 'pointer'
-                  }}
-                  disabled={isLoading}
-                />
-                <span style={{
-                  fontSize: '0.875rem',
-                  color: '#374151'
-                }}>
-                  I agree to the{' '}
-                  <Link href="/terms" style={{
-                    color: '#7c3aed',
-                    textDecoration: 'none',
-                    fontWeight: 500
-                  }}>
-                    Terms of Service
-                  </Link>{' '}
-                  and{' '}
-                  <Link href="/privacy" style={{
-                    color: '#7c3aed',
-                    textDecoration: 'none',
-                    fontWeight: 500
-                  }}>
-                    Privacy Policy
-                  </Link>
-                  . I understand that my data will be used to provide 3D printing services and improve my experience.
-                </span>
-              </label>
-              {errors.terms && (
-                <p style={{
-                  color: '#dc2626',
-                  fontSize: '0.75rem',
-                  marginLeft: '1.5rem',
-                  marginTop: '0.25rem'
-                }}>
-                  {errors.terms}
-                </p>
-              )}
-            </div>
+      {/* ── Printed object: person silhouette built layer by layer ── */}
+      {/* Layer 1 — base / feet (prints first, always visible) */}
+      <rect
+        x="112"
+        y="208"
+        width="36"
+        height="6"
+        rx="2"
+        fill="#ff5000"
+        opacity="0.9"
+        style={{ animation: "layerAppear 3.2s 0.0s ease-out infinite" }}
+      />
+      {/* Layer 2 — legs */}
+      <rect
+        x="114"
+        y="198"
+        width="14"
+        height="12"
+        rx="2"
+        fill="#ff5000"
+        opacity="0.85"
+        style={{ animation: "layerAppear 3.2s 0.25s ease-out infinite" }}
+      />
+      <rect
+        x="132"
+        y="198"
+        width="14"
+        height="12"
+        rx="2"
+        fill="#ff5000"
+        opacity="0.85"
+        style={{ animation: "layerAppear 3.2s 0.25s ease-out infinite" }}
+      />
+      {/* Layer 3 — torso */}
+      <rect
+        x="110"
+        y="178"
+        width="40"
+        height="22"
+        rx="4"
+        fill="#ff5000"
+        opacity="0.9"
+        style={{ animation: "layerAppear 3.2s 0.50s ease-out infinite" }}
+      />
+      {/* Layer 4 — arms */}
+      <rect
+        x="96"
+        y="182"
+        width="16"
+        height="8"
+        rx="3"
+        fill="#ff5000"
+        opacity="0.80"
+        style={{ animation: "layerAppear 3.2s 0.75s ease-out infinite" }}
+      />
+      <rect
+        x="148"
+        y="182"
+        width="16"
+        height="8"
+        rx="3"
+        fill="#ff5000"
+        opacity="0.80"
+        style={{ animation: "layerAppear 3.2s 0.75s ease-out infinite" }}
+      />
+      {/* Layer 5 — neck */}
+      <rect
+        x="124"
+        y="170"
+        width="12"
+        height="10"
+        rx="3"
+        fill="#ff5000"
+        opacity="0.85"
+        style={{ animation: "layerAppear 3.2s 1.00s ease-out infinite" }}
+      />
+      {/* Layer 6 — head */}
+      <circle
+        cx="130"
+        cy="157"
+        r="18"
+        fill="#ff5000"
+        opacity="0.95"
+        style={{ animation: "layerAppear 3.2s 1.25s ease-out infinite" }}
+      />
+      {/* Face — simple smile */}
+      <circle
+        cx="123"
+        cy="154"
+        r="2.5"
+        fill="rgba(255,255,255,0.55)"
+        style={{ animation: "layerAppear 3.2s 1.50s ease-out infinite" }}
+      />
+      <circle
+        cx="137"
+        cy="154"
+        r="2.5"
+        fill="rgba(255,255,255,0.55)"
+        style={{ animation: "layerAppear 3.2s 1.50s ease-out infinite" }}
+      />
+      <path
+        d="M 123 162 Q 130 168 137 162"
+        stroke="rgba(255,255,255,0.60)"
+        strokeWidth="2"
+        strokeLinecap="round"
+        fill="none"
+        style={{ animation: "layerAppear 3.2s 1.75s ease-out infinite" }}
+      />
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              style={{
-                width: '100%',
-                padding: '0.875rem 1rem',
-                backgroundColor: isLoading ? '#a78bfa' : '#7c3aed',
-                color: 'white',
-                border: 'none',
-                borderRadius: '0.5rem',
-                fontSize: '1rem',
-                fontWeight: 600,
-                cursor: isLoading ? 'not-allowed' : 'pointer',
-                transition: 'all 0.2s ease',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.5rem'
-              }}
-              onMouseEnter={(e) => {
-                if (!isLoading) {
-                  e.currentTarget.style.backgroundColor = '#6d28d9'
-                  e.currentTarget.style.transform = 'translateY(-1px)'
-                  e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isLoading) {
-                  e.currentTarget.style.backgroundColor = '#7c3aed'
-                  e.currentTarget.style.transform = 'translateY(0)'
-                  e.currentTarget.style.boxShadow = 'none'
-                }
-              }}
-            >
-              {isLoading ? (
-                <>
-                  <svg style={{
-                    width: '1.5rem',
-                    height: '1.5rem',
-                    animation: 'spin 1s linear infinite'
-                  }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                  </svg>
-                  Creating Account...
-                </>
-              ) : (
-                <>
-                  <svg style={{ width: '1.5rem', height: '1.5rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                  </svg>
-                  Create Account
-                </>
-              )}
-            </button>
+      {/* ── Filament trail from nozzle to object ── */}
+      <line
+        x1="130"
+        y1="68"
+        x2="130"
+        y2="140"
+        stroke="#ff5000"
+        strokeWidth="2"
+        strokeDasharray="4 3"
+        opacity="0.45"
+        style={{ animation: "filamentDrop 2.8s ease-in-out infinite" }}
+      />
 
-            {/* Divider */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              margin: '1.5rem 0'
-            }}>
-              <div style={{ flex: 1, height: '1px', backgroundColor: '#e5e7eb' }} />
-              <span style={{
-                padding: '0 1rem',
-                fontSize: '0.875rem',
-                color: '#6b7280'
-              }}>
-                Or sign up with
-              </span>
-              <div style={{ flex: 1, height: '1px', backgroundColor: '#e5e7eb' }} />
-            </div>
+      {/* ── Plus/star sparkles (new account creation flair) ── */}
+      {[
+        { cx: 52, cy: 100, delay: "0.0s" },
+        { cx: 208, cy: 130, delay: "0.8s" },
+        { cx: 44, cy: 170, delay: "1.6s" },
+        { cx: 216, cy: 80, delay: "2.2s" },
+      ].map(({ cx, cy, delay }, i) => (
+        <g
+          key={i}
+          style={{
+            animation: `sparkle 2.4s ${delay} ease-in-out infinite`,
+            transformOrigin: `${cx}px ${cy}px`,
+          }}
+        >
+          <line
+            x1={cx - 7}
+            y1={cy}
+            x2={cx + 7}
+            y2={cy}
+            stroke="#ff5000"
+            strokeWidth="2"
+            strokeLinecap="round"
+            opacity="0.7"
+          />
+          <line
+            x1={cx}
+            y1={cy - 7}
+            x2={cx}
+            y2={cy + 7}
+            stroke="#ff5000"
+            strokeWidth="2"
+            strokeLinecap="round"
+            opacity="0.7"
+          />
+          <line
+            x1={cx - 5}
+            y1={cy - 5}
+            x2={cx + 5}
+            y2={cy + 5}
+            stroke="#ff5000"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            opacity="0.4"
+          />
+          <line
+            x1={cx + 5}
+            y1={cy - 5}
+            x2={cx - 5}
+            y2={cy + 5}
+            stroke="#ff5000"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            opacity="0.4"
+          />
+        </g>
+      ))}
 
-            {/* Social Signup Options */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '1.5rem' }}>
-              <button
-                type="button"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.5rem',
-                  padding: '0.75rem',
-                  border: '1px solid #d1d5db',
-                  backgroundColor: 'white',
-                  borderRadius: '0.5rem',
-                  fontSize: '0.875rem',
-                  fontWeight: 500,
-                  color: '#374151',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#f9fafb'
-                  e.currentTarget.style.borderColor = '#9ca3af'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'white'
-                  e.currentTarget.style.borderColor = '#d1d5db'
-                }}
-              >
-                <svg style={{ width: '1.25rem', height: '1.25rem' }} viewBox="0 0 24 24">
-                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                </svg>
-                Google
-              </button>
-              
-              <button
-                type="button"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.5rem',
-                  padding: '0.75rem',
-                  border: '1px solid #d1d5db',
-                  backgroundColor: 'white',
-                  borderRadius: '0.5rem',
-                  fontSize: '0.875rem',
-                  fontWeight: 500,
-                  color: '#374151',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#f9fafb'
-                  e.currentTarget.style.borderColor = '#9ca3af'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'white'
-                  e.currentTarget.style.borderColor = '#d1d5db'
-                }}
-              >
-                <svg style={{ width: '1.25rem', height: '1.25rem' }} fill="#000000" viewBox="0 0 24 24">
-                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-                </svg>
-                GitHub
-              </button>
-            </div>
+      {/* ── Floating layer count ── */}
+      <g style={{ animation: "fadeSlideIn 0.4s ease-out both" }}>
+        <rect
+          x="174"
+          y="148"
+          width="60"
+          height="22"
+          rx="8"
+          fill="rgba(255,80,0,0.15)"
+          stroke="rgba(255,80,0,0.40)"
+          strokeWidth="1.5"
+        />
+        <text
+          x="204"
+          y="163"
+          textAnchor="middle"
+          style={{
+            fontFamily: "'Faculty Glyphic', sans-serif",
+            fontSize: "9px",
+            fontWeight: 900,
+            fill: "#ff5000",
+            letterSpacing: "0.10em",
+          }}
+        >
+          LAYER 6/6
+        </text>
+      </g>
 
-            {/* Login Link */}
-            <div style={{ textAlign: 'center' }}>
-              <p style={{
-                fontSize: '0.875rem',
-                color: '#6b7280'
-              }}>
-                Already have an account?{' '}
-                <Link href="/login" style={{
-                  color: '#7c3aed',
-                  fontWeight: 600,
-                  textDecoration: 'none',
-                  transition: 'color 0.2s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = '#6d28d9'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = '#7c3aed'
-                }}>
-                  Sign in
-                </Link>
-              </p>
-            </div>
-          </form>
-        </div>
-
-        {/* Footer */}
-        <div style={{
-          backgroundColor: '#f9fafb',
-          padding: '1rem 2rem',
-          borderTop: '1px solid #e5e7eb',
-          textAlign: 'center'
-        }}>
-          <p style={{
-            fontSize: '0.75rem',
-            color: '#6b7280'
-          }}>
-            By creating an account, you get access to our 3D printing services,
-            model marketplace, design tools, and community features.
-          </p>
-        </div>
-      </div>
-
-      {/* Animation styles */}
-      <style jsx global>{`
-        @keyframes spin {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
-        }
-        
-        input[type="checkbox"] {
-          appearance: none;
-          position: relative;
-        }
-        
-        input[type="checkbox"]:checked::after {
-          content: "✓";
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          color: white;
-          font-size: 0.75rem;
-          font-weight: bold;
-        }
-        
-        @media (max-width: 640px) {
-          .form-grid {
-            grid-template-columns: 1fr !important;
-          }
-          
-          .social-buttons {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}</style>
-    </div>
-  )
+      {/* ── Filament threads at base ── */}
+      <path
+        d="M 0 258 Q 65 244, 130 258 T 260 258"
+        stroke="rgba(255,80,0,0.20)"
+        strokeWidth="2.5"
+        strokeDasharray="6 4"
+        fill="none"
+        style={{ animation: "filamentSlide 3s linear infinite" }}
+      />
+      <path
+        d="M 0 270 Q 65 256, 130 270 T 260 270"
+        stroke="rgba(255,80,0,0.12)"
+        strokeWidth="2"
+        strokeDasharray="4 6"
+        fill="none"
+        style={{ animation: "filamentSlide 3s linear infinite reverse" }}
+      />
+    </svg>
+  );
 }
 
-export default SignupPage
+/* ══════════════════════════════════════════
+   REUSABLE STYLED INPUT
+══════════════════════════════════════════ */
+interface SpoolInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  icon: React.ReactNode;
+  rightSlot?: React.ReactNode;
+}
+function SpoolInput({ icon, rightSlot, ...props }: SpoolInputProps) {
+  const [focused, setFocused] = useState(false);
+  return (
+    <div className="relative">
+      <span
+        className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors duration-150"
+        style={{ color: focused ? "#ff5000" : "rgba(0,0,0,0.35)" }}
+      >
+        {icon}
+      </span>
+      <input
+        {...props}
+        onFocus={(e) => {
+          setFocused(true);
+          props.onFocus?.(e);
+        }}
+        onBlur={(e) => {
+          setFocused(false);
+          props.onBlur?.(e);
+        }}
+        className="w-full rounded-2xl border-2 py-[13px] pl-12 pr-4 text-[15px] font-semibold outline-none transition-all disabled:cursor-not-allowed disabled:opacity-50"
+        style={{
+          background: "rgba(255,255,255,0.95)",
+          color: "#101113",
+          fontFamily: "inherit",
+          borderColor: focused ? "#ff5000" : "transparent",
+          boxShadow: focused ? "0 0 0 4px rgba(255,80,0,0.12)" : "none",
+          ...(props.style ?? {}),
+        }}
+      />
+      {rightSlot && (
+        <span className="absolute right-4 top-1/2 -translate-y-1/2">
+          {rightSlot}
+        </span>
+      )}
+    </div>
+  );
+}
+
+/* ── Field label ── */
+function FieldLabel({
+  children,
+  htmlFor,
+}: {
+  children: React.ReactNode;
+  htmlFor: string;
+}) {
+  return (
+    <label
+      htmlFor={htmlFor}
+      className="block text-[11px] font-black uppercase tracking-[0.10em] mb-2"
+      style={{ color: "#2b2e33" }}
+    >
+      {children}
+    </label>
+  );
+}
+
+/* ══════════════════════════════════════════
+   PAGE
+══════════════════════════════════════════ */
+export default function SignupPage() {
+  const router = useRouter();
+  const { signup } = useAuth();
+
+  const [formData, setFormData] = useState({
+    username: "",
+    password: "",
+    firstName: "",
+    middleName: "",
+    lastName: "",
+    email: "",
+    mobileNumber1: "",
+    mobileNumber2: "",
+    confirmPassword: "",
+  });
+
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    try {
+      const submitData = {
+        ...formData,
+        middleName: formData.middleName || undefined,
+        mobileNumber2: formData.mobileNumber2 || undefined,
+      };
+      await signup(submitData);
+      router.push("/login");
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "An unknown error occurred during signup",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !loading) {
+      e.preventDefault();
+      handleSubmit(e as unknown as React.FormEvent);
+    }
+  };
+
+  /* icon atoms */
+  const UserIcon = (
+    <svg
+      width="18"
+      height="18"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      viewBox="0 0 24 24"
+    >
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+    </svg>
+  );
+  const EmailIcon = (
+    <svg
+      width="18"
+      height="18"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+      />
+    </svg>
+  );
+  const LockIcon = (
+    <svg
+      width="18"
+      height="18"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      viewBox="0 0 24 24"
+    >
+      <rect x="3" y="11" width="18" height="11" rx="2" />
+      <path d="M7 11V7a5 5 0 0110 0v4" />
+    </svg>
+  );
+  const PhoneIcon = (
+    <svg
+      width="18"
+      height="18"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+      />
+    </svg>
+  );
+
+  /* ════════════════════════════════════════
+     RENDER
+  ════════════════════════════════════════ */
+  return (
+    <>
+      <style global jsx>{`
+        @import url("https://fonts.googleapis.com/css2?family=Faculty+Glyphic&display=swap");
+
+        /* ── Nozzle carriage sweeps left ↔ right ── */
+        @keyframes carriageSlide {
+          0% {
+            transform: translateX(-62px);
+          }
+          50% {
+            transform: translateX(62px);
+          }
+          100% {
+            transform: translateX(-62px);
+          }
+        }
+
+        /* ── Each printed layer fades+rises in, then resets ── */
+        @keyframes layerAppear {
+          0%,
+          5% {
+            opacity: 0;
+            transform: translateY(6px);
+          }
+          25%,
+          90% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+          100% {
+            opacity: 0;
+            transform: translateY(0);
+          }
+        }
+
+        /* ── Nozzle heat glow pulses ── */
+        @keyframes heatPulse {
+          0%,
+          100% {
+            r: 3;
+            opacity: 0.9;
+            fill: #ffb347;
+          }
+          50% {
+            r: 5;
+            opacity: 0.6;
+            fill: #ff7700;
+          }
+        }
+
+        /* ── Filament drop from nozzle ── */
+        @keyframes filamentDrop {
+          0%,
+          100% {
+            stroke-dashoffset: 0;
+            opacity: 0.45;
+          }
+          50% {
+            stroke-dashoffset: 14;
+            opacity: 0.2;
+          }
+        }
+
+        /* ── Sparkle crosses ── */
+        @keyframes sparkle {
+          0%,
+          100% {
+            opacity: 0;
+            transform: scale(0.5) rotate(0deg);
+          }
+          40%,
+          60% {
+            opacity: 1;
+            transform: scale(1) rotate(45deg);
+          }
+        }
+
+        /* ── Filament scroll ── */
+        @keyframes filamentSlide {
+          from {
+            stroke-dashoffset: 0;
+          }
+          to {
+            stroke-dashoffset: -40;
+          }
+        }
+
+        /* ── Scan line ── */
+        @keyframes layerPrint {
+          0% {
+            top: 15%;
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          90% {
+            opacity: 1;
+          }
+          100% {
+            top: 80%;
+            opacity: 0;
+          }
+        }
+        .layer-line {
+          animation: layerPrint 3.5s ease-in-out infinite;
+        }
+
+        /* ── Generic slide-in ── */
+        @keyframes fadeSlideIn {
+          from {
+            opacity: 0;
+            transform: translateY(-8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        /* ── Custom checkbox ── */
+        .spool-check {
+          appearance: none;
+          width: 18px;
+          height: 18px;
+          border: 2px solid rgba(0, 0, 0, 0.25);
+          border-radius: 5px;
+          background: rgba(255, 255, 255, 0.95);
+          cursor: pointer;
+          flex-shrink: 0;
+          transition:
+            border-color 0.15s,
+            background 0.15s;
+          position: relative;
+        }
+        .spool-check:checked {
+          background: #ff5000;
+          border-color: #ff5000;
+        }
+        .spool-check:checked::after {
+          content: "";
+          position: absolute;
+          left: 3px;
+          top: 0px;
+          width: 6px;
+          height: 10px;
+          border: 2px solid #fff;
+          border-top: none;
+          border-left: none;
+          transform: rotate(45deg);
+        }
+        .spool-check:focus {
+          outline: none;
+          box-shadow: 0 0 0 3px rgba(255, 80, 0, 0.2);
+        }
+      `}</style>
+
+      <div
+        className="flex flex-col"
+        style={{
+          fontFamily: "'Faculty Glyphic', sans-serif",
+          background: "#e4e7ec",
+        }}
+      >
+        {/* ─── SPLIT ─── */}
+        <main className="flex flex-1">
+          {/* ── LEFT: animation panel ── */}
+          <div
+            className="hidden lg:flex lg:w-5/12 relative flex-col justify-end overflow-hidden"
+            style={{ background: "#101113", padding: "60px 56px" }}
+          >
+            {/* Print-bed grid */}
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                backgroundImage:
+                  "linear-gradient(rgba(255,80,0,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,80,0,0.08) 1px, transparent 1px)",
+                backgroundSize: "44px 44px",
+              }}
+            />
+
+            {/* Scan line */}
+            <div
+              className="layer-line absolute left-0 right-0 pointer-events-none"
+              style={{
+                height: "2px",
+                background:
+                  "linear-gradient(90deg, transparent, rgba(255,80,0,0.6), transparent)",
+              }}
+            />
+
+            {/* Animation centred */}
+            <div
+              className="absolute inset-0 flex items-center justify-center pointer-events-none"
+              style={{ paddingBottom: "22%" }}
+            >
+              <SignupAnimation />
+            </div>
+
+            {/* Copy */}
+            <div className="relative z-10">
+              <p
+                className="text-xs font-black uppercase tracking-[0.14em] mb-3"
+                style={{ color: "#ff5000" }}
+              >
+                Join the Community
+              </p>
+              <h2
+                className="font-black leading-[1.08] mb-4"
+                style={{
+                  fontSize: "clamp(28px, 2.8vw, 46px)",
+                  letterSpacing: "-0.03em",
+                  color: "#fff",
+                }}
+              >
+                Build it.
+                <br />
+                <span style={{ color: "#ff5000" }}>Share it.</span>
+                <br />
+                Ship it.
+              </h2>
+              <p
+                className="text-[16px] font-medium leading-relaxed max-w-[340px] mb-8"
+                style={{ color: "rgba(255,255,255,0.55)" }}
+              >
+                Join thousands of makers accessing premium filament, community
+                models, and print-ready files.
+              </p>
+              {[
+                "Access 12,000+ community models",
+                "Exclusive filament drops & bundles",
+                "48-hour dispatch on all orders",
+              ].map((text) => (
+                <div key={text} className="flex items-center gap-3 mb-3">
+                  <div
+                    className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{
+                      background: "rgba(255,80,0,0.18)",
+                      border: "1.5px solid rgba(255,80,0,0.4)",
+                    }}
+                  >
+                    <svg
+                      width="12"
+                      height="12"
+                      fill="none"
+                      stroke="#ff5000"
+                      strokeWidth={2.5}
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  </div>
+                  <span
+                    className="text-[14px] font-semibold"
+                    style={{ color: "rgba(255,255,255,0.70)" }}
+                  >
+                    {text}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ── RIGHT: form ── */}
+          <div
+            className="w-full lg:w-7/12 flex items-start justify-center overflow-y-auto px-6 py-12"
+            style={{ background: "#e4e7ec" }}
+          >
+            <div className="w-full max-w-[580px]">
+              {/* Heading */}
+              <p
+                className="text-xs font-black uppercase tracking-[0.14em] mb-2"
+                style={{ color: "#ff5000" }}
+              >
+                Get started
+              </p>
+              <h1
+                className="font-black leading-[1.05] mb-2"
+                style={{
+                  fontSize: "clamp(28px, 2.6vw, 42px)",
+                  letterSpacing: "-0.03em",
+                  color: "#101113",
+                }}
+              >
+                Create your
+                <br />
+                SpoolBear account
+              </h1>
+              <p
+                className="text-[15px] font-medium mb-8"
+                style={{ color: "#2b2e33" }}
+              >
+                Fill in the details below — it only takes a minute.
+              </p>
+
+              {/* Error banner */}
+              {error && (
+                <div
+                  className="flex items-start gap-3 rounded-2xl px-4 py-3.5 mb-7 text-sm font-semibold"
+                  style={{
+                    background: "rgba(255,80,0,0.10)",
+                    border: "1.5px solid rgba(255,80,0,0.4)",
+                    color: "#ff5000",
+                    animation: "fadeSlideIn 0.3s ease-out",
+                  }}
+                >
+                  <svg
+                    className="w-5 h-5 flex-shrink-0 mt-0.5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2.5}
+                    viewBox="0 0 24 24"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <circle cx="12" cy="16" r="1" fill="currentColor" />
+                  </svg>
+                  {error}
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+                {/* ── Personal Info ── */}
+                <div>
+                  <p
+                    className="text-[11px] font-black uppercase tracking-[0.12em] mb-3 pb-2"
+                    style={{
+                      color: "rgba(0,0,0,0.35)",
+                      borderBottom: "1.5px solid rgba(0,0,0,0.08)",
+                    }}
+                  >
+                    Personal Info
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <FieldLabel htmlFor="firstName">
+                        First Name <span style={{ color: "#ff5000" }}>*</span>
+                      </FieldLabel>
+                      <SpoolInput
+                        id="firstName"
+                        name="firstName"
+                        type="text"
+                        required
+                        placeholder="John"
+                        value={formData.firstName}
+                        onChange={handleChange}
+                        onKeyPress={handleKeyPress}
+                        disabled={loading}
+                        icon={UserIcon}
+                      />
+                    </div>
+                    <div>
+                      <FieldLabel htmlFor="middleName">
+                        Middle Name{" "}
+                        <span
+                          className="normal-case font-semibold tracking-normal"
+                          style={{
+                            color: "rgba(0,0,0,0.30)",
+                            fontSize: "10px",
+                          }}
+                        >
+                          (Optional)
+                        </span>
+                      </FieldLabel>
+                      <SpoolInput
+                        id="middleName"
+                        name="middleName"
+                        type="text"
+                        placeholder="Middle"
+                        value={formData.middleName}
+                        onChange={handleChange}
+                        onKeyPress={handleKeyPress}
+                        disabled={loading}
+                        icon={UserIcon}
+                      />
+                    </div>
+                    <div>
+                      <FieldLabel htmlFor="lastName">
+                        Last Name <span style={{ color: "#ff5000" }}>*</span>
+                      </FieldLabel>
+                      <SpoolInput
+                        id="lastName"
+                        name="lastName"
+                        type="text"
+                        required
+                        placeholder="Doe"
+                        value={formData.lastName}
+                        onChange={handleChange}
+                        onKeyPress={handleKeyPress}
+                        disabled={loading}
+                        icon={UserIcon}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* ── Account Details ── */}
+                <div>
+                  <p
+                    className="text-[11px] font-black uppercase tracking-[0.12em] mb-3 pb-2"
+                    style={{
+                      color: "rgba(0,0,0,0.35)",
+                      borderBottom: "1.5px solid rgba(0,0,0,0.08)",
+                    }}
+                  >
+                    Account Details
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <FieldLabel htmlFor="username">
+                        Username <span style={{ color: "#ff5000" }}>*</span>
+                      </FieldLabel>
+                      <SpoolInput
+                        id="username"
+                        name="username"
+                        type="text"
+                        required
+                        placeholder="johndoe"
+                        value={formData.username}
+                        onChange={handleChange}
+                        onKeyPress={handleKeyPress}
+                        disabled={loading}
+                        icon={UserIcon}
+                      />
+                    </div>
+                    <div>
+                      <FieldLabel htmlFor="email">
+                        Email Address{" "}
+                        <span style={{ color: "#ff5000" }}>*</span>
+                      </FieldLabel>
+                      <SpoolInput
+                        id="email"
+                        name="email"
+                        type="email"
+                        required
+                        placeholder="john@example.com"
+                        value={formData.email}
+                        onChange={handleChange}
+                        onKeyPress={handleKeyPress}
+                        disabled={loading}
+                        icon={EmailIcon}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* ── Password ── */}
+                <div>
+                  <FieldLabel htmlFor="password">
+                    Password <span style={{ color: "#ff5000" }}>*</span>
+                  </FieldLabel>
+                  <SpoolInput
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    required
+                    placeholder="Create a strong password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    onKeyPress={handleKeyPress}
+                    disabled={loading}
+                    icon={LockIcon}
+                    rightSlot={
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        disabled={loading}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                          color: "rgba(0,0,0,0.35)",
+                          padding: 0,
+                        }}
+                        onMouseEnter={(e) =>
+                          (e.currentTarget.style.color = "#ff5000")
+                        }
+                        onMouseLeave={(e) =>
+                          (e.currentTarget.style.color = "rgba(0,0,0,0.35)")
+                        }
+                      >
+                        {showPassword ? <EyeOff /> : <EyeOpen />}
+                      </button>
+                    }
+                  />
+                </div>
+
+                {/* ── Contact ── */}
+                <div>
+                  <p
+                    className="text-[11px] font-black uppercase tracking-[0.12em] mb-3 pb-2"
+                    style={{
+                      color: "rgba(0,0,0,0.35)",
+                      borderBottom: "1.5px solid rgba(0,0,0,0.08)",
+                    }}
+                  >
+                    Contact
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <FieldLabel htmlFor="mobileNumber1">
+                        Primary Mobile{" "}
+                        <span style={{ color: "#ff5000" }}>*</span>
+                      </FieldLabel>
+                      <SpoolInput
+                        id="mobileNumber1"
+                        name="mobileNumber1"
+                        type="tel"
+                        required
+                        placeholder="0771234567"
+                        value={formData.mobileNumber1}
+                        onChange={handleChange}
+                        onKeyPress={handleKeyPress}
+                        disabled={loading}
+                        icon={PhoneIcon}
+                      />
+                    </div>
+                    <div>
+                      <FieldLabel htmlFor="mobileNumber2">
+                        Secondary Mobile{" "}
+                        <span
+                          className="normal-case font-semibold tracking-normal"
+                          style={{
+                            color: "rgba(0,0,0,0.30)",
+                            fontSize: "10px",
+                          }}
+                        >
+                          (Optional)
+                        </span>
+                      </FieldLabel>
+                      <SpoolInput
+                        id="mobileNumber2"
+                        name="mobileNumber2"
+                        type="tel"
+                        placeholder="0711234567"
+                        value={formData.mobileNumber2}
+                        onChange={handleChange}
+                        onKeyPress={handleKeyPress}
+                        disabled={loading}
+                        icon={PhoneIcon}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* ── Terms ── */}
+                <label className="flex items-start gap-3 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    required
+                    className="spool-check mt-0.5"
+                  />
+                  <span
+                    className="text-[14px] font-medium leading-snug"
+                    style={{ color: "#2b2e33" }}
+                  >
+                    I agree to the{" "}
+                    <Link
+                      href="/terms"
+                      className="font-bold no-underline hover:underline"
+                      style={{ color: "#ff5000" }}
+                    >
+                      Terms of Service
+                    </Link>{" "}
+                    and{" "}
+                    <Link
+                      href="/privacy"
+                      className="font-bold no-underline hover:underline"
+                      style={{ color: "#ff5000" }}
+                    >
+                      Privacy Policy
+                    </Link>
+                  </span>
+                </label>
+
+                {/* ── Submit ── */}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full rounded-2xl py-[17px] px-6 text-base font-black uppercase tracking-[0.10em] text-white transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-40"
+                  style={{
+                    background: "#ff5000",
+                    boxShadow: "0 6px 28px rgba(255,80,0,0.30)",
+                    fontFamily: "inherit",
+                    border: "none",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!loading) {
+                      e.currentTarget.style.background = "#e34800";
+                      e.currentTarget.style.transform = "translateY(-2px)";
+                      e.currentTarget.style.boxShadow =
+                        "0 10px 36px rgba(255,80,0,0.40)";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "#ff5000";
+                    e.currentTarget.style.transform = "none";
+                    e.currentTarget.style.boxShadow =
+                      "0 6px 28px rgba(255,80,0,0.30)";
+                  }}
+                >
+                  {loading ? (
+                    <span className="flex items-center justify-center gap-3">
+                      <svg
+                        className="h-5 w-5 animate-spin"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
+                      </svg>
+                      Creating Account…
+                    </span>
+                  ) : (
+                    "Create Account →"
+                  )}
+                </button>
+
+                {/* Divider */}
+                <div className="flex items-center gap-4">
+                  <div
+                    className="flex-1 h-[1.5px]"
+                    style={{ background: "rgba(0,0,0,0.12)" }}
+                  />
+                  <span
+                    className="text-xs font-bold uppercase tracking-[0.10em]"
+                    style={{ color: "rgba(0,0,0,0.30)" }}
+                  >
+                    or
+                  </span>
+                  <div
+                    className="flex-1 h-[1.5px]"
+                    style={{ background: "rgba(0,0,0,0.12)" }}
+                  />
+                </div>
+
+                {/* Login link */}
+                <p
+                  className="text-center text-sm font-semibold"
+                  style={{ color: "#2b2e33" }}
+                >
+                  Already have an account?{" "}
+                  <Link
+                    href="/login"
+                    className="font-black no-underline transition-opacity hover:opacity-75"
+                    style={{ color: "#ff5000" }}
+                  >
+                    Sign in instead →
+                  </Link>
+                </p>
+              </form>
+            </div>
+          </div>
+        </main>
+      </div>
+    </>
+  );
+}

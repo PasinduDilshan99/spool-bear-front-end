@@ -379,151 +379,153 @@ const BlogPage: React.FC = () => {
   const paginatedBlogs = getPaginatedBlogs();
 
   return (
-    <div className="bg-[#e4e7ec] min-h-screen">
-      {/* Decorative Grid Pattern */}
-      <div 
-        className="absolute inset-0 opacity-[0.02] pointer-events-none"
+    <div
+      className="bg-[#e4e7ec] relative overflow-x-hidden min-h-screen"
+      style={{ fontFamily: "'Faculty Glyphic', sans-serif" }}
+    >
+      <div
+        className="min-h-screen relative overflow-x-hidden"
         style={{
-          backgroundImage: `linear-gradient(${spoolbearTheme.colors.accent}1a 1px, transparent 1px), 
-                           linear-gradient(90deg, ${spoolbearTheme.colors.accent}1a 1px, transparent 1px)`,
-          backgroundSize: '44px 44px',
+          backgroundImage:
+            "linear-gradient(rgba(255,80,0,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,80,0,0.045) 1px, transparent 1px)",
+          backgroundSize: "44px 44px",
         }}
-      />
-
-      <div className="container mx-auto px-4 py-8 md:py-12 lg:py-16 relative z-10">
-        {/* Page Header */}
-        <div className="text-center mb-8 md:mb-12">
-          <div className="inline-flex items-center gap-2 bg-[#ff5000]/10 rounded-full px-4 py-2 mb-6">
-            <span className="relative flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ff5000] opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-[#ff5000]"></span>
-            </span>
-            <span className="text-[#ff5000] font-semibold uppercase tracking-wider text-sm">
-              Our Blog
-            </span>
-          </div>
-          
-          <h1 className="font-black text-[clamp(36px,5vw,56px)] tracking-[-0.02em] text-[#101113] mb-4">
-            {writerParam
-              ? `${writerParam}'s Stories`
-              : searchParam
-                ? `Search: "${searchParam}"`
-                : "Stories & Insights"}
-          </h1>
-          
-          <p className="text-lg text-[#2b2e33] max-w-3xl mx-auto">
-            {writerParam
-              ? `Discover all articles written by ${writerParam}`
-              : searchParam
-                ? `Showing results related to "${searchParam}"`
-                : "Discover authentic stories, expert tips, and inspiring adventures from our community."}
-          </p>
-        </div>
-
-        {/* Filters Section - Only show if no URL parameters */}
-        {shouldShowFilters() ? (
-          <BlogFilter
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            onResetFilters={resetFilters}
-            writers={writers}
-            categories={categories}
-          />
-        ) : (
-          <div 
-            className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 mb-8 border"
-            style={{ borderColor: `${spoolbearTheme.colors.accent}20` }}
-          >
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <div>
-                <h2 className="text-xl font-bold text-[#101113]">
-                  {writerParam
-                    ? `Filtered by Writer: ${writerParam}`
-                    : searchParam
-                      ? `Filtered by Search: ${searchParam}`
-                      : ""}
-                </h2>
-                <p className="text-sm text-[#2b2e33]">
-                  Showing {blogs.length} blog{blogs.length !== 1 ? "s" : ""}
-                  {writerParam
-                    ? ` by ${writerParam}`
-                    : searchParam
-                      ? ` related to "${searchParam}"`
-                      : ""}
-                </p>
-              </div>
-              <button
-                onClick={resetFilters}
-                className="flex items-center gap-2 px-4 py-2.5 bg-[#ff5000]/10 text-[#ff5000] font-medium rounded-lg hover:bg-[#ff5000]/20 transition-colors border"
-                style={{ borderColor: `${spoolbearTheme.colors.accent}30` }}
-              >
-                Clear Filter
-              </button>
+      >
+        <div className="container mx-auto px-4 py-8 md:py-12 lg:py-16 relative z-10">
+          {/* Page Header */}
+          <div className="text-center mb-8 md:mb-12">
+            <div className="inline-flex items-center gap-2 bg-[#ff5000]/10 rounded-full px-4 py-2 mb-6">
+              <span className="relative flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ff5000] opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-[#ff5000]"></span>
+              </span>
+              <span className="text-[#ff5000] font-semibold uppercase tracking-wider text-sm">
+                Our Blog
+              </span>
             </div>
-          </div>
-        )}
 
-        {/* Results Section */}
-        <div className="mb-8">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-            <h3 className="text-2xl font-bold text-[#101113]">
-              {filteredBlogs.length} Blog
-              {filteredBlogs.length !== 1 ? "s" : ""} Found
-            </h3>
+            <h1 className="font-black text-[clamp(36px,5vw,56px)] tracking-[-0.02em] text-[#101113] mb-4">
+              {writerParam
+                ? `${writerParam}'s Stories`
+                : searchParam
+                  ? `Search: "${searchParam}"`
+                  : "Stories & Insights"}
+            </h1>
 
-            {/* Items per page selector */}
-            <div className="flex items-center gap-3">
-              <label
-                htmlFor="itemsPerPage"
-                className="text-sm font-medium text-[#2b2e33] whitespace-nowrap"
-              >
-                Show:
-              </label>
-              <select
-                id="itemsPerPage"
-                value={pagination.itemsPerPage}
-                onChange={(e) =>
-                  handleItemsPerPageChange(Number(e.target.value))
-                }
-                className="text-[#101113] px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#ff5000] focus:border-[#ff5000] text-sm bg-white"
-                style={{ borderColor: `${spoolbearTheme.colors.muted}30` }}
-              >
-                {itemsPerPageOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {option} per page
-                  </option>
-                ))}
-              </select>
-            </div>
+            <p className="text-lg text-[#2b2e33] max-w-3xl mx-auto">
+              {writerParam
+                ? `Discover all articles written by ${writerParam}`
+                : searchParam
+                  ? `Showing results related to "${searchParam}"`
+                  : "Discover authentic stories, expert tips, and inspiring adventures from our community."}
+            </p>
           </div>
 
-          {/* Blogs Grid */}
-          {paginatedBlogs.length > 0 ? (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                {paginatedBlogs.map((blog) => (
-                  <BlogCard
-                    key={blog.blog_id}
-                    blog={blog}
-                    onClick={handleBlogClick}
-                  />
-                ))}
-              </div>
-
-              {/* Pagination Controls */}
-              {totalPages > 1 && (
-                <PaginationControls
-                  currentPage={pagination.currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                  totalItems={filteredBlogs.length}
-                  itemsPerPage={pagination.itemsPerPage}
-                />
-              )}
-            </>
+          {/* Filters Section - Only show if no URL parameters */}
+          {shouldShowFilters() ? (
+            <BlogFilter
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              onResetFilters={resetFilters}
+              writers={writers}
+              categories={categories}
+            />
           ) : (
-            <NoResults onResetFilters={resetFilters} />
+            <div
+              className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 mb-8 border"
+              style={{ borderColor: `${spoolbearTheme.colors.accent}20` }}
+            >
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                  <h2 className="text-xl font-bold text-[#101113]">
+                    {writerParam
+                      ? `Filtered by Writer: ${writerParam}`
+                      : searchParam
+                        ? `Filtered by Search: ${searchParam}`
+                        : ""}
+                  </h2>
+                  <p className="text-sm text-[#2b2e33]">
+                    Showing {blogs.length} blog{blogs.length !== 1 ? "s" : ""}
+                    {writerParam
+                      ? ` by ${writerParam}`
+                      : searchParam
+                        ? ` related to "${searchParam}"`
+                        : ""}
+                  </p>
+                </div>
+                <button
+                  onClick={resetFilters}
+                  className="flex items-center gap-2 px-4 py-2.5 bg-[#ff5000]/10 text-[#ff5000] font-medium rounded-lg hover:bg-[#ff5000]/20 transition-colors border"
+                  style={{ borderColor: `${spoolbearTheme.colors.accent}30` }}
+                >
+                  Clear Filter
+                </button>
+              </div>
+            </div>
           )}
+
+          {/* Results Section */}
+          <div className="mb-8">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+              <h3 className="text-2xl font-bold text-[#101113]">
+                {filteredBlogs.length} Blog
+                {filteredBlogs.length !== 1 ? "s" : ""} Found
+              </h3>
+
+              {/* Items per page selector */}
+              <div className="flex items-center gap-3">
+                <label
+                  htmlFor="itemsPerPage"
+                  className="text-sm font-medium text-[#2b2e33] whitespace-nowrap"
+                >
+                  Show:
+                </label>
+                <select
+                  id="itemsPerPage"
+                  value={pagination.itemsPerPage}
+                  onChange={(e) =>
+                    handleItemsPerPageChange(Number(e.target.value))
+                  }
+                  className="text-[#101113] px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#ff5000] focus:border-[#ff5000] text-sm bg-white"
+                  style={{ borderColor: `${spoolbearTheme.colors.muted}30` }}
+                >
+                  {itemsPerPageOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option} per page
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Blogs Grid */}
+            {paginatedBlogs.length > 0 ? (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                  {paginatedBlogs.map((blog) => (
+                    <BlogCard
+                      key={blog.blog_id}
+                      blog={blog}
+                      onClick={handleBlogClick}
+                    />
+                  ))}
+                </div>
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                  <PaginationControls
+                    currentPage={pagination.currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                    totalItems={filteredBlogs.length}
+                    itemsPerPage={pagination.itemsPerPage}
+                  />
+                )}
+              </>
+            ) : (
+              <NoResults onResetFilters={resetFilters} />
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -590,10 +592,14 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
   };
 
   return (
-    <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-8 pt-6 border-t" style={{ borderColor: `${spoolbearTheme.colors.accent}20` }}>
+    <div
+      className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-8 pt-6 border-t"
+      style={{ borderColor: `${spoolbearTheme.colors.accent}20` }}
+    >
       <div className="text-sm text-[#2b2e33]">
-        Showing <span className="font-semibold text-[#ff5000]">{startItem}</span>{" "}
-        to <span className="font-semibold text-[#ff5000]">{endItem}</span> of{" "}
+        Showing{" "}
+        <span className="font-semibold text-[#ff5000]">{startItem}</span> to{" "}
+        <span className="font-semibold text-[#ff5000]">{endItem}</span> of{" "}
         <span className="font-semibold text-[#ff5000]">{totalItems}</span> blogs
       </div>
 
@@ -602,7 +608,7 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
           className="px-3 py-2 rounded-md border text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#ff5000]/10 transition-colors"
-          style={{ 
+          style={{
             borderColor: `${spoolbearTheme.colors.muted}30`,
             color: spoolbearTheme.colors.text,
           }}
@@ -622,10 +628,14 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
                   ? "cursor-default text-[#2b2e33]"
                   : "border hover:bg-[#ff5000]/10 transition-colors"
             }`}
-            style={page !== currentPage && page !== "..." ? { 
-              borderColor: `${spoolbearTheme.colors.muted}30`,
-              color: spoolbearTheme.colors.text,
-            } : {}}
+            style={
+              page !== currentPage && page !== "..."
+                ? {
+                    borderColor: `${spoolbearTheme.colors.muted}30`,
+                    color: spoolbearTheme.colors.text,
+                  }
+                : {}
+            }
           >
             {page}
           </button>
@@ -635,7 +645,7 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
           className="px-3 py-2 rounded-md border text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#ff5000]/10 transition-colors"
-          style={{ 
+          style={{
             borderColor: `${spoolbearTheme.colors.muted}30`,
             color: spoolbearTheme.colors.text,
           }}

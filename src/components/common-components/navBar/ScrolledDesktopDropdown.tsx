@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NavBarItem } from "@/types/nav-bar-types";
 import { getVisibleSubmenus } from "@/utils/utils";
+import { spoolbearTheme } from "@/theme/spoolbear-theme";
 
 interface ScrolledDesktopDropdownProps {
   item: NavBarItem;
@@ -29,34 +30,48 @@ const ScrolledDesktopDropdown: React.FC<ScrolledDesktopDropdownProps> = ({
     return false;
   };
 
+  const buttonStyle = {
+    color: isActive || isOpen ? spoolbearTheme.colors.accent : spoolbearTheme.colors.text,
+    fontSize: spoolbearTheme.nav.linkSize,
+    fontWeight: 600,
+    letterSpacing: '0.06em',
+    textTransform: 'uppercase' as const,
+    padding: '10px 2px',
+    position: 'relative' as const,
+    transition: 'color 0.2s ease',
+  };
+
+  const activeIndicatorStyle = {
+    content: '""',
+    position: 'absolute' as const,
+    left: 0,
+    right: 0,
+    bottom: '2px',
+    height: '4px',
+    background: spoolbearTheme.colors.accent,
+    borderRadius: '999px',
+  };
+
   return (
     <div className="relative group nav-dropdown">
       <button
         onClick={onToggle}
-        className="relative font-medium transition-colors duration-300 group px-2 py-1 rounded-md text-sm flex items-center space-x-1"
-        style={{
-          color: isActive || isOpen ? "#0ea5e9" : "#075985",
-          backgroundColor: isOpen || isActive ? "rgba(14, 165, 233, 0.08)" : "transparent",
-        }}
+        className="relative font-semibold transition-colors duration-200 flex items-center space-x-1"
+        style={buttonStyle}
         onMouseEnter={(e) => {
           if (!isOpen && !isActive) {
-            e.currentTarget.style.color = "#0ea5e9";
-            e.currentTarget.style.backgroundColor = "rgba(14, 165, 233, 0.08)";
+            e.currentTarget.style.color = spoolbearTheme.colors.accent;
           }
         }}
         onMouseLeave={(e) => {
           if (!isOpen && !isActive) {
-            e.currentTarget.style.color = "#075985";
-            e.currentTarget.style.backgroundColor = "transparent";
+            e.currentTarget.style.color = spoolbearTheme.colors.text;
           }
         }}
       >
         <span>{item.name}</span>
-        {isActive && !isOpen && (
-          <div className="w-1.5 h-1.5 rounded-full bg-sky-500 ml-1"></div>
-        )}
         <svg
-          className={`w-3 h-3 transition-transform duration-200 ${
+          className={`w-4 h-4 transition-transform duration-200 ${
             isOpen ? "rotate-180" : ""
           }`}
           fill="none"
@@ -70,26 +85,19 @@ const ScrolledDesktopDropdown: React.FC<ScrolledDesktopDropdownProps> = ({
             d="M19 9l-7 7-7-7"
           />
         </svg>
-        {isActive && (
-          <span
-            className="absolute left-0 -bottom-1.5 w-full h-0.5 rounded-full"
-            style={{
-              background: "linear-gradient(90deg, #0ea5e9 0%, #0d9488 100%)",
-            }}
-          ></span>
-        )}
+        {isActive && <span style={activeIndicatorStyle}></span>}
       </button>
 
-      {/* Dropdown Submenu for Scrolled Nav */}
+      {/* Dropdown Submenu with scrolled nav styling */}
       {isOpen && (
         <div
-          className="absolute left-0 top-full mt-1 w-48 rounded-lg shadow-xl border backdrop-blur-sm z-50"
+          className="absolute left-0 top-full mt-2 w-56 rounded-lg shadow-xl border z-50 backdrop-blur-sm"
           style={{
-            backgroundColor: "rgba(248, 250, 252, 0.98)",
-            borderColor: "rgba(14, 165, 233, 0.3)",
+            backgroundColor: spoolbearTheme.colors.header,
+            borderColor: 'rgba(0,0,0,0.08)',
           }}
         >
-          <div className="py-1">
+          <div className="py-2">
             {visibleSubmenus.map((submenu) => {
               const submenuIsActive = isSubmenuActive(submenu.linkUrl);
               
@@ -97,32 +105,41 @@ const ScrolledDesktopDropdown: React.FC<ScrolledDesktopDropdownProps> = ({
                 <Link
                   key={submenu.id}
                   href={submenu.linkUrl}
-                  className="flex items-center space-x-2 px-3 py-2 transition-colors duration-300 text-sm"
+                  className="flex items-center space-x-3 px-4 py-3 transition-colors duration-200"
                   style={{
-                    color: submenuIsActive ? "#0ea5e9" : "#075985",
-                    backgroundColor: submenuIsActive ? "rgba(14, 165, 233, 0.08)" : "transparent",
+                    color: submenuIsActive ? spoolbearTheme.colors.accent : spoolbearTheme.colors.text,
+                    backgroundColor: submenuIsActive ? 'rgba(255, 80, 0, 0.12)' : 'transparent',
                   }}
                   onMouseEnter={(e) => {
                     if (!submenuIsActive) {
-                      e.currentTarget.style.color = "#0ea5e9";
-                      e.currentTarget.style.backgroundColor =
-                        "rgba(14, 165, 233, 0.08)";
+                      e.currentTarget.style.color = spoolbearTheme.colors.accent;
+                      e.currentTarget.style.backgroundColor = 'rgba(255, 80, 0, 0.12)';
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (!submenuIsActive) {
-                      e.currentTarget.style.color = "#075985";
-                      e.currentTarget.style.backgroundColor = "transparent";
+                      e.currentTarget.style.color = spoolbearTheme.colors.text;
+                      e.currentTarget.style.backgroundColor = 'transparent';
                     }
                   }}
                   onClick={onClose}
                 >
                   {submenu.iconClass && (
-                    <i className={`${submenu.iconClass} w-3 h-3`}></i>
+                    <i className={`${submenu.iconClass} w-4 h-4 text-current`}></i>
                   )}
-                  <span className="flex-1">{submenu.name}</span>
+                  <div className="flex-1">
+                    <div className="font-medium">{submenu.name}</div>
+                    {submenu.description && (
+                      <div className="text-xs mt-1" style={{ color: spoolbearTheme.colors.muted }}>
+                        {submenu.description}
+                      </div>
+                    )}
+                  </div>
                   {submenuIsActive && (
-                    <div className="w-1.5 h-1.5 rounded-full bg-sky-500"></div>
+                    <div 
+                      className="w-1 h-1 rounded-full"
+                      style={{ backgroundColor: spoolbearTheme.colors.accent }}
+                    ></div>
                   )}
                 </Link>
               );

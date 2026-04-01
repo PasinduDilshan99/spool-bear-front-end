@@ -21,12 +21,12 @@ const MobileMenuItem: React.FC<MobileMenuItemProps> = ({
   const hasSubmenu = visibleSubmenus.length > 0;
 
   const buttonClasses = isScrolled
-    ? "flex items-center justify-between w-full px-3 py-2 rounded-md font-medium transition-all duration-200 border border-transparent text-sm uppercase tracking-wider"
-    : "flex items-center justify-between w-full px-4 py-3 rounded-lg font-medium transition-all duration-200 border border-transparent uppercase tracking-wider";
+    ? "flex items-center justify-between w-full px-3 py-1 rounded-md font-medium transition-all duration-200 border border-transparent text-sm uppercase tracking-wider"
+    : "flex items-center justify-between w-full px-4 py-1 rounded-lg font-medium transition-all duration-200 border border-transparent uppercase tracking-wider";
 
   const linkClasses = isScrolled
-    ? "block px-3 py-2 rounded-md font-medium transition-all duration-200 border border-transparent text-sm uppercase tracking-wider"
-    : "block px-4 py-3 rounded-lg font-medium transition-all duration-200 border border-transparent uppercase tracking-wider";
+    ? "block px-3 py-1 rounded-md font-medium transition-all duration-200 border border-transparent text-sm uppercase tracking-wider"
+    : "block px-4 py-1 rounded-lg font-medium transition-all duration-200 border border-transparent uppercase tracking-wider";
 
   if (hasSubmenu) {
     return (

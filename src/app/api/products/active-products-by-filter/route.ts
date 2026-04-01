@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    console.log("Fetch products React API - Request body:", body);
+    const cookie = request.headers.get("cookie");
 
     const response = await fetch(
       GET_ACTIVE_PRODUCTS_BY_GIVEN_FILTER_PARAMS_DATA,
@@ -16,6 +16,7 @@ export async function POST(request: NextRequest) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          ...(cookie && { Cookie: cookie }),
         },
         body: JSON.stringify(body),
       },

@@ -1,3 +1,4 @@
+// components/ScrolledDesktopNav.tsx
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
@@ -9,6 +10,9 @@ import ScrolledDesktopDropdown from "./ScrolledDesktopDropdown";
 import UserDropdown from "./UserDropdown";
 import Image from "next/image";
 import { spoolbearTheme } from "@/theme/spoolbear-theme";
+import CartIcon from "../CartIcon";
+import { LOGO_WITH_NAME } from "@/utils/constant";
+import { CurrencySelector } from "../CurrencySelector";
 
 interface ScrolledDesktopNavProps {
   visibleItems: NavBarItem[];
@@ -73,24 +77,24 @@ const ScrolledDesktopNav: React.FC<ScrolledDesktopNavProps> = ({
   // SpoolBear specific styles for scrolled state (slightly smaller)
   const navLinkStyle = {
     color: spoolbearTheme.colors.text,
-    fontSize: '14px', // Slightly smaller for scrolled state
+    fontSize: "16px", // Slightly smaller for scrolled state
     fontWeight: 600,
-    letterSpacing: '0.06em',
-    textTransform: 'uppercase' as const,
-    padding: '6px 2px',
-    position: 'relative' as const,
-    transition: 'color 0.2s ease',
+    letterSpacing: "0.06em",
+    textTransform: "uppercase" as const,
+    padding: "6px 2px",
+    position: "relative" as const,
+    transition: "color 0.2s ease",
   };
 
   const activeIndicatorStyle = {
     content: '""',
-    position: 'absolute' as const,
+    position: "absolute" as const,
     left: 0,
     right: 0,
-    bottom: '-2px',
-    height: '3px', // Slightly thinner for scrolled state
+    bottom: "-2px",
+    height: "3px", // Slightly thinner for scrolled state
     background: spoolbearTheme.colors.accent,
-    borderRadius: '999px',
+    borderRadius: "999px",
   };
 
   return (
@@ -102,11 +106,11 @@ const ScrolledDesktopNav: React.FC<ScrolledDesktopNavProps> = ({
           onClick={closeAllDropdowns}
         >
           <Image
-            src="/images/logo.png"
+            src={LOGO_WITH_NAME}
             alt={companyName}
-            width={120} // Slightly smaller for scrolled state
-            height={40}
-            className="h-8 w-auto" // Smaller height for scrolled state
+            width={2000}
+            height={2000}
+            className="h-20 w-auto" // Smaller height for scrolled state
           />
         </Link>
       </div>
@@ -139,7 +143,9 @@ const ScrolledDesktopNav: React.FC<ScrolledDesktopNavProps> = ({
               className="relative font-semibold transition-colors duration-200"
               style={{
                 ...navLinkStyle,
-                color: isActive ? spoolbearTheme.colors.accent : spoolbearTheme.colors.text,
+                color: isActive
+                  ? spoolbearTheme.colors.accent
+                  : spoolbearTheme.colors.text,
               }}
               onMouseEnter={(e) => {
                 if (!isActive) {
@@ -154,9 +160,7 @@ const ScrolledDesktopNav: React.FC<ScrolledDesktopNavProps> = ({
               onClick={closeAllDropdowns}
             >
               {item.name}
-              {isActive && (
-                <span style={activeIndicatorStyle}></span>
-              )}
+              {isActive && <span style={activeIndicatorStyle}></span>}
             </Link>
           );
         })}
@@ -172,7 +176,9 @@ const ScrolledDesktopNav: React.FC<ScrolledDesktopNavProps> = ({
               className="relative font-semibold transition-colors duration-200 flex items-center space-x-1"
               style={{
                 ...navLinkStyle,
-                color: isScrolledMoreDropdownOpen ? spoolbearTheme.colors.accent : spoolbearTheme.colors.text,
+                color: isScrolledMoreDropdownOpen
+                  ? spoolbearTheme.colors.accent
+                  : spoolbearTheme.colors.text,
               }}
               onMouseEnter={(e) => {
                 if (!isScrolledMoreDropdownOpen) {
@@ -209,7 +215,7 @@ const ScrolledDesktopNav: React.FC<ScrolledDesktopNavProps> = ({
                 className="absolute right-0 top-full mt-2 w-48 rounded-lg shadow-xl border z-50"
                 style={{
                   backgroundColor: spoolbearTheme.colors.header,
-                  borderColor: 'rgba(0,0,0,0.08)',
+                  borderColor: "rgba(0,0,0,0.08)",
                 }}
               >
                 <div className="py-2">
@@ -235,16 +241,18 @@ const ScrolledDesktopNav: React.FC<ScrolledDesktopNavProps> = ({
                                   : spoolbearTheme.colors.text,
                               backgroundColor:
                                 activeScrolledDropdown === item.id || isActive
-                                  ? 'rgba(255, 80, 0, 0.12)'
-                                  : 'transparent',
+                                  ? "rgba(255, 80, 0, 0.12)"
+                                  : "transparent",
                             }}
                             onMouseEnter={(e) => {
                               if (
                                 activeScrolledDropdown !== item.id &&
                                 !isActive
                               ) {
-                                e.currentTarget.style.color = spoolbearTheme.colors.accent;
-                                e.currentTarget.style.backgroundColor = 'rgba(255, 80, 0, 0.12)';
+                                e.currentTarget.style.color =
+                                  spoolbearTheme.colors.accent;
+                                e.currentTarget.style.backgroundColor =
+                                  "rgba(255, 80, 0, 0.12)";
                               }
                             }}
                             onMouseLeave={(e) => {
@@ -252,15 +260,23 @@ const ScrolledDesktopNav: React.FC<ScrolledDesktopNavProps> = ({
                                 activeScrolledDropdown !== item.id &&
                                 !isActive
                               ) {
-                                e.currentTarget.style.color = spoolbearTheme.colors.text;
-                                e.currentTarget.style.backgroundColor = 'transparent';
+                                e.currentTarget.style.color =
+                                  spoolbearTheme.colors.text;
+                                e.currentTarget.style.backgroundColor =
+                                  "transparent";
                               }
                             }}
                           >
                             <span className="flex items-center gap-2">
                               {item.name}
                               {isActive && (
-                                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: spoolbearTheme.colors.accent }} />
+                                <span
+                                  className="w-1.5 h-1.5 rounded-full"
+                                  style={{
+                                    backgroundColor:
+                                      spoolbearTheme.colors.accent,
+                                  }}
+                                />
                               )}
                             </span>
                             <svg
@@ -284,7 +300,7 @@ const ScrolledDesktopNav: React.FC<ScrolledDesktopNavProps> = ({
                               className="absolute left-full top-0 ml-1 w-48 rounded-lg shadow-xl border z-50"
                               style={{
                                 backgroundColor: spoolbearTheme.colors.header,
-                                borderColor: 'rgba(0,0,0,0.08)',
+                                borderColor: "rgba(0,0,0,0.08)",
                               }}
                             >
                               <div className="py-2">
@@ -305,19 +321,23 @@ const ScrolledDesktopNav: React.FC<ScrolledDesktopNavProps> = ({
                                             ? spoolbearTheme.colors.accent
                                             : spoolbearTheme.colors.text,
                                           backgroundColor: isSubActive
-                                            ? 'rgba(255, 80, 0, 0.12)'
-                                            : 'transparent',
+                                            ? "rgba(255, 80, 0, 0.12)"
+                                            : "transparent",
                                         }}
                                         onMouseEnter={(e) => {
                                           if (!isSubActive) {
-                                            e.currentTarget.style.color = spoolbearTheme.colors.accent;
-                                            e.currentTarget.style.backgroundColor = 'rgba(255, 80, 0, 0.12)';
+                                            e.currentTarget.style.color =
+                                              spoolbearTheme.colors.accent;
+                                            e.currentTarget.style.backgroundColor =
+                                              "rgba(255, 80, 0, 0.12)";
                                           }
                                         }}
                                         onMouseLeave={(e) => {
                                           if (!isSubActive) {
-                                            e.currentTarget.style.color = spoolbearTheme.colors.text;
-                                            e.currentTarget.style.backgroundColor = 'transparent';
+                                            e.currentTarget.style.color =
+                                              spoolbearTheme.colors.text;
+                                            e.currentTarget.style.backgroundColor =
+                                              "transparent";
                                           }
                                         }}
                                         onClick={closeAllDropdowns}
@@ -327,9 +347,17 @@ const ScrolledDesktopNav: React.FC<ScrolledDesktopNavProps> = ({
                                             className={`${submenu.iconClass} w-3 h-3`}
                                           />
                                         )}
-                                        <span className="flex-1">{submenu.name}</span>
+                                        <span className="flex-1">
+                                          {submenu.name}
+                                        </span>
                                         {isSubActive && (
-                                          <span className="w-1 h-1 rounded-full" style={{ backgroundColor: spoolbearTheme.colors.accent }} />
+                                          <span
+                                            className="w-1 h-1 rounded-full"
+                                            style={{
+                                              backgroundColor:
+                                                spoolbearTheme.colors.accent,
+                                            }}
+                                          />
                                         )}
                                       </Link>
                                     );
@@ -347,19 +375,27 @@ const ScrolledDesktopNav: React.FC<ScrolledDesktopNavProps> = ({
                         href={item.linkUrl}
                         className="flex items-center justify-between px-4 py-2 transition-colors duration-200 text-sm"
                         style={{
-                          color: isActive ? spoolbearTheme.colors.accent : spoolbearTheme.colors.text,
-                          backgroundColor: isActive ? 'rgba(255, 80, 0, 0.12)' : 'transparent',
+                          color: isActive
+                            ? spoolbearTheme.colors.accent
+                            : spoolbearTheme.colors.text,
+                          backgroundColor: isActive
+                            ? "rgba(255, 80, 0, 0.12)"
+                            : "transparent",
                         }}
                         onMouseEnter={(e) => {
                           if (!isActive) {
-                            e.currentTarget.style.color = spoolbearTheme.colors.accent;
-                            e.currentTarget.style.backgroundColor = 'rgba(255, 80, 0, 0.12)';
+                            e.currentTarget.style.color =
+                              spoolbearTheme.colors.accent;
+                            e.currentTarget.style.backgroundColor =
+                              "rgba(255, 80, 0, 0.12)";
                           }
                         }}
                         onMouseLeave={(e) => {
                           if (!isActive) {
-                            e.currentTarget.style.color = spoolbearTheme.colors.text;
-                            e.currentTarget.style.backgroundColor = 'transparent';
+                            e.currentTarget.style.color =
+                              spoolbearTheme.colors.text;
+                            e.currentTarget.style.backgroundColor =
+                              "transparent";
                           }
                         }}
                         onClick={closeAllDropdowns}
@@ -367,7 +403,12 @@ const ScrolledDesktopNav: React.FC<ScrolledDesktopNavProps> = ({
                         <span className="flex items-center gap-2">
                           {item.name}
                           {isActive && (
-                            <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: spoolbearTheme.colors.accent }} />
+                            <span
+                              className="w-1.5 h-1.5 rounded-full"
+                              style={{
+                                backgroundColor: spoolbearTheme.colors.accent,
+                              }}
+                            />
                           )}
                         </span>
                       </Link>
@@ -381,13 +422,22 @@ const ScrolledDesktopNav: React.FC<ScrolledDesktopNavProps> = ({
       </div>
 
       {/* Compact User Auth Section - Desktop with SpoolBear styling */}
-      {/* <div className="hidden md:flex items-center space-x-3">
+      <div className="hidden md:flex items-center space-x-3">
+        <CurrencySelector />
         {user ? (
-          <UserDropdown
-            user={user}
-            onLogout={logout}
-            onCloseAll={closeAllDropdowns}
-          />
+          <>
+            {/* Currency Selector - Added before cart */}
+
+            {/* Cart Icon - Only shown when user is logged in */}
+            <CartIcon onCloseAll={closeAllDropdowns} />
+
+            {/* User Dropdown */}
+            <UserDropdown
+              user={user}
+              onLogout={logout}
+              onCloseAll={closeAllDropdowns}
+            />
+          </>
         ) : (
           <div className="flex items-center space-x-2">
             <Link
@@ -396,15 +446,17 @@ const ScrolledDesktopNav: React.FC<ScrolledDesktopNavProps> = ({
               style={{
                 color: spoolbearTheme.colors.text,
                 border: `1px solid ${spoolbearTheme.colors.muted}`,
-                backgroundColor: 'transparent',
+                backgroundColor: "transparent",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = spoolbearTheme.colors.accent;
-                e.currentTarget.style.color = '#ffffff';
-                e.currentTarget.style.borderColor = spoolbearTheme.colors.accent;
+                e.currentTarget.style.backgroundColor =
+                  spoolbearTheme.colors.accent;
+                e.currentTarget.style.color = "#ffffff";
+                e.currentTarget.style.borderColor =
+                  spoolbearTheme.colors.accent;
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.backgroundColor = "transparent";
                 e.currentTarget.style.color = spoolbearTheme.colors.text;
                 e.currentTarget.style.borderColor = spoolbearTheme.colors.muted;
               }}
@@ -417,16 +469,18 @@ const ScrolledDesktopNav: React.FC<ScrolledDesktopNavProps> = ({
               className="px-3 py-1.5 rounded-md font-medium transition-all duration-200 text-xs uppercase tracking-wider"
               style={{
                 backgroundColor: spoolbearTheme.colors.accent,
-                color: '#ffffff',
+                color: "#ffffff",
                 border: `1px solid ${spoolbearTheme.colors.accent}`,
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#e64800';
-                e.currentTarget.style.borderColor = '#e64800';
+                e.currentTarget.style.backgroundColor = "#e64800";
+                e.currentTarget.style.borderColor = "#e64800";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = spoolbearTheme.colors.accent;
-                e.currentTarget.style.borderColor = spoolbearTheme.colors.accent;
+                e.currentTarget.style.backgroundColor =
+                  spoolbearTheme.colors.accent;
+                e.currentTarget.style.borderColor =
+                  spoolbearTheme.colors.accent;
               }}
               onClick={closeAllDropdowns}
             >
@@ -434,7 +488,7 @@ const ScrolledDesktopNav: React.FC<ScrolledDesktopNavProps> = ({
             </Link>
           </div>
         )}
-      </div> */}
+      </div>
     </>
   );
 };

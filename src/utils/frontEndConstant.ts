@@ -5,6 +5,16 @@ const NAV_BAR = "/nav-bar";
 const GALLERY = "/gallery";
 const BLOGS = "/blogs";
 const PRODUCTS = "/products";
+const USER_PROFILE = "/user-profile";
+const USER_NOTIFICATION_PERMISSIONS = "/user-notification-permissions";
+const ACCOUNT_SECURITY = "/account-security";
+const WISH_LIST = "/wish-list";
+const OTHERS = "/others";
+const BROWSER_HISTORY = "/browser-history";
+const REVIEWS = "/reviews";
+const ORDERS = "/orders";
+const CONTACT_US = "/contact-us";
+const MATERIAL = "/material";
 
 // Auth endpoints for frontend (relative paths for proxy)
 export const LOGIN_FE = `${API}${AUTH}/login`;
@@ -17,6 +27,26 @@ export const UPDATE_SECRET_QUESTIONS_DATA_FE = `${API}${AUTH}/update-secret-ques
 export const USERNAME_PASSWORD_VALIDATION_DATA_FE = `${API}${AUTH}/username-password-validation`;
 export const GET_ACTIVE_SECRET_QUESTIONS_DATA_FE = `${API}${AUTH}/secret-questions`;
 export const GET_SECRET_QUESTIONS_BY_USER_DATA_FE = `${API}${AUTH}/secret-questions-by-user`;
+
+// User Profile
+export const UPDATE_USER_PROFILE_DETAILS_DATA_FE = `${API}${USER_PROFILE}/update-user-details`;
+export const GET_USER_PROFILE_SIDE_BAR_DATA_FE = `${API}${USER_PROFILE}/side-bar`;
+export const GET_USER_PROFILE_USER_DETAILS_DATA_FE = `${API}${USER_PROFILE}/user`;
+
+// User Notification Permissions
+export const GET_USER_NOTIFICATION_DETAILS_DATA_FE = `${API}${USER_NOTIFICATION_PERMISSIONS}/details`;
+export const UPDATE_USER_NOTIFICATION_DETAILS_DATA_FE = `${API}${USER_NOTIFICATION_PERMISSIONS}/update`;
+
+// Account Security
+export const GET_ACCOUNT_SECURITY_DETAILS_FE = `${API}${ACCOUNT_SECURITY}/details`;
+export const REQUEST_MOBILE_VERIFY_SECURITY_DETAILS_FE = `${API}${ACCOUNT_SECURITY}/mobile-verify`;
+export const UPDATE_MOBILE_VERIFY_SECURITY_DETAILS_FE = `${API}${ACCOUNT_SECURITY}/mobile-update`;
+export const REQUEST_EMAIL_VERIFY_SECURITY_DETAILS_FE = `${API}${ACCOUNT_SECURITY}/email-verify`;
+export const UPDATE_EMAIL_VERIFY_SECURITY_DETAILS_FE = `${API}${ACCOUNT_SECURITY}/email-update`;
+
+// Wish List
+export const ADD_WISH_LIST_DATA_FE = `${API}${WISH_LIST}/insert-wish-list`;
+export const GET_WIS_LIST_DETAILS_DATA_FE = `${API}${WISH_LIST}/details`;
 
 // Nav Bar
 export const GET_ALL_NAV_BAR_DATA = `${API}${NAV_BAR}`;
@@ -38,6 +68,41 @@ export const ADD_BLOG_REACT_DATA_FE = `${API}${BLOGS}/add-react`;
 export const ADD_BLOG_COMMENT_REACT_DATA_FE = `${API}${BLOGS}/add-blog-comment-react`;
 export const ADD_BLOG_COMMENT_DATA_FE = `${API}${BLOGS}/add-comment-to-blog`;
 
-
 // PRODUCTS
 export const GET_ACTIVE_PRODUCTS_BY_GIVEN_FILTER_PARAMS_FE = `${API}${PRODUCTS}/active-products-by-filter`;
+export const GET_PRODUCT_DETAILS_BY_ID_DATA_FE = `${API}${PRODUCTS}/product-details`;
+
+// Browser History
+export const ADD_BROWSER_HISTORY_REQUEST_DATA_FE = `${API}${BROWSER_HISTORY}/add`;
+export const GET_BROWSER_HISTORY_DATA_FE = `${API}${BROWSER_HISTORY}/history-data`;
+export const REMOVE_BROWSER_HISTORY_BY_ID_DATA_FE = `${API}${BROWSER_HISTORY}/remove`;
+export const REMOVE_ALL_BROWSER_HISTORY_DATA_FE = `${API}${BROWSER_HISTORY}/remove-all`;
+export const REMOVE_LIST_OF_BROWSER_HISTORY_DATA_FE = `${API}${BROWSER_HISTORY}/remove-list`;
+
+// Others
+export const UPLOAD_IMAGE_TO_CLOUDINARY_FE = `${API}${OTHERS}/save-images`;
+export const UPLOAD_FILE_TO_CLOUDINARY_FE = `${API}${OTHERS}/save-images`;
+
+// Reviews
+export const GET_USER_REVIEWS_DATA_FE = `${API}${REVIEWS}/reviews-by-user`;
+export const GET_ALL_REVIEWS_DATA_FE = `${API}${REVIEWS}/all`;
+export const ADD_REVIEW_DATA_FE = `${API}${REVIEWS}/add-review`;
+export const ADD_REVIEW_REACTION_DATA_FE = `${API}${REVIEWS}/add-react`;
+export const ADD_REVIEW_COMMENT_REACTION_DATA_FE = `${API}${REVIEWS}/add-comment-react`;
+export const ADD_REVIEW_COMMENT_DATA_FE = `${API}${REVIEWS}/add-comment`;
+export const GET_REVIEW_BY_REVIEW_ID_DATA_FE = `${API}${REVIEWS}/review-by-id`;
+export const GET_REVIEW_BY_PRODUCT_ID_DATA_FE = `${API}${REVIEWS}/reviews-by-product-id`;
+
+// Orders
+export const GET_ORDERS_DETAILS_BY_USER_ID_DATA_FE = `${API}${ORDERS}/orders-by-user`;
+export const GET_ORDERS_DETAILS_BY_USER_ID_FOR_ADD_REVIEW_DATA_FE = `${API}${ORDERS}/orders-by-user-for-review`;
+export const ADD_PRINTING_ORDER_DATA_FE = `${API}${ORDERS}/add-printing-order`;
+export const ADD_DESIGN_ORDER_DATA_FE = `${API}${ORDERS}/add-design-order`;
+export const ADD_PRODUCT_ORDER_DATA_FE = `${API}${ORDERS}/add-product-order`;
+
+// Contact
+export const ADD_INQUIRY_DATA_FE = `${API}${CONTACT_US}/inquiry`;
+
+// Materials
+export const GET_ALL_MATERIALS_DETAILS_DATA_FE = `${API}${MATERIAL}/all`;
+export const GET_MATERIAL_DETAILS_BY_ID_DATA_FE = `${API}${MATERIAL}/material-details-by-id`;
