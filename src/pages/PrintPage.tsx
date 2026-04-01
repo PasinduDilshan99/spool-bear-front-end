@@ -1,6 +1,4 @@
-// app/print/page.tsx
 "use client";
-
 import PrintCTA from "@/components/print-page-components/PrintCTA";
 import PrintFeatures from "@/components/print-page-components/PrintFeatures";
 import PrintHero from "@/components/print-page-components/PrintHero";
@@ -15,7 +13,6 @@ const PrintPage = () => {
   return (
     <div className="min-h-screen bg-[#e4e7ec] relative overflow-x-hidden">
 
-      {/* Global grid texture */}
       <div
         className="fixed inset-0 pointer-events-none z-0"
         style={{
@@ -29,18 +26,14 @@ const PrintPage = () => {
         className="container mx-auto relative z-10"
         style={{ padding: "0 clamp(16px, 4vw, 64px)" }}
       >
-        {/* 1 — Hero + Upload Form side by side on lg+ */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 xl:gap-16 items-start pt-10 sm:pt-12 md:pt-16">
-          {/* Hero */}
           <PrintHero onScrollToForm={scrollToForm} />
 
-          {/* Upload Form */}
           <div className="lg:sticky lg:top-8 pt-0 lg:pt-16">
             <PrintUploadForm />
           </div>
         </div>
 
-        {/* Divider */}
         <div className="flex items-center gap-4 my-4">
           <div className="flex-1 h-px bg-black/8" />
           <div className="flex gap-1.5">
@@ -52,13 +45,10 @@ const PrintPage = () => {
           <div className="flex-1 h-px bg-black/8" />
         </div>
 
-        {/* 2 — Features */}
         <PrintFeatures />
 
-        {/* 3 — Materials */}
         <PrintMaterials />
 
-        {/* 4 — CTA */}
         <PrintCTA onScrollToForm={scrollToForm} />
       </div>
     </div>

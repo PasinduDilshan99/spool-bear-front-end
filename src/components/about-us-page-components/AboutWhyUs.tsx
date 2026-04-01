@@ -1,23 +1,8 @@
-// components/about/AboutWhyUs.tsx
 "use client";
 import React from "react";
-import { Zap, Shield, Package, Truck, CheckCircle } from "lucide-react";
 import { useScrollReveal } from "./aboutUtils";
-
-const features = [
-  { icon: Zap,     title: "Fast Turnaround",      desc: "Most prints completed within 48 hours" },
-  { icon: Shield,  title: "Quality Guaranteed",   desc: "100% satisfaction or your money back" },
-  { icon: Package, title: "Wide Material Range",  desc: "50+ materials for any project" },
-  { icon: Truck,   title: "Fast Delivery",        desc: "Reliable shipping to your door" },
-];
-
-const checklist = [
-  "Professional-grade printers and materials",
-  "Expert design assistance and consultation",
-  "Real-time order tracking and updates",
-  "Competitive pricing with no hidden fees",
-  "Dedicated customer support team",
-];
+import { checklistData, featuresData } from "@/data/about-us-page-data";
+import { CheckCircle } from "lucide-react";
 
 const AboutWhyUs: React.FC = () => {
   const { ref, visible } = useScrollReveal();
@@ -29,8 +14,6 @@ const AboutWhyUs: React.FC = () => {
         style={{ maxWidth: "1400px", padding: "0 clamp(16px, 4vw, 64px)" }}
       >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-
-          {/* ── Left: 2×2 cards ── */}
           <div
             className="grid grid-cols-2 gap-3 sm:gap-4"
             style={{
@@ -39,7 +22,7 @@ const AboutWhyUs: React.FC = () => {
               transition: "opacity 0.65s ease-out, transform 0.65s ease-out",
             }}
           >
-            {features.map((item, i) => {
+            {featuresData.map((item, i) => {
               const Icon = item.icon;
               return (
                 <div
@@ -61,7 +44,10 @@ const AboutWhyUs: React.FC = () => {
                       background: "rgba(255,80,0,0.10)",
                     }}
                   >
-                    <Icon size={16} className="text-[#FF5000] group-hover:text-white transition-colors duration-300" />
+                    <Icon
+                      size={16}
+                      className="text-[#FF5000] group-hover:text-white transition-colors duration-300"
+                    />
                   </div>
                   <h4
                     className="font-black text-[#101113] mb-1"
@@ -69,8 +55,10 @@ const AboutWhyUs: React.FC = () => {
                   >
                     {item.title}
                   </h4>
-                  <p className="font-medium text-[#2b2e33]"
-                    style={{ fontSize: "clamp(10px, 1vw, 13px)" }}>
+                  <p
+                    className="font-medium text-[#2b2e33]"
+                    style={{ fontSize: "clamp(10px, 1vw, 13px)" }}
+                  >
                     {item.desc}
                   </p>
                 </div>
@@ -78,38 +66,47 @@ const AboutWhyUs: React.FC = () => {
             })}
           </div>
 
-          {/* ── Right: copy + checklist ── */}
           <div
             style={{
               opacity: visible ? 1 : 0,
               transform: visible ? "none" : "translateX(24px)",
-              transition: "opacity 0.65s 0.15s ease-out, transform 0.65s 0.15s ease-out",
+              transition:
+                "opacity 0.65s 0.15s ease-out, transform 0.65s 0.15s ease-out",
             }}
           >
             <div className="inline-flex items-center gap-2 sm:gap-3 mb-5">
-              <div className="h-[2px] rounded-full bg-[#FF5000]" style={{ width: "clamp(20px, 3vw, 36px)" }} />
-              <span className="font-black uppercase tracking-[0.2em] text-[#FF5000]"
-                style={{ fontSize: "clamp(9px, 1vw, 12px)" }}>
+              <div
+                className="h-[2px] rounded-full bg-[#FF5000]"
+                style={{ width: "clamp(20px, 3vw, 36px)" }}
+              />
+              <span
+                className="font-black uppercase tracking-[0.2em] text-[#FF5000]"
+                style={{ fontSize: "clamp(9px, 1vw, 12px)" }}
+              >
                 Why Us
               </span>
             </div>
 
             <h2
               className="font-black text-[#101113] tracking-tight mb-4"
-              style={{ fontSize: "clamp(24px, 4vw, 46px)", letterSpacing: "-0.03em" }}
+              style={{
+                fontSize: "clamp(24px, 4vw, 46px)",
+                letterSpacing: "-0.03em",
+              }}
             >
-              Why Choose{" "}
-              <span className="text-[#FF5000]">SpoolBear</span>
+              Why Choose <span className="text-[#FF5000]">SpoolBear</span>
             </h2>
 
-            <p className="font-medium text-[#2b2e33] mb-7 leading-relaxed"
-              style={{ fontSize: "clamp(13px, 1.4vw, 17px)" }}>
-              We combine expertise, cutting-edge technology, and a passion for 3D printing
-              to deliver exceptional results every time.
+            <p
+              className="font-medium text-[#2b2e33] mb-7 leading-relaxed"
+              style={{ fontSize: "clamp(13px, 1.4vw, 17px)" }}
+            >
+              We combine expertise, cutting-edge technology, and a passion for
+              3D printing to deliver exceptional results every time.
             </p>
 
             <ul className="space-y-3 sm:space-y-4">
-              {checklist.map((item, i) => (
+              {checklistData.map((item, i) => (
                 <li
                   key={i}
                   className="flex items-start gap-3"
@@ -122,8 +119,10 @@ const AboutWhyUs: React.FC = () => {
                   <div className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-orange-50 border border-orange-200 flex items-center justify-center mt-0.5">
                     <CheckCircle size={12} className="text-[#FF5000]" />
                   </div>
-                  <span className="font-medium text-[#101113]"
-                    style={{ fontSize: "clamp(13px, 1.4vw, 16px)" }}>
+                  <span
+                    className="font-medium text-[#101113]"
+                    style={{ fontSize: "clamp(13px, 1.4vw, 16px)" }}
+                  >
                     {item}
                   </span>
                 </li>

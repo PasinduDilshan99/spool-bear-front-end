@@ -1,34 +1,6 @@
-// components/print-page-components/PrintFeatures.tsx
 "use client";
+import { featuresData } from "@/data/print-page-data";
 import React, { useEffect, useRef, useState } from "react";
-import { Printer, Package, Clock, Shield } from "lucide-react";
-
-const features = [
-  {
-    icon: Printer,
-    title: "Professional Printing",
-    description:
-      "Industrial-grade printers for perfect, consistent results every time.",
-  },
-  {
-    icon: Package,
-    title: "Wide Material Range",
-    description:
-      "PLA, ABS, PETG, TPU and more — the right material for every project.",
-  },
-  {
-    icon: Clock,
-    title: "Fast Turnaround",
-    description:
-      "Most prints ready in 24–48 hours. Rush orders available on request.",
-  },
-  {
-    icon: Shield,
-    title: "Quality Guarantee",
-    description:
-      "100% satisfaction guaranteed or we'll reprint at no extra cost.",
-  },
-];
 
 const PrintFeatures: React.FC = () => {
   const ref = useRef<HTMLElement>(null);
@@ -49,7 +21,6 @@ const PrintFeatures: React.FC = () => {
 
   return (
     <section ref={ref} className="py-14 sm:py-16 md:py-20">
-      {/* Heading */}
       <div
         className="text-center mb-10 sm:mb-12"
         style={{
@@ -86,9 +57,8 @@ const PrintFeatures: React.FC = () => {
         </h2>
       </div>
 
-      {/* Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
-        {features.map((f, i) => {
+        {featuresData.map((f, i) => {
           const Icon = f.icon;
           return (
             <div

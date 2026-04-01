@@ -1,17 +1,7 @@
-// components/print-page-components/PrintHero.tsx
 "use client";
+import { printHeroStepsData } from "@/data/print-page-data";
+import { PrintHeroProps } from "@/types/print-page-types";
 import React, { useEffect, useState } from "react";
-
-interface PrintHeroProps {
-  onScrollToForm: () => void;
-}
-
-const steps = [
-  "Upload your 3D model (STL, OBJ, 3MF, etc.)",
-  "Tell us about your requirements — material, color, quantity",
-  "Get an instant quote and approve",
-  "We print and deliver to your doorstep",
-];
 
 const PrintHero: React.FC<PrintHeroProps> = ({ onScrollToForm }) => {
   const [visible, setVisible] = useState(false);
@@ -28,9 +18,7 @@ const PrintHero: React.FC<PrintHeroProps> = ({ onScrollToForm }) => {
   return (
     <section className="pt-12 sm:pt-16 md:pt-20 pb-8 sm:pb-10">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
-        {/* Left */}
         <div>
-          {/* Eyebrow */}
           <div
             className="inline-flex items-center gap-2 sm:gap-3 mb-5 sm:mb-6"
             style={reveal("0s")}
@@ -51,7 +39,6 @@ const PrintHero: React.FC<PrintHeroProps> = ({ onScrollToForm }) => {
             />
           </div>
 
-          {/* Headline */}
           <h1
             className="font-black leading-[1.04] tracking-tight text-[#101113] mb-4 sm:mb-5"
             style={{
@@ -89,7 +76,6 @@ const PrintHero: React.FC<PrintHeroProps> = ({ onScrollToForm }) => {
             real, tangible objects — fast and affordable.
           </p>
 
-          {/* How it works */}
           <div style={reveal("0.28s")}>
             <h2
               className="font-black text-[#101113] mb-5 relative inline-block"
@@ -99,7 +85,7 @@ const PrintHero: React.FC<PrintHeroProps> = ({ onScrollToForm }) => {
               <span className="absolute -bottom-2 left-0 h-[3px] sm:h-[4px] w-full rounded-full bg-[#FF5000]/40" />
             </h2>
             <ul className="mt-5 space-y-3 sm:space-y-4">
-              {steps.map((step, i) => (
+              {printHeroStepsData.map((step, i) => (
                 <li
                   key={i}
                   className="flex items-start gap-3 sm:gap-4"
@@ -134,7 +120,6 @@ const PrintHero: React.FC<PrintHeroProps> = ({ onScrollToForm }) => {
           </div>
         </div>
 
-        {/* Right — orbit visual */}
         <div
           className="hidden lg:flex items-center justify-center relative"
           style={reveal("0.15s")}

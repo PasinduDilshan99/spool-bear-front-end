@@ -4,15 +4,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { CONTACT_US_PAGE_PATH, PRINT_PAGE_PATH } from "@/utils/urls";
 import { NUMBER_OF_DISPATCH, NUMBER_OF_MATERIALS } from "@/utils/constant";
-
-interface DesignQuestionSectionProps {
-  className?: string;
-  imagePath?: string;
-}
+import { HOME_PAGE_DESIGN_QUESTION_SECTION } from "@/utils/imagesUrl";
+import { DesignQuestionSectionProps } from "@/types/home-page-types";
 
 const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
   className = "",
-  imagePath = "https://res.cloudinary.com/dkfonkmwr/image/upload/v1774767052/bx3ck5cm75ep2bmjaop6.png",
+  imagePath = HOME_PAGE_DESIGN_QUESTION_SECTION,
 }) => {
   const sectionRef = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
@@ -112,11 +109,9 @@ const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
         className={`relative overflow-hidden ${className}`}
         style={{
           background: "#ffffff",
-          fontFamily: "'Faculty Glyphic', sans-serif",
           padding: "clamp(48px, 7vw, 112px) 0",
         }}
       >
-        {/* Grid texture */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
@@ -126,7 +121,6 @@ const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
           }}
         />
 
-        {/* Corner glows */}
         <div
           className="absolute top-0 right-0 w-[40vw] h-[40vw] max-w-[520px] max-h-[520px] pointer-events-none"
           style={{
@@ -142,7 +136,6 @@ const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
           }}
         />
 
-        {/* Filament threads */}
         <svg
           className="absolute bottom-0 left-0 right-0 w-full pointer-events-none"
           style={{ height: "36px" }}
@@ -175,12 +168,10 @@ const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
           }}
         >
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-14 lg:gap-16 xl:gap-24 items-center">
-            {/* ══ LEFT: copy + CTAs ══════════════════════════════════════ */}
             <div
               className="flex flex-col items-center lg:items-start"
               style={reveal("0s")}
             >
-              {/* Eyebrow */}
               <div className="inline-flex items-center gap-2 sm:gap-3 mb-5 sm:mb-7">
                 <div
                   className="h-[2px] rounded-full bg-[#FF5000]"
@@ -198,7 +189,6 @@ const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
                 />
               </div>
 
-              {/* Headline */}
               <h2
                 className="font-black leading-[1.08] tracking-tight text-[#101113] text-center lg:text-left mb-5 sm:mb-7"
                 style={{
@@ -223,7 +213,6 @@ const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
                 </span>
               </h2>
 
-              {/* Sub-question */}
               <div
                 className="text-center lg:text-left mb-8 sm:mb-10"
                 style={reveal("0.2s")}
@@ -242,12 +231,10 @@ const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
                 </p>
               </div>
 
-              {/* CTA buttons */}
               <div
                 className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto"
                 style={reveal("0.3s")}
               >
-                {/* Yes — ghost */}
                 <Link
                   href={PRINT_PAGE_PATH}
                   className="group relative inline-flex items-center justify-center gap-2 font-black uppercase tracking-[0.08em] text-[#101113] transition-all duration-300 overflow-hidden"
@@ -291,7 +278,6 @@ const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
                   </svg>
                 </Link>
 
-                {/* No — primary orange */}
                 <Link
                   href={CONTACT_US_PAGE_PATH}
                   className="relative overflow-hidden inline-flex items-center justify-center gap-2 font-black uppercase tracking-[0.08em] text-white transition-all duration-300"
@@ -315,7 +301,6 @@ const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
                       "0 6px 24px rgba(255,80,0,0.36)";
                   }}
                 >
-                  {/* Shimmer sweep */}
                   <span
                     className="absolute top-0 bottom-0 w-16 pointer-events-none"
                     style={{
@@ -342,12 +327,10 @@ const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
               </div>
             </div>
 
-            {/* ══ RIGHT: image + decorations ════════════════════════════ */}
             <div
               className="relative flex items-center justify-center order-first lg:order-last"
               style={reveal("0.15s")}
             >
-              {/* Orbit rings */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <svg
                   className="max-w-full max-h-full"
@@ -395,7 +378,6 @@ const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
                       transformOrigin: "250px 250px",
                     }}
                   />
-                  {/* Rider dots */}
                   <g
                     style={{
                       animation: "dqsOrbitCW 32s linear infinite",
@@ -452,7 +434,6 @@ const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
                 </svg>
               </div>
 
-              {/* Glow blob */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div
                   className="rounded-full"
@@ -467,7 +448,6 @@ const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
                 />
               </div>
 
-              {/* Main image — responsive height */}
               <div
                 className="relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-full mx-auto"
                 style={{
@@ -488,7 +468,6 @@ const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
                 />
               </div>
 
-              {/* Badge — top left (Materials) */}
               <div
                 className="absolute flex items-center gap-2 sm:gap-3 rounded-xl sm:rounded-2xl pointer-events-none"
                 style={{
@@ -546,7 +525,6 @@ const DesignQuestionSection: React.FC<DesignQuestionSectionProps> = ({
                 </div>
               </div>
 
-              {/* Badge — bottom right (Fast Turn) */}
               <div
                 className="absolute flex items-center gap-2 sm:gap-3 rounded-xl sm:rounded-2xl pointer-events-none"
                 style={{

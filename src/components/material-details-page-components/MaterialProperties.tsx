@@ -1,15 +1,10 @@
-// components/material-details-page-components/MaterialProperties.tsx
 "use client";
 import React from "react";
 import { motion } from "framer-motion";
 import { Zap } from "lucide-react";
-import { MaterialProperty } from "@/types/material-types";
+import { MaterialDetailsPropertiesProps } from "@/types/material-types";
 
-interface MaterialPropertiesProps {
-  properties: MaterialProperty[];
-}
-
-export const MaterialProperties: React.FC<MaterialPropertiesProps> = ({
+export const MaterialProperties: React.FC<MaterialDetailsPropertiesProps> = ({
   properties,
 }) => {
   return (
@@ -42,10 +37,7 @@ export const MaterialProperties: React.FC<MaterialPropertiesProps> = ({
             <div className="text-[10px] font-bold uppercase tracking-widest text-[#B8ADA4] mb-1">
               {prop.propertyName}
             </div>
-            <div
-              className="text-[14px] font-black text-[#1C1714]"
-              style={{ fontFamily: "'Fraunces','Georgia',serif" }}
-            >
+            <div className="text-[14px] font-black text-[#1C1714]">
               {prop.propertyValue}
             </div>
           </motion.div>

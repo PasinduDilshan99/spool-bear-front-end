@@ -1,4 +1,3 @@
-// components/material-details/ShippingInfo.tsx
 "use client";
 import React from "react";
 

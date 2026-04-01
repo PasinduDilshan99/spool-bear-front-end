@@ -1,4 +1,3 @@
-// app/design/page.tsx
 "use client";
 
 import DesignCategories from "@/components/design-page-components/DesignCategories";
@@ -17,7 +16,6 @@ const scrollToForm = () => {
 const DesignPage = () => {
   return (
     <div className="min-h-screen bg-[#e4e7ec] relative overflow-x-hidden">
-      {/* Global grid texture */}
       <div
         className="fixed inset-0 pointer-events-none z-0"
         style={{
@@ -27,10 +25,8 @@ const DesignPage = () => {
         }}
       />
 
-      {/* 1 — Hero (full-width, has its own background) */}
       <DesignHero onScrollToForm={scrollToForm} />
 
-      {/* 2 — Form anchored just below hero */}
       <div
         className="relative z-10"
         style={{ padding: "0 clamp(16px, 4vw, 64px)" }}
@@ -43,12 +39,10 @@ const DesignPage = () => {
         </div>
       </div>
 
-      {/* 3 — Rest of the page */}
       <div
         className="container mx-auto relative z-10"
         style={{ padding: "0 clamp(16px, 4vw, 64px)" }}
       >
-        {/* Dot divider */}
         <div className="flex items-center gap-4 mt-14 sm:mt-16">
           <div className="flex-1 h-px bg-black/8" />
           <div className="flex gap-1.5">
@@ -68,16 +62,12 @@ const DesignPage = () => {
           <div className="flex-1 h-px bg-black/8" />
         </div>
 
-        {/* Services */}
         <DesignServices />
 
-        {/* What We Can Design */}
         <DesignCategories />
 
-        {/* Process + Why Us */}
         <DesignProcess />
 
-        {/* CTA */}
         <DesignCTA onScrollToForm={scrollToForm} />
       </div>
     </div>

@@ -1,4 +1,3 @@
-// components/material-details-page-components/MaterialImageGallery.tsx
 "use client";
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -11,17 +10,11 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { MaterialDetailsImageGalleryProps } from "@/types/material-types";
 
-interface MaterialImageGalleryProps {
-  images: string[];
-  materialName: string;
-  isPopular: boolean;
-  isAvailable: boolean;
-  selectedImage: string | null;
-  onImageSelect: (image: string) => void;
-}
-
-export const MaterialImageGallery: React.FC<MaterialImageGalleryProps> = ({
+export const MaterialImageGallery: React.FC<
+  MaterialDetailsImageGalleryProps
+> = ({
   images,
   materialName,
   isPopular,
@@ -57,14 +50,12 @@ export const MaterialImageGallery: React.FC<MaterialImageGalleryProps> = ({
       transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
       className="flex flex-col gap-4"
     >
-      {/* Main image */}
       <div
         className="relative overflow-hidden rounded-3xl bg-[#F7F5F2] aspect-square group"
         style={{
           boxShadow: "0 4px 32px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04)",
         }}
       >
-        {/* Decorative corner accent */}
         <div
           className="absolute bottom-0 left-0 w-40 h-40 rounded-tr-full opacity-15 pointer-events-none z-10"
           style={{ background: "linear-gradient(135deg,#FF5000,#FF8C42)" }}
@@ -102,13 +93,12 @@ export const MaterialImageGallery: React.FC<MaterialImageGalleryProps> = ({
           </div>
         )}
 
-        {/* Zoom hint overlay */}
         {hasImages && (
           <motion.button
             initial={{ opacity: 0 }}
             whileHover={{ opacity: 1 }}
             onClick={() => onImageSelect(mainImage!)}
-            className="absolute inset-0 flex items-center justify-center z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            className="absolute inset-0 flex items-center justify-center z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer"
             style={{ background: "rgba(28,23,20,0.18)" }}
           >
             <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/90 backdrop-blur-sm shadow-lg">
@@ -120,7 +110,6 @@ export const MaterialImageGallery: React.FC<MaterialImageGalleryProps> = ({
           </motion.button>
         )}
 
-        {/* Arrow navigation */}
         {hasImages && images.length > 1 && (
           <>
             <button
@@ -146,7 +135,6 @@ export const MaterialImageGallery: React.FC<MaterialImageGalleryProps> = ({
           </>
         )}
 
-        {/* Badges */}
         <div className="absolute top-4 left-4 flex flex-col gap-2 z-20">
           {isPopular && (
             <motion.span
@@ -173,7 +161,6 @@ export const MaterialImageGallery: React.FC<MaterialImageGalleryProps> = ({
           </motion.span>
         </div>
 
-        {/* Dot indicators */}
         {hasImages && images.length > 1 && (
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 z-20">
             {images.map((_, idx) => (
@@ -196,7 +183,6 @@ export const MaterialImageGallery: React.FC<MaterialImageGalleryProps> = ({
         )}
       </div>
 
-      {/* Thumbnail strip */}
       {hasImages && images.length > 1 && (
         <motion.div
           initial={{ opacity: 0, y: 8 }}

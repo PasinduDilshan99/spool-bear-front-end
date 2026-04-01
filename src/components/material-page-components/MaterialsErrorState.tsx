@@ -1,4 +1,3 @@
-// components/materials/MaterialsErrorState.tsx
 interface MaterialsErrorStateProps {
   error: string;
   onRetry: () => void;

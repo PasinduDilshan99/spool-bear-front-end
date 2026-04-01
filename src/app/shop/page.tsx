@@ -1,5 +1,4 @@
-// app/products/page.tsx
-import React, { Suspense } from "react";
+import { Suspense } from "react";
 import { Loader2 } from "lucide-react";
 import ProductsPage from "@/pages/ProductsPage";
 import { Metadata } from "next";

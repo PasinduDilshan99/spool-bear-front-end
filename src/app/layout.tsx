@@ -10,7 +10,7 @@ import { CurrencyProvider } from "@/context/CurrencyContext";
 
 const facultyGlyphic = Faculty_Glyphic({
   subsets: ["latin"],
-  weight: ["400"], // adjust if needed
+  weight: ["400"],
   variable: "--font-faculty",
 });
 
@@ -29,7 +29,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="min-h-screen">
+      <body
+        style={{ fontFamily: "'Faculty Glyphic', sans-serif" }}
+        className="min-h-screen"
+      >
+        {" "}
         <AuthProvider>
           <CartProvider>
             <CurrencyProvider>

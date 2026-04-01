@@ -1,23 +1,12 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import {
+  HowItWorksSectionProps,
+  HowItWorksStep,
+} from "@/types/home-page-types";
+import { howItsWorkData } from "@/data/home-page-data";
 
-interface HowItWorksStep {
-  iconWrapClass: string;
-  icon: { src: string; alt: string; ariaHidden?: boolean };
-  title: string;
-  textHtml: string;
-}
-
-interface HowItWorksSectionProps {
-  className?: string;
-  title?: string;
-  steps?: HowItWorksStep[];
-}
-
-/* ══════════════════════════════════════════
-   STEP CARD
-══════════════════════════════════════════ */
 function StepCard({
   step,
   index,
@@ -40,7 +29,6 @@ function StepCard({
         opacity: visible ? undefined : 0,
       }}
     >
-      {/* ── Step number badge ── */}
       <div
         className="relative z-20 flex items-center justify-center font-black text-white"
         style={{
@@ -64,14 +52,12 @@ function StepCard({
         />
       </div>
 
-      {/* ── Icon area ── */}
       <div
         className="relative flex items-center justify-center"
         style={{ margin: "0 auto clamp(20px, 3vw, 36px) auto" }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-        {/* Outer orbit ring */}
         <svg
           className="absolute pointer-events-none"
           style={{
@@ -130,7 +116,6 @@ function StepCard({
           />
         </svg>
 
-        {/* Glow blob */}
         <div
           className="absolute pointer-events-none rounded-full"
           style={{
@@ -145,7 +130,6 @@ function StepCard({
           }}
         />
 
-        {/* Main icon circle */}
         <div
           className="relative flex items-center justify-center transition-all duration-500"
           style={{
@@ -180,7 +164,6 @@ function StepCard({
           </div>
         </div>
 
-        {/* Accent rings */}
         <div
           className="absolute rounded-full pointer-events-none transition-all duration-500"
           style={{
@@ -201,7 +184,6 @@ function StepCard({
         />
       </div>
 
-      {/* Title */}
       <h3
         className="font-black leading-tight text-[#101113] mb-2 sm:mb-3 transition-colors duration-300"
         style={{
@@ -213,7 +195,6 @@ function StepCard({
         {step.title}
       </h3>
 
-      {/* Description */}
       <p
         className="font-medium leading-relaxed text-[#2b2e33] mx-auto"
         style={{
@@ -224,7 +205,6 @@ function StepCard({
         {step.textHtml}
       </p>
 
-      {/* Mobile down-arrow between steps */}
       {index < total - 1 && (
         <div className="flex lg:hidden mt-8 mb-2 items-center justify-center">
           <div
@@ -260,44 +240,10 @@ function StepCard({
   );
 }
 
-/* ══════════════════════════════════════════
-   MAIN SECTION
-══════════════════════════════════════════ */
 const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
   className = "",
   title = "How It Works?",
-  steps = [
-    {
-      iconWrapClass: "",
-      icon: {
-        src: "https://res.cloudinary.com/dkfonkmwr/image/upload/v1774956995/lohtt7twxtccnpzdrk1o.png",
-        alt: "Upload icon",
-      },
-      title: "Upload and Describe",
-      textHtml:
-        "Upload your 3D design file, or tell us about your idea if you don't have a design yet.",
-    },
-    {
-      iconWrapClass: "",
-      icon: {
-        src: "https://res.cloudinary.com/dkfonkmwr/image/upload/v1774957022/ann2f9zcaffpfh2cueq3.png",
-        alt: "Quote icon",
-      },
-      title: "Get an Instant Quote",
-      textHtml:
-        "Our system automatically analyzes your request and generates a real-time quotation.",
-    },
-    {
-      iconWrapClass: "",
-      icon: {
-        src: "https://res.cloudinary.com/dkfonkmwr/image/upload/v1774957040/pigldn7cjs8qk5uv6whu.png",
-        alt: "Print and delivery icon",
-      },
-      title: "Print & Deliver",
-      textHtml:
-        "Once confirmed, we manufacture your part with care and deliver it to you.",
-    },
-  ],
+  steps = howItsWorkData,
 }) => {
   const sectionRef = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
@@ -392,11 +338,9 @@ const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
         className={`relative overflow-hidden ${className}`}
         style={{
           background: "#e4e7ec",
-          fontFamily: "'Faculty Glyphic', sans-serif",
           padding: "clamp(48px, 7vw, 112px) 0",
         }}
       >
-        {/* Grid texture */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
@@ -406,7 +350,6 @@ const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
           }}
         />
 
-        {/* Corner glows */}
         <div
           className="absolute top-0 left-0 w-[40vw] h-[40vw] max-w-[560px] max-h-[560px] pointer-events-none"
           style={{
@@ -422,7 +365,6 @@ const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
           }}
         />
 
-        {/* Filament threads */}
         <svg
           className="absolute top-0 left-0 right-0 w-full pointer-events-none"
           style={{ height: "36px" }}
@@ -454,9 +396,7 @@ const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
             padding: "0 clamp(16px, 4vw, 64px)",
           }}
         >
-          {/* ── Heading ── */}
           <div className="text-center mb-10 sm:mb-14 md:mb-16 lg:mb-20">
-            {/* Eyebrow */}
             <div
               className="inline-flex items-center gap-2 sm:gap-3 mb-4 sm:mb-5"
               style={{
@@ -480,7 +420,6 @@ const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
               />
             </div>
 
-            {/* Title */}
             <h2
               className="font-black leading-tight text-[#101113] mb-4"
               style={{
@@ -495,7 +434,6 @@ const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
               {title}
             </h2>
 
-            {/* Underline */}
             <div
               className="h-[3px] sm:h-[4px] rounded-full mx-auto bg-[#FF5000]"
               style={{
@@ -507,9 +445,7 @@ const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
             />
           </div>
 
-          {/* ── Steps ── */}
           <div className="relative">
-            {/* Desktop connecting path */}
             <div
               className="hidden lg:block absolute left-0 right-0 pointer-events-none"
               style={{ top: "clamp(60px, 8vw, 100px)" }}
@@ -535,7 +471,6 @@ const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
                       : "none",
                   }}
                 />
-                {/* Arrow nodes */}
                 {[
                   { x: 390, y: 38 },
                   { x: 810, y: 56 },
@@ -570,7 +505,6 @@ const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
               </svg>
             </div>
 
-            {/* Cards */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 sm:gap-12 lg:gap-10 xl:gap-14">
               {steps.map((step, index) => (
                 <StepCard
@@ -584,7 +518,6 @@ const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
             </div>
           </div>
 
-          {/* Bottom decorative dots */}
           <div
             className="mt-12 sm:mt-16 flex justify-center items-center gap-2 sm:gap-3"
             style={{

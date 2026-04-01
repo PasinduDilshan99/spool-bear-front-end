@@ -1,5 +1,4 @@
-import { Linkedin } from 'lucide-react';
-export const COMPANY_OWNER = "Ravindu Lakshan";
+export const COMPANY_OWNER = "Jayashan Kaveesha";
 export const COMPANY_NAME = "Spool Bear";
 export const COMPANY_INFO_EMAIL = "spoolbear@gmail.com";
 export const COMPANY_INFO_EMAIL_LINK = "mailto:spoolbear@gmail.com";

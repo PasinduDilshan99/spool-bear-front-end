@@ -9,34 +9,9 @@ import {
   NUMBER_OF_MODELS,
   SHIPS_IN,
 } from "@/utils/constant";
-import HeroSectionSkeleton from "./loadings/HeroSectionSkeleton";
+import { HOME_PAGE_HERO_SECTION } from "@/utils/imagesUrl";
+import { HeroSectionProps, Particle } from "@/types/home-page-types";
 
-interface HeroSectionProps {
-  title?: string;
-  accentText?: string;
-  subtitle?: string;
-  primaryCtaText?: string;
-  primaryCtaLink?: string;
-  secondaryCtaText?: string;
-  secondaryCtaLink?: string;
-  imagePath?: string;
-  imageAlt?: string;
-  className?: string;
-}
-
-interface Particle {
-  id: number;
-  x: number;
-  y: number;
-  size: number;
-  duration: number;
-  delay: number;
-  opacity: number;
-}
-
-/* ══════════════════════════════════════════
-   FLOATING PARTICLES
-══════════════════════════════════════════ */
 function FloatingParticles() {
   const [particles] = useState<Particle[]>(() =>
     Array.from({ length: 18 }, (_, i) => ({
@@ -71,9 +46,6 @@ function FloatingParticles() {
   );
 }
 
-/* ══════════════════════════════════════════
-   FILAMENT ORBIT SVG
-══════════════════════════════════════════ */
 function FilamentOrbit() {
   return (
     <svg
@@ -118,7 +90,6 @@ function FilamentOrbit() {
           transformOrigin: "250px 250px",
         }}
       />
-      {/* Rider dots — outer */}
       <g
         style={{
           animation: "orbitCW 28s linear infinite",
@@ -128,7 +99,6 @@ function FilamentOrbit() {
         <circle cx="460" cy="250" r="5" fill="#FF5000" opacity="0.7" />
         <circle cx="40" cy="250" r="3" fill="#FF5000" opacity="0.4" />
       </g>
-      {/* Rider dots — mid */}
       <g
         style={{
           animation: "orbitCCW 20s linear infinite",
@@ -138,7 +108,6 @@ function FilamentOrbit() {
         <circle cx="250" cy="85" r="4" fill="#FF5000" opacity="0.6" />
         <circle cx="415" cy="250" r="3" fill="#FF5000" opacity="0.35" />
       </g>
-      {/* Cross-hairs */}
       {[
         [250, 30, 250, 80],
         [250, 420, 250, 470],
@@ -155,7 +124,6 @@ function FilamentOrbit() {
           strokeWidth="1"
         />
       ))}
-      {/* Centre glow */}
       <circle cx="250" cy="250" r="80" fill="url(#heroGlow)" opacity="0.35" />
       <defs>
         <radialGradient id="heroGlow" cx="50%" cy="50%" r="50%">
@@ -167,9 +135,6 @@ function FilamentOrbit() {
   );
 }
 
-/* ══════════════════════════════════════════
-   ANIMATED STAT COUNTER
-══════════════════════════════════════════ */
 function AnimatedStat({
   to,
   suffix,
@@ -222,7 +187,7 @@ function AnimatedStat({
         <span style={{ color: "#FF5000" }}>{suffix}</span>
       </span>
       <span
-        className="font-bold uppercase tracking-[0.10em] mt-1"
+        className="font-bold uppercase tracking-widest mt-1"
         style={{ fontSize: "clamp(9px, 0.9vw, 11px)", color: "#2b2e33" }}
       >
         {label}
@@ -231,9 +196,6 @@ function AnimatedStat({
   );
 }
 
-/* ══════════════════════════════════════════
-   HERO SECTION
-══════════════════════════════════════════ */
 const HeroSection: React.FC<HeroSectionProps> = ({
   title = "Turning digital designs into",
   accentText = "real-world solutions.",
@@ -241,14 +203,13 @@ const HeroSection: React.FC<HeroSectionProps> = ({
   primaryCtaLink = SHOP_PAGE_PATH,
   secondaryCtaText = "Learn More",
   secondaryCtaLink = ABOUT_US_PAGE_PATH,
-  imagePath = "https://res.cloudinary.com/dkfonkmwr/image/upload/v1774766973/xx8944nyn602dmyxcy4b.png",
+  imagePath = HOME_PAGE_HERO_SECTION,
   imageAlt = "3D Printer",
   className = "",
 }) => {
   return (
     <>
       <style global jsx>{`
-
         @keyframes heroFloat {
           from {
             transform: translateY(0px) rotate(0deg);
@@ -364,11 +325,9 @@ const HeroSection: React.FC<HeroSectionProps> = ({
         className={`relative flex items-center overflow-hidden ${className}`}
         style={{
           background: "#dfe3e8",
-          fontFamily: "'Faculty Glyphic', sans-serif",
           minHeight: "clamp(520px, 80vh, 820px)",
         }}
       >
-        {/* Grid texture */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
@@ -378,7 +337,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({
           }}
         />
 
-        {/* Diagonal accent — top right */}
         <div
           className="absolute -top-10 -right-10 pointer-events-none"
           style={{
@@ -390,7 +348,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({
           }}
         />
 
-        {/* Bottom-left glow */}
         <div
           className="absolute -bottom-14 -left-14 pointer-events-none"
           style={{
@@ -401,9 +358,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({
           }}
         />
 
-        {/* Scan line */}
         <div
-          className="absolute left-0 right-0 h-[2px] pointer-events-none"
+          className="absolute left-0 right-0 h-0.5 pointer-events-none"
           style={{
             background:
               "linear-gradient(90deg, transparent, rgba(255,80,0,0.5), transparent)",
@@ -413,7 +369,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({
 
         <FloatingParticles />
 
-        {/* Filament threads bottom */}
         <svg
           className="absolute bottom-0 left-0 right-0 w-full pointer-events-none"
           style={{ height: "40px" }}
@@ -438,7 +393,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({
           />
         </svg>
 
-        {/* ── Main grid ── */}
         <div
           className="container mx-auto relative z-10 w-full"
           style={{
@@ -447,12 +401,10 @@ const HeroSection: React.FC<HeroSectionProps> = ({
           }}
         >
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-14 xl:gap-20 items-center">
-            {/* ══ LEFT: copy ═══════════════════════════════════════════════ */}
             <div className="order-2 lg:order-1 text-center lg:text-left flex flex-col items-center lg:items-start">
-              {/* Eyebrow */}
               <div className="hero-item-1 inline-flex items-center gap-2 sm:gap-3 mb-5 sm:mb-6">
                 <div
-                  className="h-[2px] rounded-full bg-[#FF5000]"
+                  className="h-0.5 rounded-full bg-[#FF5000]"
                   style={{ width: "clamp(20px, 3vw, 36px)" }}
                 />
                 <span
@@ -462,12 +414,11 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                   Premium 3D Printing
                 </span>
                 <div
-                  className="h-[2px] rounded-full bg-[#FF5000]"
+                  className="h-0.5 rounded-full bg-[#FF5000]"
                   style={{ width: "clamp(20px, 3vw, 36px)" }}
                 />
               </div>
 
-              {/* Headline */}
               <h1
                 className="hero-item-2 font-black leading-[1.08] tracking-tight mb-6 sm:mb-8"
                 style={{ letterSpacing: "-0.03em" }}
@@ -484,7 +435,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                 >
                   {accentText}
                   <span
-                    className="absolute bottom-0 left-0 h-[3px] sm:h-[4px] rounded-full"
+                    className="absolute bottom-0 left-0 h-0.75 sm:h-1 rounded-full"
                     style={{
                       background: "rgba(255,80,0,0.30)",
                       animation: "underlineDraw 1.0s 0.8s ease-out both",
@@ -494,9 +445,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                 </span>
               </h1>
 
-              {/* CTA buttons */}
               <div className="hero-item-3 flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto mb-8 sm:mb-10">
-                {/* Primary */}
                 <Link
                   href={primaryCtaLink}
                   className="relative overflow-hidden inline-flex items-center justify-center gap-2 font-black uppercase tracking-[0.08em] text-white transition-all duration-300"
@@ -545,7 +494,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                   </svg>
                 </Link>
 
-                {/* Secondary */}
                 <Link
                   href={secondaryCtaLink}
                   className="inline-flex items-center justify-center gap-2 font-black uppercase tracking-[0.08em] transition-all duration-300"
@@ -592,16 +540,15 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                 </Link>
               </div>
 
-              {/* Stats row */}
               <div className="hero-item-4 flex items-center gap-4 sm:gap-6 lg:gap-8 justify-center lg:justify-start">
                 <AnimatedStat to={NUMBER_OF_MODELS} suffix="+" label="Models" />
-                <div className="h-7 sm:h-8 w-px bg-black/12 flex-shrink-0" />
+                <div className="h-7 sm:h-8 w-px bg-black/12 shrink-0" />
                 <AnimatedStat
                   to={NUMBER_OF_MATERIALS}
                   suffix="+"
                   label="Materials"
                 />
-                <div className="h-7 sm:h-8 w-px bg-black/12 flex-shrink-0" />
+                <div className="h-7 sm:h-8 w-px bg-black/12 shrink-0" />
                 <AnimatedStat
                   to={NUMBER_OF_DISPATCH}
                   suffix="h"
@@ -610,9 +557,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
               </div>
             </div>
 
-            {/* ══ RIGHT: image ══════════════════════════════════════════════ */}
             <div className="order-1 lg:order-2 relative flex items-center justify-center">
-              {/* Orbit rings */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div
                   className="relative"
@@ -625,7 +570,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                 </div>
               </div>
 
-              {/* Glow blob */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div
                   className="rounded-full"
@@ -640,7 +584,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                 />
               </div>
 
-              {/* Printer image */}
               <div
                 className="hero-img relative w-full"
                 style={{
@@ -661,7 +604,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                 />
               </div>
 
-              {/* Badge — top left (Quality) */}
               <div
                 className="absolute flex items-center gap-2 sm:gap-2.5 rounded-xl sm:rounded-2xl pointer-events-none"
                 style={{
@@ -675,7 +617,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                 }}
               >
                 <div
-                  className="flex items-center justify-center rounded-lg sm:rounded-xl flex-shrink-0"
+                  className="flex items-center justify-center rounded-lg sm:rounded-xl shrink-0"
                   style={{
                     width: "clamp(26px, 3vw, 36px)",
                     height: "clamp(26px, 3vw, 36px)",
@@ -699,7 +641,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                 </div>
                 <div>
                   <p
-                    className="font-black uppercase tracking-[0.10em]"
+                    className="font-black uppercase tracking-widest"
                     style={{
                       fontSize: "clamp(8px, 0.85vw, 10px)",
                       color: "rgba(0,0,0,0.40)",
@@ -719,7 +661,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                 </div>
               </div>
 
-              {/* Badge — bottom right (Ships in) */}
               <div
                 className="absolute flex items-center gap-2 sm:gap-2.5 rounded-xl sm:rounded-2xl pointer-events-none"
                 style={{
@@ -732,7 +673,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                 }}
               >
                 <div
-                  className="flex items-center justify-center rounded-lg sm:rounded-xl flex-shrink-0"
+                  className="flex items-center justify-center rounded-lg sm:rounded-xl shrink-0"
                   style={{
                     width: "clamp(26px, 3vw, 36px)",
                     height: "clamp(26px, 3vw, 36px)",
@@ -756,7 +697,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
                 </div>
                 <div>
                   <p
-                    className="font-black uppercase tracking-[0.10em]"
+                    className="font-black uppercase tracking-widest"
                     style={{
                       fontSize: "clamp(8px, 0.85vw, 10px)",
                       color: "rgba(255,255,255,0.65)",

@@ -1,6 +1,5 @@
-// app/materials/[materialId]/page.tsx
 "use client";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { MaterialService } from "@/service/materialService";
@@ -13,8 +12,6 @@ import { MaterialProperties } from "@/components/material-details-page-component
 import { MaterialTags } from "@/components/material-details-page-components/MaterialTags";
 import { MaterialColors } from "@/components/material-details-page-components/MaterialColors";
 import { MaterialProsCons } from "@/components/material-details-page-components/MaterialProsCons";
-import { MaterialActions } from "@/components/material-details-page-components/MaterialActions";
-import { ShippingInfo } from "@/components/material-details-page-components/ShippingInfo";
 import { BackButton } from "@/components/material-details-page-components/BackButton";
 import { LightboxModal } from "@/components/material-details-page-components/LightboxModal";
 import MaterialDetailsLoading from "@/components/material-details-page-components/MaterialDetailsLoading";
@@ -65,20 +62,12 @@ const MaterialDetailsPage = () => {
     }
   };
 
-  const handleAddToCart = () =>
-    console.log("Add to cart:", material?.materialId);
-  const handleAddToFavorites = () =>
-    console.log("Add to favorites:", material?.materialId);
-
   if (loading) return <MaterialDetailsLoading />;
   if (error || !material)
     return <MaterialDetailsError error={error || "Material not found"} />;
 
   return (
-    <div
-      className="bg-[#e4e7ec] relative overflow-x-hidden min-h-screen"
-      style={{ fontFamily: "'Faculty Glyphic', sans-serif" }}
-    >
+    <div className="bg-[#e4e7ec] relative overflow-x-hidden min-h-screen">
       <div
         className="min-h-screen relative"
         style={{
@@ -87,7 +76,6 @@ const MaterialDetailsPage = () => {
           backgroundSize: "44px 44px",
         }}
       >
-        {/* Subtle decorative blobs */}
         <div
           className="fixed top-0 right-0 w-[500px] h-[500px] rounded-full pointer-events-none opacity-[0.04]"
           style={{
@@ -112,7 +100,6 @@ const MaterialDetailsPage = () => {
             transition={{ duration: 0.4 }}
             className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16"
           >
-            {/* Left Column — Images */}
             <div className="lg:sticky lg:top-8 lg:self-start">
               <MaterialImageGallery
                 images={material.images}
@@ -124,7 +111,6 @@ const MaterialDetailsPage = () => {
               />
             </div>
 
-            {/* Right Column — Details */}
             <div className="space-y-7">
               <MaterialInfo
                 name={material.materialName}
@@ -159,19 +145,10 @@ const MaterialDetailsPage = () => {
               )}
 
               <MaterialProsCons pros={material.pros} cons={material.cons} />
-
-              {/* <MaterialActions
-              isAvailable={material.isAvailable}
-              onAddToCart={handleAddToCart}
-              onAddToFavorites={handleAddToFavorites}
-            /> */}
-
-              {/* <ShippingInfo /> */}
             </div>
           </motion.div>
         </div>
 
-        {/* Lightbox */}
         <LightboxModal
           imageUrl={selectedImage}
           onClose={() => setSelectedImage(null)}

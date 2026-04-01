@@ -1,17 +1,10 @@
-// components/material-details-page-components/MaterialInfo.tsx
 "use client";
 import React from "react";
 import { motion } from "framer-motion";
 import { Package } from "lucide-react";
+import { MaterialDetailsInfoProps } from "@/types/material-types";
 
-interface MaterialInfoProps {
-  name: string;
-  type?: string;
-  price: number;
-  description: string;
-}
-
-export const MaterialInfo: React.FC<MaterialInfoProps> = ({
+export const MaterialInfo: React.FC<MaterialDetailsInfoProps> = ({
   name,
   type,
   price,
@@ -24,7 +17,6 @@ export const MaterialInfo: React.FC<MaterialInfoProps> = ({
       transition={{ duration: 0.45, delay: 0.05, ease: [0.25, 0.1, 0.25, 1] }}
       className="space-y-4"
     >
-      {/* Type badge */}
       {type && (
         <div className="flex items-center gap-2">
           <span
@@ -37,32 +29,14 @@ export const MaterialInfo: React.FC<MaterialInfoProps> = ({
         </div>
       )}
 
-      {/* Name + Price row */}
       <div className="flex items-start justify-between gap-4">
-        <h1
-          className="text-4xl lg:text-5xl font-black text-[#1C1714] leading-tight"
-          style={{ fontFamily: "'Fraunces','Georgia',serif" }}
-        >
+        <h1 className="text-4xl lg:text-5xl font-black text-[#1C1714] leading-tight">
           {name}
         </h1>
-
-        {/* <div className="flex-shrink-0 text-right pt-1">
-          <div
-            className="text-3xl font-black text-[#FF5000] leading-none"
-            style={{ fontFamily: "'Fraunces','Georgia',serif" }}
-          >
-            ${price.toFixed(3)}
-          </div>
-          <div className="text-[10px] font-bold uppercase tracking-widest text-[#B8ADA4] mt-1">
-            per gram
-          </div>
-        </div> */}
       </div>
 
-      {/* Divider */}
       <div className="h-px bg-gradient-to-r from-[#FF5000]/20 via-[#EAE4DC] to-transparent" />
 
-      {/* Description */}
       <div
         className="relative p-5 rounded-2xl overflow-hidden"
         style={{

@@ -1,25 +1,7 @@
-// components/about/AboutStats.tsx
 "use client";
 import React from "react";
-import { Printer, Users, Package, Clock } from "lucide-react";
 import { AnimatedCounter, useScrollReveal } from "./aboutUtils";
-import {
-  NUMBER_OF_HAPPY_CLIENTS,
-  NUMBER_OF_MATERIALS,
-  NUMBER_OF_PRINTS_COMPLETED,
-  SUPPORT,
-} from "@/utils/constant";
-
-const stats = [
-  {
-    value: `${NUMBER_OF_PRINTS_COMPLETED}+`,
-    label: "Prints Completed",
-    icon: Printer,
-  },
-  { value: `${NUMBER_OF_HAPPY_CLIENTS}+`, label: "Happy Clients", icon: Users },
-  { value: `${NUMBER_OF_MATERIALS}`, label: "Materials", icon: Package },
-  { value: SUPPORT, label: "Support", icon: Clock },
-];
+import { statsData } from "@/data/about-us-page-data";
 
 const AboutStats: React.FC = () => {
   const { ref, visible } = useScrollReveal();
@@ -31,7 +13,7 @@ const AboutStats: React.FC = () => {
         style={{ maxWidth: "1400px", padding: "0 clamp(16px, 4vw, 64px)" }}
       >
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
-          {stats.map((stat, i) => {
+          {statsData.map((stat, i) => {
             const Icon = stat.icon;
             return (
               <div
@@ -44,7 +26,6 @@ const AboutStats: React.FC = () => {
                   transition: `opacity 0.55s ${0.08 + i * 0.09}s ease-out, transform 0.55s ${0.08 + i * 0.09}s ease-out, box-shadow 0.3s, translate 0.3s`,
                 }}
               >
-                {/* Orange top bar on hover */}
                 <div className="h-1 bg-gray-100 group-hover:bg-[#FF5000] transition-colors duration-300 absolute top-0 left-0 right-0" />
 
                 <div

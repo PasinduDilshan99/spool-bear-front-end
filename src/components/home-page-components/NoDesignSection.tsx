@@ -3,15 +3,8 @@ import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { CONTACT_US_PAGE_PATH } from "@/utils/urls";
-
-interface NoDesignSectionProps {
-  className?: string;
-  title?: string;
-  subtitle?: string;
-  paragraphs?: string[];
-  closingLine?: string;
-  imagePath?: string;
-}
+import { NoDesignSectionProps } from "@/types/home-page-types";
+import { HOME_PAGE_NO_DESIGN_SECTION_LOCAL } from "@/utils/imagesUrl";
 
 const NoDesignSection: React.FC<NoDesignSectionProps> = ({
   className = "",
@@ -24,12 +17,11 @@ const NoDesignSection: React.FC<NoDesignSectionProps> = ({
     "You'll be able to review the design before we move forward with printing.",
   ],
   closingLine = "You bring the idea — we handle the design and printing.",
-  imagePath = "https://res.cloudinary.com/dkfonkmwr/image/upload/v1774766973/xx8944nyn602dmyxcy4b.png",
+  imagePath = HOME_PAGE_NO_DESIGN_SECTION_LOCAL,
 }) => {
   const sectionRef = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
 
-  // Intersection observer — trigger animations on scroll into view
   useEffect(() => {
     const obs = new IntersectionObserver(
       ([entry]) => {
@@ -52,23 +44,34 @@ const NoDesignSection: React.FC<NoDesignSectionProps> = ({
       ref={sectionRef}
       className={`relative bg-[#EBEBEB] overflow-hidden ${className}`}
     >
-      {/* ── Subtle dot-grid background ── */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage:
-            "radial-gradient(circle, #FF5000 1px, transparent 1px)",
-          backgroundSize: "36px 36px",
-          opacity: 0.045,
+            "linear-gradient(rgba(255,80,0,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,80,0,0.04) 1px, transparent 1px)",
+          backgroundSize: "44px 44px",
         }}
       />
 
-      {/* ── Orange vertical accent bar (desktop only) ── */}
-      <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#FF5000] hidden lg:block" />
+      <div
+        className="absolute top-0 right-0 w-[40vw] h-[40vw] max-w-[520px] max-h-[520px] pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(circle at top right, rgba(255,80,0,0.05) 0%, transparent 65%)",
+        }}
+      />
+      <div
+        className="absolute bottom-0 left-0 w-[35vw] h-[35vw] max-w-[440px] max-h-[440px] pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(circle at bottom left, rgba(255,80,0,0.04) 0%, transparent 65%)",
+        }}
+      />
+
+      <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#FF5000] hidden lg:block z-20" />
 
       <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-12 xl:px-20 max-w-7xl py-16 sm:py-20 md:py-24 lg:py-32 xl:py-36">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-14 lg:gap-16 xl:gap-20 items-center">
-          {/* ══ LEFT: Text content ══════════════════════════════════════════ */}
           <div
             className={`order-2 lg:order-1 transition-all duration-700 ease-out ${
               visible
@@ -76,7 +79,6 @@ const NoDesignSection: React.FC<NoDesignSectionProps> = ({
                 : "opacity-0 -translate-x-10"
             }`}
           >
-            {/* Badge */}
             <div className="inline-flex items-center gap-2.5 mb-5 sm:mb-7">
               <div className="w-9 h-9 sm:w-10 sm:h-10 bg-[#FF5000] rounded-xl flex items-center justify-center rotate-6 shadow-md shadow-orange-200 flex-shrink-0">
                 <svg
@@ -98,7 +100,6 @@ const NoDesignSection: React.FC<NoDesignSectionProps> = ({
               </span>
             </div>
 
-            {/* Title */}
             <h2
               className="font-black tracking-tight text-[#101113] leading-[1.05] mb-3 sm:mb-4"
               style={{ fontSize: "clamp(32px, 5.5vw, 62px)" }}
@@ -106,7 +107,6 @@ const NoDesignSection: React.FC<NoDesignSectionProps> = ({
               {title}
             </h2>
 
-            {/* Subtitle */}
             <h3
               className="font-bold text-[#FF5000] mb-6 sm:mb-8 leading-snug"
               style={{ fontSize: "clamp(18px, 2.8vw, 30px)" }}
@@ -114,7 +114,6 @@ const NoDesignSection: React.FC<NoDesignSectionProps> = ({
               {subtitle}
             </h3>
 
-            {/* Paragraphs */}
             <div className="space-y-3 sm:space-y-4 mb-8 sm:mb-10">
               {paragraphs.map((para, i) => (
                 <div
@@ -153,7 +152,6 @@ const NoDesignSection: React.FC<NoDesignSectionProps> = ({
               ))}
             </div>
 
-            {/* Closing line */}
             <div
               className={`relative mb-8 sm:mb-10 transition-all duration-700 ${
                 visible
@@ -171,7 +169,6 @@ const NoDesignSection: React.FC<NoDesignSectionProps> = ({
               </p>
             </div>
 
-            {/* CTA */}
             <div
               className={`transition-all duration-700 ${
                 visible
@@ -200,13 +197,11 @@ const NoDesignSection: React.FC<NoDesignSectionProps> = ({
                     />
                   </svg>
                 </span>
-                {/* Shine sweep */}
                 <span className="absolute inset-0 bg-white/10 -translate-x-full group-hover:translate-x-full transition-transform duration-500 skew-x-12" />
               </Link>
             </div>
           </div>
 
-          {/* ══ RIGHT: Image + elements ════════════════════════════════════ */}
           <div
             className={`order-1 lg:order-2 transition-all duration-700 ease-out ${
               visible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"
@@ -214,10 +209,8 @@ const NoDesignSection: React.FC<NoDesignSectionProps> = ({
             style={{ transitionDelay: "150ms" }}
           >
             <div className="relative max-w-xs sm:max-w-sm md:max-w-md lg:max-w-full mx-auto">
-              {/* Glow blob */}
               <div className="absolute inset-0 bg-gradient-to-br from-[#FF5000]/15 to-transparent rounded-[40px] blur-3xl -z-10 scale-110" />
 
-              {/* Main image */}
               <div className="relative aspect-square w-full max-w-[280px] sm:max-w-[340px] md:max-w-[400px] lg:max-w-[420px] xl:max-w-[480px] mx-auto">
                 <Image
                   src={imagePath}
@@ -228,7 +221,6 @@ const NoDesignSection: React.FC<NoDesignSectionProps> = ({
                   priority
                 />
 
-                {/* Thought bubble */}
                 <div
                   className="absolute -top-4 -right-2 sm:-top-6 sm:-right-4 md:-top-8 md:-right-6 bg-white rounded-2xl sm:rounded-3xl px-3 py-2 sm:px-4 sm:py-3 shadow-2xl z-10 animate-float"
                   style={{ rotate: "3deg" }}
@@ -239,22 +231,18 @@ const NoDesignSection: React.FC<NoDesignSectionProps> = ({
                   <div className="absolute -bottom-2 left-6 w-4 h-4 bg-white rotate-45 shadow-sm" />
                 </div>
 
-                {/* Floating pencil */}
                 <div className="absolute -left-3 sm:-left-5 top-1/4 w-9 h-9 sm:w-11 sm:h-11 bg-white rounded-xl shadow-xl flex items-center justify-center animate-float-delayed z-10">
                   <span className="text-lg sm:text-2xl">✏️</span>
                 </div>
 
-                {/* Floating ruler */}
                 <div className="absolute -right-3 sm:-right-5 bottom-1/4 w-9 h-9 sm:w-11 sm:h-11 bg-white rounded-xl shadow-xl flex items-center justify-center animate-float-more-delayed z-10">
                   <span className="text-lg sm:text-2xl">📐</span>
                 </div>
 
-                {/* Subtle corner glows */}
                 <div className="absolute -bottom-4 -left-4 w-20 h-20 sm:w-28 sm:h-28 bg-[#FF5000]/10 rounded-full blur-2xl" />
                 <div className="absolute -top-4 -right-4 w-24 h-24 sm:w-32 sm:h-32 bg-[#FF5000]/10 rounded-full blur-2xl" />
               </div>
 
-              {/* Process steps */}
               <div
                 className={`mt-8 sm:mt-10 grid grid-cols-3 gap-2 sm:gap-4 max-w-xs sm:max-w-sm md:max-w-md mx-auto transition-all duration-700 ${
                   visible
@@ -265,7 +253,6 @@ const NoDesignSection: React.FC<NoDesignSectionProps> = ({
               >
                 {steps.map((item, i) => (
                   <div key={item.step} className="text-center group">
-                    {/* Step circle */}
                     <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 mx-auto bg-white rounded-xl sm:rounded-2xl shadow-md group-hover:shadow-xl group-hover:-translate-y-1 transition-all duration-300 flex flex-col items-center justify-center mb-2 sm:mb-3 border border-gray-100 group-hover:border-orange-200">
                       <span className="text-base sm:text-xl md:text-2xl leading-none">
                         {item.icon}
@@ -278,7 +265,6 @@ const NoDesignSection: React.FC<NoDesignSectionProps> = ({
                       {item.label}
                     </div>
 
-                    {/* Connector line between steps */}
                     {i < steps.length - 1 && (
                       <div className="hidden sm:block absolute" />
                     )}
@@ -289,7 +275,6 @@ const NoDesignSection: React.FC<NoDesignSectionProps> = ({
           </div>
         </div>
 
-        {/* ── Bottom paw trail ── */}
         <div
           className={`mt-12 sm:mt-16 md:mt-20 flex justify-center items-center gap-2 sm:gap-3 transition-all duration-700 ${
             visible ? "opacity-30 translate-y-0" : "opacity-0 translate-y-4"

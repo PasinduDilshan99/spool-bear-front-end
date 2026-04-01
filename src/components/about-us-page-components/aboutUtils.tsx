@@ -1,8 +1,6 @@
-// components/about/aboutUtils.tsx
 "use client";
 import { useEffect, useRef, useState } from "react";
 
-/* ── Scroll-reveal hook ── */
 export function useScrollReveal(threshold = 0.1) {
   const ref = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
@@ -21,7 +19,6 @@ export function useScrollReveal(threshold = 0.1) {
   return { ref, visible };
 }
 
-/* ── Animated number counter ── */
 export function AnimatedCounter({ target, suffix = "" }: { target: string; suffix?: string }) {
   const [count, setCount] = useState(0);
   const ref = useRef<HTMLSpanElement>(null);

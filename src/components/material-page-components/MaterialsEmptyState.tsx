@@ -1,4 +1,3 @@
-// components/materials/MaterialsEmptyState.tsx
 export const MaterialsEmptyState = () => (
   <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-12 text-center">
     <div className="text-6xl mb-4">🔍</div>

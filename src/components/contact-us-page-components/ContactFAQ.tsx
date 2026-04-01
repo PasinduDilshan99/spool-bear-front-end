@@ -1,30 +1,7 @@
-// components/contact/ContactFAQ.tsx
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import { HelpCircle } from "lucide-react";
-
-const faqs = [
-  {
-    question: "How quickly do you respond to inquiries?",
-    answer:
-      "We typically respond within 24 hours during business days. For urgent matters, please mention 'URGENT' in your subject line.",
-  },
-  {
-    question: "Do you offer international shipping?",
-    answer:
-      "Yes! We ship worldwide. Shipping costs and delivery times vary by location.",
-  },
-  {
-    question: "Can I get a quote before ordering?",
-    answer:
-      "Absolutely! Just send us your project details and we'll provide a free, no-obligation quote.",
-  },
-  {
-    question: "What file formats do you accept?",
-    answer:
-      "We accept STL, OBJ, 3MF, STEP, and F3D files. If you have a different format, let us know!",
-  },
-];
+import { faqsData } from "@/data/contact-us-page-data";
 
 const ContactFAQ: React.FC = () => {
   const ref = useRef<HTMLElement>(null);
@@ -50,7 +27,6 @@ const ContactFAQ: React.FC = () => {
         className="container mx-auto"
         style={{ maxWidth: "1400px", padding: "0 clamp(16px, 4vw, 64px)" }}
       >
-        {/* Heading */}
         <div
           className="text-center mb-10 sm:mb-12 transition-all duration-700"
           style={{
@@ -94,9 +70,8 @@ const ContactFAQ: React.FC = () => {
           </p>
         </div>
 
-        {/* FAQ grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 max-w-4xl mx-auto">
-          {faqs.map((faq, i) => (
+          {faqsData.map((faq, i) => (
             <div
               key={i}
               className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"

@@ -1,4 +1,3 @@
-// components/common/CurrencySelector.tsx
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import { useCurrency } from "@/context/CurrencyContext";
@@ -38,7 +37,7 @@ export const CurrencySelector: React.FC = () => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg hover:border-[#FF5000] transition-all duration-200"
+        className="cursor-pointer flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg hover:border-[#FF5000] transition-all duration-200"
         disabled={isLoading}
       >
         <span className="text-sm">{currentCurrency.flag}</span>
@@ -100,7 +99,7 @@ export const CurrencySelector: React.FC = () => {
                   <button
                     key={currency.code}
                     onClick={() => handleCurrencySelect(currency)}
-                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${
+                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all cursor-pointer duration-300 ${
                       currentCurrency.code === currency.code
                         ? "bg-[#FF5000]/10 text-[#FF5000]"
                         : "hover:bg-gray-50"
