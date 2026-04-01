@@ -174,11 +174,11 @@ const DesktopNav: React.FC<DesktopNavProps> = ({
 
       {/* User Auth Section - Desktop */}
       <div className="hidden md:flex items-center space-x-4">
+        <CurrencySelector />
         {user ? (
           <>
             {/* Currency Selector - Added before cart */}
-            <CurrencySelector />
-            
+
             {/* Cart Icon - Only shown when user is logged in */}
             <CartIcon onCloseAll={closeAllDropdowns} />
 

@@ -4,10 +4,314 @@ import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Heart,
+  Calendar,
+  Tag,
+  Sparkles,
+  ShoppingBag,
+  AlertCircle,
+  ArrowRight,
+  Package,
+  Percent,
+  BookmarkCheck,
+  RefreshCw,
+} from "lucide-react";
 import { PLACE_HOLDER_IMAGE } from "@/utils/constant";
 import { WishItem } from "@/types/wish-list-types";
 import { WishListService } from "@/service/wishListService";
 import { useCurrency } from "@/context/CurrencyContext";
+
+// ─── helpers ────────────────────────────────────────────────────────────────
+
+const formatDate = (dateString: string) =>
+  new Date(dateString).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+
+const calculateOriginalPrice = (
+  currentPrice: number,
+  discountPercent: number,
+) =>
+  discountPercent === 0
+    ? currentPrice
+    : currentPrice * (100 / (100 - discountPercent));
+
+// ─── Skeleton ────────────────────────────────────────────────────────────────
+
+const SkeletonCard = () => (
+  <div
+    className="bg-white rounded-3xl overflow-hidden animate-pulse"
+    style={{
+      border: "1px solid #EAE4DC",
+      boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+    }}
+  >
+    <div className="h-56 bg-[#F0EBE5]" />
+    <div className="p-5 space-y-3">
+      <div className="h-5 bg-[#F0EBE5] rounded-xl w-3/4" />
+      <div className="h-3.5 bg-[#F0EBE5] rounded-xl" />
+      <div className="h-3.5 bg-[#F0EBE5] rounded-xl w-5/6" />
+      <div className="h-6 bg-[#F0EBE5] rounded-xl w-1/3 mt-2" />
+      <div className="h-3 bg-[#F0EBE5] rounded-xl w-1/2" />
+    </div>
+  </div>
+);
+
+// ─── Stat Tile ────────────────────────────────────────────────────────────────
+
+const StatTile = ({
+  value,
+  label,
+  icon: Icon,
+  accent = false,
+}: {
+  value: number;
+  label: string;
+  icon: React.ElementType;
+  accent?: boolean;
+}) => (
+  <motion.div
+    whileHover={{ y: -3 }}
+    className="flex flex-col items-center gap-2 p-5 rounded-3xl transition-shadow duration-200"
+    style={{
+      background: accent
+        ? "linear-gradient(135deg,#FF5000,#FF7A40)"
+        : "#F7F5F2",
+      border: accent ? "none" : "1px solid #EAE4DC",
+      boxShadow: accent
+        ? "0 8px 24px rgba(255,80,0,0.2)"
+        : "0 1px 4px rgba(0,0,0,0.04)",
+    }}
+  >
+    <div
+      className="w-9 h-9 rounded-2xl flex items-center justify-center"
+      style={{
+        background: accent ? "rgba(255,255,255,0.2)" : "rgba(255,80,0,0.08)",
+      }}
+    >
+      <Icon
+        size={16}
+        strokeWidth={2.5}
+        style={{ color: accent ? "#fff" : "#FF5000" }}
+      />
+    </div>
+    <div
+      className="text-3xl font-black leading-none"
+      style={{
+        color: accent ? "#fff" : "#1C1714",
+        fontFamily: "'Fraunces','Georgia',serif",
+      }}
+    >
+      {value}
+    </div>
+    <div
+      className="text-[11px] font-bold uppercase tracking-widest"
+      style={{ color: accent ? "rgba(255,255,255,0.75)" : "#B8ADA4" }}
+    >
+      {label}
+    </div>
+  </motion.div>
+);
+
+// ─── Product Card ─────────────────────────────────────────────────────────────
+
+const ProductCard = ({
+  item,
+  onRemove,
+  isRemoving,
+  formatCurrency,
+  showOriginalPrice,
+}: {
+  item: WishItem;
+  onRemove: (id: number) => void;
+  isRemoving: boolean;
+  formatCurrency: (n: number) => string;
+  showOriginalPrice: boolean;
+}) => {
+  const router = useRouter();
+  const originalPrice = calculateOriginalPrice(
+    item.productPrice,
+    item.discount,
+  );
+
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.92, transition: { duration: 0.22 } }}
+      whileHover={{
+        y: -5,
+        boxShadow:
+          "0 20px 48px rgba(255,80,0,0.10), 0 4px 16px rgba(0,0,0,0.07)",
+      }}
+      transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+      onClick={() =>
+        router.push(`/shop/${item.productUrl}?name=${item.productName}`)
+      }
+      className="group relative flex flex-col bg-white rounded-3xl overflow-hidden cursor-pointer"
+      style={{
+        border: "1px solid rgba(0,0,0,0.06)",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+        transition: "box-shadow 0.3s ease",
+      }}
+    >
+      {/* Image */}
+      <div className="relative h-56 overflow-hidden bg-[#F7F5F2]">
+        {/* Corner accent */}
+        <div
+          className="absolute bottom-0 left-0 w-24 h-24 rounded-tr-full opacity-20 pointer-events-none z-10"
+          style={{ background: "linear-gradient(135deg,#FF5000,#FF8C42)" }}
+        />
+
+        <Image
+          src={item.productImages?.[0] || PLACE_HOLDER_IMAGE}
+          alt={item.productName}
+          width={600}
+          height={400}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.07]"
+          loading="lazy"
+        />
+
+        {/* Hover overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#1C1714]/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+        {/* Discount badge */}
+        {item.discount > 0 && (
+          <div className="absolute top-3.5 left-3.5 z-20">
+            <span
+              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[11px] font-black text-white shadow-lg"
+              style={{ background: "linear-gradient(135deg,#FF5000,#FF7A40)" }}
+            >
+              <Percent size={9} strokeWidth={3} />
+              {item.discount}% OFF
+            </span>
+          </div>
+        )}
+
+        {/* Status badge */}
+        <div className="absolute top-3.5 right-12 z-20">
+          <span
+            className={`px-2.5 py-1.5 rounded-xl text-[10px] font-bold backdrop-blur-sm ${
+              item.status === "ACTIVE"
+                ? "bg-emerald-500/90 text-white"
+                : "bg-gray-700/80 text-white"
+            }`}
+          >
+            {item.status === "ACTIVE" ? "In Stock" : item.status}
+          </span>
+        </div>
+
+        {/* Remove (heart) button */}
+        <motion.button
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onRemove(item.productId);
+          }}
+          disabled={isRemoving}
+          whileTap={{ scale: 0.85 }}
+          whileHover={{ scale: 1.1 }}
+          className="absolute top-3 right-3 z-20 w-9 h-9 rounded-2xl bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-md"
+          title="Remove from wish list"
+        >
+          {isRemoving ? (
+            <RefreshCw size={14} className="text-[#FF5000] animate-spin" />
+          ) : (
+            <Heart size={14} fill="#FF5000" stroke="#FF5000" strokeWidth={2} />
+          )}
+        </motion.button>
+      </div>
+
+      {/* Body */}
+      <div className="flex flex-col flex-1 p-5 gap-3">
+        {/* Name */}
+        <h3
+          className="text-[17px] font-black text-[#1C1714] line-clamp-1 group-hover:text-[#FF5000] transition-colors duration-200 leading-snug"
+          style={{ fontFamily: "'Fraunces','Georgia',serif" }}
+        >
+          {item.productName}
+        </h3>
+
+        {/* Description */}
+        <p className="text-[13px] text-[#6B5F56] line-clamp-2 leading-relaxed -mt-1">
+          {item.productDescription}
+        </p>
+
+        {/* Color swatch */}
+        {item.productColor && (
+          <div className="flex items-center gap-2">
+            <div
+              className="w-4 h-4 rounded-lg border-2 border-white shadow-sm ring-1 ring-black/10 flex-shrink-0"
+              style={{ backgroundColor: item.productColor.toLowerCase() }}
+            />
+            <span className="text-[11px] font-semibold text-[#B8ADA4] uppercase tracking-widest">
+              {item.productColor}
+            </span>
+          </div>
+        )}
+
+        {/* Price */}
+        <div>
+          <div
+            className="text-[22px] font-black text-[#FF5000] leading-none"
+            style={{ fontFamily: "'Fraunces','Georgia',serif" }}
+          >
+            {formatCurrency(item.productPrice)}
+          </div>
+          {item.discount > 0 && (
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-[12px] text-[#B8ADA4] line-through font-medium">
+                {formatCurrency(originalPrice)}
+              </span>
+              <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-lg">
+                Save {item.discount}%
+              </span>
+            </div>
+          )}
+          {showOriginalPrice && (
+            <div className="text-[10px] text-[#B8ADA4] font-semibold mt-0.5">
+              LKR {item.productPrice.toFixed(2)} original
+            </div>
+          )}
+        </div>
+
+        <div className="flex-1" />
+
+        {/* Footer row */}
+        <div
+          className="flex items-center justify-between pt-3"
+          style={{ borderTop: "1px solid #F0EBE5" }}
+        >
+          <div className="flex items-center gap-1.5 text-[11px] text-[#B8ADA4] font-semibold">
+            <Calendar size={10} strokeWidth={2.5} />
+            {formatDate(item.createdAt)}
+          </div>
+          <motion.div
+            whileHover={{ x: 2 }}
+            className="flex items-center gap-1.5 text-[#FF5000]"
+          >
+            <span className="text-[11px] font-black uppercase tracking-[0.1em]">
+              View
+            </span>
+            <div
+              className="w-6 h-6 rounded-xl flex items-center justify-center"
+              style={{ background: "linear-gradient(135deg,#FF5000,#FF7A40)" }}
+            >
+              <ArrowRight size={10} strokeWidth={2.5} className="text-white" />
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function WishListPage() {
   const [wishListData, setWishListData] = useState<WishItem[]>([]);
@@ -17,8 +321,8 @@ export default function WishListPage() {
 
   const wishListService = new WishListService();
   const router = useRouter();
-  const { user } = useAuth();
-  const { formatPrice, currentCurrency, convertPrice } = useCurrency();
+  const { formatPrice, currentCurrency } = useCurrency();
+  const showOriginalPrice = currentCurrency.code !== "LKR";
 
   useEffect(() => {
     loadWishListDetails();
@@ -30,236 +334,46 @@ export default function WishListPage() {
       setError(null);
       const response = await wishListService.getWishListDetails();
       setWishListData(response.data || []);
-    } catch (err) {
-      console.error("Failed to load wish list:", err);
+    } catch {
       setError("Failed to load wish list");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleRemoveFromWishList = async (productId: number) => {
+  const handleRemove = async (productId: number) => {
     if (removingItem) return;
-
     setRemovingItem(productId);
-
     try {
-      const requestBody = { productId };
-      const response = await wishListService.addWishList(requestBody);
-
+      const response = await wishListService.addWishList({ productId });
       if (response.code === 200) {
         setWishListData((prev) =>
-          prev.filter((item) => item.productId !== productId),
+          prev.filter((i) => i.productId !== productId),
         );
-        console.log(response.message);
-      } else {
-        throw new Error(response.message || "Failed to remove item");
       }
-    } catch (err) {
-      console.error("Failed to remove item from wish list:", err);
+    } catch {
+      console.error("Failed to remove item");
     } finally {
       setRemovingItem(null);
     }
   };
 
-  // Updated formatCurrency to use the currency context
-  const formatCurrency = (amount: number) => {
-    return formatPrice(amount);
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  const handleItemClick = (url: string, name: string) => {
-    router.push(`/shop/${url}?name=${name}`);
-  };
-
-  // Calculate original price before discount
-  const calculateOriginalPrice = (
-    currentPrice: number,
-    discountPercent: number,
-  ) => {
-    if (discountPercent === 0) return currentPrice;
-    return currentPrice * (100 / (100 - discountPercent));
-  };
-
-  // Wish Icon Button Component
-  const WishIconButton = ({
-    productId,
-    isRemoving,
-  }: {
-    productId: number;
-    isRemoving?: boolean;
-  }) => (
-    <button
-      onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        handleRemoveFromWishList(productId);
-      }}
-      disabled={isRemoving}
-      className={`absolute top-3 right-3 w-10 h-10 flex items-center justify-center rounded-full shadow-lg transition-all duration-300 z-10 ${
-        isRemoving
-          ? "bg-gray-100 cursor-not-allowed"
-          : "bg-white hover:bg-red-50 hover:scale-110 active:scale-95"
-      }`}
-      aria-label="Remove from wish list"
-    >
-      {isRemoving ? (
-        <div className="w-4 h-4 border-2 border-[#FF5000] border-t-transparent rounded-full animate-spin"></div>
-      ) : (
-        <svg
-          className="w-5 h-5 text-red-500"
-          fill="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-        </svg>
-      )}
-    </button>
-  );
-
-  const ProductCard = ({ item }: { item: WishItem }) => {
-    const isRemoving = removingItem === item.productId;
-    const showOriginalPrice = currentCurrency.code !== "LKR";
-    const originalPrice = calculateOriginalPrice(
-      item.productPrice,
-      item.discount,
-    );
-    const formattedCurrentPrice = formatCurrency(item.productPrice);
-    const formattedOriginalPrice = formatCurrency(originalPrice);
-
-    return (
-      <div
-        className="cursor-pointer bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 group transform hover:translate-y-[-4px] relative"
-        onClick={() => handleItemClick(item.productUrl, item.productName)}
-      >
-        <div className="relative h-52 md:h-56 overflow-hidden">
-          <Image
-            src={item.productImages[0] || PLACE_HOLDER_IMAGE}
-            alt={item.productName}
-            width={1000}
-            height={1000}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            loading="lazy"
-          />
-
-          <WishIconButton productId={item.productId} isRemoving={isRemoving} />
-
-          {item.discount > 0 && (
-            <div className="absolute top-3 left-3 bg-gradient-to-r from-[#FF5000] to-[#ff6b2c] text-white px-3 py-1.5 rounded-lg text-sm font-semibold shadow-lg">
-              {item.discount}% OFF
-            </div>
-          )}
-
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-        </div>
-
-        <div className="p-5 md:p-6">
-          <div className="flex justify-between items-start mb-3">
-            <h3 className="font-bold text-gray-900 text-lg md:text-xl mb-1 group-hover:text-[#FF5000] transition-colors duration-300 line-clamp-1">
-              {item.productName}
-            </h3>
-          </div>
-
-          <p className="text-gray-600 text-sm md:text-base mb-4 line-clamp-2">
-            {item.productDescription}
-          </p>
-
-          {/* Color Badge */}
-          {item.productColor && (
-            <div className="mb-3">
-              <span className="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
-                <span
-                  className="w-3 h-3 rounded-full mr-2"
-                  style={{ backgroundColor: item.productColor.toLowerCase() }}
-                ></span>
-                {item.productColor}
-              </span>
-            </div>
-          )}
-
-          <div className="mb-4">
-            <div className="text-lg font-bold text-[#FF5000]">
-              {formattedCurrentPrice}
-              {showOriginalPrice && (
-                <span className="text-sm text-gray-400 ml-2">
-                  (LKR {item.productPrice.toFixed(2)})
-                </span>
-              )}
-            </div>
-            {item.discount > 0 && (
-              <div className="text-sm text-gray-500 line-through">
-                {formattedOriginalPrice}
-                {showOriginalPrice && (
-                  <span className="text-xs text-gray-400 ml-2">
-                    LKR {originalPrice.toFixed(2)}
-                  </span>
-                )}
-              </div>
-            )}
-          </div>
-
-          <div className="flex items-center justify-between text-sm text-gray-500 border-t border-gray-100 pt-4">
-            <div className="flex items-center space-x-4">
-              <span className="flex items-center">
-                <svg
-                  className="w-4 h-4 mr-1 text-[#FF5000]"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
-                {formatDate(item.createdAt)}
-              </span>
-            </div>
-            <span
-              className={`px-3 py-1 rounded-full text-xs font-medium ${
-                item.status === "ACTIVE"
-                  ? "bg-green-50 text-green-700 border border-green-200"
-                  : "bg-gray-100 text-gray-700 border border-gray-300"
-              }`}
-            >
-              {item.status}
-            </span>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
+  // ── Loading ────────────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="flex-1 p-4 md:p-6 lg:p-8 bg-gradient-to-br from-gray-50 to-white min-h-screen">
+      <div
+        className="flex-1 p-6 lg:p-10 min-h-screen"
+        style={{
+          background:
+            "linear-gradient(160deg,#FDFAF7 0%,#F7F5F2 50%,#FFF8F5 100%)",
+        }}
+      >
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div
-                key={i}
-                className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden animate-pulse"
-              >
-                <div className="h-52 md:h-56 bg-gray-200"></div>
-                <div className="p-5 md:p-6">
-                  <div className="h-6 bg-gray-200 rounded mb-3"></div>
-                  <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded mb-4"></div>
-                  <div className="h-5 bg-gray-200 rounded w-24 mb-4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-32"></div>
-                </div>
-              </div>
+          <div className="h-10 w-48 bg-[#EAE4DC] rounded-2xl animate-pulse mb-2" />
+          <div className="h-4 w-72 bg-[#EAE4DC] rounded-xl animate-pulse mb-10" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, i) => (
+              <SkeletonCard key={i} />
             ))}
           </div>
         </div>
@@ -267,176 +381,278 @@ export default function WishListPage() {
     );
   }
 
+  // ── Error ──────────────────────────────────────────────────────────────────
   if (error) {
     return (
-      <div className="flex-1 p-4 md:p-6 lg:p-8 bg-gradient-to-br from-gray-50 to-white min-h-screen">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8 text-center">
-            <div className="w-20 h-20 bg-gradient-to-r from-red-50 to-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg
-                className="w-10 h-10 text-red-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <h3 className="text-2xl font-semibold text-gray-800 mb-3">
-              Unable to Load Wish List
-            </h3>
-            <p className="text-gray-600 mb-8">{error}</p>
-            <button
-              onClick={loadWishListDetails}
-              className="px-8 py-3.5 bg-gradient-to-r from-[#FF5000] to-[#ff6b2c] text-white rounded-xl hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] font-semibold"
-            >
-              Try Again
-            </button>
+      <div
+        className="flex-1 p-6 lg:p-10 min-h-screen flex items-center justify-center"
+        style={{ background: "linear-gradient(160deg,#FDFAF7,#F7F5F2)" }}
+      >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.94 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-white rounded-3xl p-10 text-center max-w-md w-full"
+          style={{
+            border: "1px solid #EAE4DC",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.06)",
+          }}
+        >
+          <div className="w-16 h-16 rounded-3xl bg-rose-50 flex items-center justify-center mx-auto mb-5">
+            <AlertCircle size={28} className="text-rose-500" strokeWidth={2} />
           </div>
-        </div>
+          <h3
+            className="text-xl font-black text-[#1C1714] mb-2"
+            style={{ fontFamily: "'Fraunces','Georgia',serif" }}
+          >
+            Unable to Load
+          </h3>
+          <p className="text-[14px] text-[#6B5F56] mb-7">{error}</p>
+          <motion.button
+            whileHover={{ y: -2, boxShadow: "0 12px 32px rgba(255,80,0,0.3)" }}
+            whileTap={{ scale: 0.97 }}
+            onClick={loadWishListDetails}
+            className="px-8 py-3 rounded-2xl text-[13px] font-black text-white"
+            style={{ background: "linear-gradient(135deg,#FF5000,#FF7A40)" }}
+          >
+            Try Again
+          </motion.button>
+        </motion.div>
       </div>
     );
   }
 
+  // ── Empty ──────────────────────────────────────────────────────────────────
+  if (wishListData.length === 0) {
+    return (
+      <div
+        className="flex-1 p-6 lg:p-10 min-h-screen flex items-center justify-center"
+        style={{ background: "linear-gradient(160deg,#FDFAF7,#F7F5F2)" }}
+      >
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white rounded-3xl p-10 md:p-14 text-center max-w-lg w-full"
+          style={{
+            border: "1px solid #EAE4DC",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.06)",
+          }}
+        >
+          <motion.div
+            animate={{ scale: [1, 1.08, 1] }}
+            transition={{ repeat: Infinity, duration: 2.4, ease: "easeInOut" }}
+            className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6"
+            style={{
+              background:
+                "linear-gradient(135deg,rgba(255,80,0,0.10),rgba(255,140,66,0.07))",
+            }}
+          >
+            <Heart size={34} strokeWidth={1.5} className="text-[#FF5000]" />
+          </motion.div>
+          <h3
+            className="text-2xl font-black text-[#1C1714] mb-3"
+            style={{ fontFamily: "'Fraunces','Georgia',serif" }}
+          >
+            Your Wish List is Empty
+          </h3>
+          <p className="text-[14px] text-[#6B5F56] mb-8 leading-relaxed max-w-sm mx-auto">
+            Start exploring our 3D printing products and save your favorites
+            here.
+          </p>
+          <motion.button
+            whileHover={{ y: -2, boxShadow: "0 12px 32px rgba(255,80,0,0.3)" }}
+            whileTap={{ scale: 0.97 }}
+            onClick={() => router.push("/products")}
+            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl text-[13px] font-black text-white"
+            style={{ background: "linear-gradient(135deg,#FF5000,#FF7A40)" }}
+          >
+            <ShoppingBag size={15} strokeWidth={2.5} />
+            Explore Products
+          </motion.button>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // ── Main ───────────────────────────────────────────────────────────────────
+  const activeCount = wishListData.filter((i) => i.status === "ACTIVE").length;
+  const onSaleCount = wishListData.filter((i) => i.discount > 0).length;
+
   return (
-    <div className="flex-1 p-4 md:p-6 lg:p-8 bg-gradient-to-br from-gray-50 to-white min-h-screen">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8 md:mb-12">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
-                My Wish List
-              </h1>
-              <p className="text-gray-600 text-sm md:text-base">
-                Your saved 3D printing products and accessories
-              </p>
-              {currentCurrency.code !== "LKR" && (
-                <p className="text-xs text-gray-500 mt-1">
-                  Prices shown in {currentCurrency.code} (
-                  {currentCurrency.symbol})
-                  <span className="text-gray-400 ml-2">
-                    (Original prices shown in LKR)
-                  </span>
-                </p>
-              )}
-            </div>
-            <div className="flex items-center space-x-2">
-              <span className="px-4 py-2 bg-[#FFF5E6] text-[#FF5000] rounded-lg text-sm font-medium border border-[#FFE0C2]">
-                {wishListData.length} Total Items
+    <div
+      className="flex-1 p-6 lg:p-10 min-h-screen relative"
+      style={{
+        background:
+          "linear-gradient(160deg,#FDFAF7 0%,#F7F5F2 50%,#FFF8F5 100%)",
+      }}
+    >
+      {/* Decorative blobs */}
+      <div
+        className="fixed top-0 right-0 w-[500px] h-[500px] rounded-full pointer-events-none opacity-[0.035]"
+        style={{
+          background: "radial-gradient(circle,#FF5000,transparent 70%)",
+          transform: "translate(35%,-35%)",
+        }}
+      />
+
+      <div className="max-w-7xl mx-auto relative z-10">
+        {/* ── Header ── */}
+        <motion.div
+          initial={{ opacity: 0, y: -14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45 }}
+          className="flex flex-col md:flex-row md:items-end justify-between gap-5 mb-10"
+        >
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <div
+                className="h-5 w-1 rounded-full"
+                style={{
+                  background: "linear-gradient(180deg,#FF5000,#FF8C42)",
+                }}
+              />
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#B8ADA4]">
+                Profile
               </span>
             </div>
-          </div>
-        </div>
-
-        {/* Wish List Items */}
-        {wishListData.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8 md:p-12 text-center">
-            <div className="w-24 h-24 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg
-                className="w-12 h-12 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                />
-              </svg>
-            </div>
-            <h3 className="text-2xl font-semibold text-gray-800 mb-3">
-              Your Wish List is Empty
-            </h3>
-            <p className="text-gray-600 mb-8 max-w-md mx-auto">
-              Start exploring our amazing 3D printing products and add your
-              favorites to your wish list.
-            </p>
-            <button
-              onClick={() => router.push("/products")}
-              className="px-8 py-3.5 bg-gradient-to-r from-[#FF5000] to-[#ff6b2c] text-white rounded-xl hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] font-semibold"
+            <h1
+              className="text-3xl md:text-4xl font-black text-[#1C1714] leading-tight"
+              style={{ fontFamily: "'Fraunces','Georgia',serif" }}
             >
-              Explore Products
-            </button>
+              My Wish List
+            </h1>
+            <p className="text-[13px] text-[#6B5F56] font-medium mt-1">
+              Your saved 3D printing products and accessories
+            </p>
+            {showOriginalPrice && (
+              <p className="text-[11px] text-[#B8ADA4] font-semibold mt-1">
+                Prices in {currentCurrency.code} ({currentCurrency.symbol}) ·
+                Original LKR shown below
+              </p>
+            )}
           </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-              {wishListData.map((item) => (
-                <ProductCard key={item.productId} item={item} />
-              ))}
-            </div>
 
-            {/* Quick Stats */}
-            <div className="mt-12 md:mt-16 bg-white rounded-2xl shadow-lg border border-gray-200 p-6 md:p-8">
-              <h3 className="text-lg md:text-xl font-semibold text-gray-800 mb-6">
+          <span
+            className="self-start md:self-auto inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-[12px] font-black text-[#FF5000]"
+            style={{
+              background: "rgba(255,80,0,0.07)",
+              border: "1px solid rgba(255,80,0,0.15)",
+            }}
+          >
+            <BookmarkCheck size={13} strokeWidth={2.5} />
+            {wishListData.length} Saved Items
+          </span>
+        </motion.div>
+
+        {/* ── Cards Grid ── */}
+        <motion.div
+          layout
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
+          <AnimatePresence mode="popLayout">
+            {wishListData.map((item, idx) => (
+              <motion.div
+                key={item.productId}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.07, duration: 0.35 }}
+              >
+                <ProductCard
+                  item={item}
+                  onRemove={handleRemove}
+                  isRemoving={removingItem === item.productId}
+                  formatCurrency={formatPrice}
+                  showOriginalPrice={showOriginalPrice}
+                />
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </motion.div>
+
+        {/* ── Summary ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="mt-14 rounded-3xl overflow-hidden"
+          style={{
+            background: "#FFFFFF",
+            border: "1px solid #EAE4DC",
+            boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
+          }}
+        >
+          {/* Accent bar */}
+          <div
+            className="h-1"
+            style={{
+              background: "linear-gradient(90deg,#FF5000,#FF8C42,transparent)",
+            }}
+          />
+
+          <div className="p-6 md:p-8">
+            <div className="flex items-center gap-3 mb-7">
+              <div
+                className="w-8 h-8 rounded-xl flex items-center justify-center"
+                style={{
+                  background: "linear-gradient(135deg,#FF5000,#FF7A40)",
+                }}
+              >
+                <Sparkles size={14} className="text-white" strokeWidth={2.5} />
+              </div>
+              <h3 className="text-[14px] font-black uppercase tracking-[0.12em] text-[#3D3530]">
                 Wish List Summary
               </h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-                <div className="text-center p-4 md:p-5 bg-[#FFF5E6] rounded-xl border border-[#FFE0C2] hover:border-[#FF5000] transition-all duration-200">
-                  <div className="text-2xl md:text-3xl font-bold text-[#FF5000] mb-1">
-                    {wishListData.length}
-                  </div>
-                  <div className="text-sm text-gray-600 font-medium">
-                    Total Items
-                  </div>
-                </div>
-                <div className="text-center p-4 md:p-5 bg-gray-50 rounded-xl border border-gray-200 hover:border-gray-300 transition-all duration-200">
-                  <div className="text-2xl md:text-3xl font-bold text-gray-700 mb-1">
-                    {
-                      wishListData.filter((item) => item.status === "ACTIVE")
-                        .length
-                    }
-                  </div>
-                  <div className="text-sm text-gray-600 font-medium">
-                    Available
-                  </div>
-                </div>
-                <div className="text-center p-4 md:p-5 bg-gray-50 rounded-xl border border-gray-200 hover:border-gray-300 transition-all duration-200">
-                  <div className="text-2xl md:text-3xl font-bold text-gray-700 mb-1">
-                    {wishListData.filter((item) => item.discount > 0).length}
-                  </div>
-                  <div className="text-sm text-gray-600 font-medium">
-                    On Sale
-                  </div>
-                </div>
-                <div className="text-center p-4 md:p-5 bg-gray-50 rounded-xl border border-gray-200 hover:border-gray-300 transition-all duration-200">
-                  <div className="text-2xl md:text-3xl font-bold text-gray-700 mb-1">
-                    {wishListData.length}
-                  </div>
-                  <div className="text-sm text-gray-600 font-medium">
-                    Saved Items
-                  </div>
-                </div>
-              </div>
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <p className="text-gray-600 text-sm text-center">
-                  Total saved items:{" "}
-                  <span className="font-semibold text-[#FF5000]">
-                    {wishListData.length}
-                  </span>{" "}
-                  • Last updated:{" "}
-                  <span className="font-medium text-gray-800">
-                    {new Date().toLocaleDateString()}
-                  </span>
-                  {currentCurrency.code !== "LKR" && (
-                    <span className="block mt-1 text-xs text-gray-400">
-                      Prices are displayed in {currentCurrency.code} with
-                      original LKR prices shown for reference
-                    </span>
-                  )}
-                </p>
-              </div>
             </div>
-          </>
-        )}
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <StatTile
+                value={wishListData.length}
+                label="Total Saved"
+                icon={Heart}
+                accent
+              />
+              <StatTile value={activeCount} label="Available" icon={Package} />
+              <StatTile value={onSaleCount} label="On Sale" icon={Percent} />
+              <StatTile
+                value={wishListData.length}
+                label="Bookmarked"
+                icon={BookmarkCheck}
+              />
+            </div>
+
+            <div
+              className="mt-6 pt-5 flex flex-col sm:flex-row items-center justify-between gap-3"
+              style={{ borderTop: "1px solid #F0EBE5" }}
+            >
+              <p className="text-[12px] text-[#B8ADA4] font-semibold text-center sm:text-left">
+                Last updated:{" "}
+                <span className="text-[#6B5F56] font-bold">
+                  {new Date().toLocaleDateString()}
+                </span>
+                {showOriginalPrice && (
+                  <span className="block mt-0.5 text-[11px]">
+                    Prices in {currentCurrency.code} · Original LKR shown on
+                    each card
+                  </span>
+                )}
+              </p>
+              <motion.button
+                whileHover={{
+                  y: -2,
+                  boxShadow: "0 10px 28px rgba(255,80,0,0.25)",
+                }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => router.push("/products")}
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-2xl text-[12px] font-black text-white whitespace-nowrap"
+                style={{
+                  background: "linear-gradient(135deg,#FF5000,#FF7A40)",
+                }}
+              >
+                <ShoppingBag size={13} strokeWidth={2.5} />
+                Continue Shopping
+              </motion.button>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </div>
   );

@@ -1,11 +1,12 @@
 // components/product-details-page-components/ProductInfo.tsx
 "use client";
 
+import { motion } from "framer-motion";
 import { Product } from "@/types/product-types";
 import { ColorSwatches } from "./ColorSwatches";
 import { ProductActions } from "./ProductActions";
 import { ProductSpecs } from "./ProductSpecs";
-import { Wrench } from "lucide-react";
+import { Wrench, CheckCircle2, XCircle } from "lucide-react";
 import { useCurrency } from "@/context/CurrencyContext";
 
 interface ProductInfoProps {
@@ -14,6 +15,12 @@ interface ProductInfoProps {
   visible: boolean;
   onWishlistToggle: () => void;
 }
+
+const fadeUp = (delay: number) => ({
+  initial: { opacity: 0, y: 16 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.45, delay, ease: [0.25, 0.1, 0.25, 1] as const },
+});
 
 export function ProductInfo({
   product,
@@ -25,123 +32,141 @@ export function ProductInfo({
   const inStock = product.stockQuantity > 0;
   const showOriginalPrice = currentCurrency.code !== "LKR";
   const formattedPrice = formatPrice(product.price);
-  const originalPrice = product.price;
+
+  if (!visible) return null;
 
   return (
-    <div
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? "none" : "translateX(20px)",
-        transition:
-          "opacity 0.65s 0.1s ease-out, transform 0.65s 0.1s ease-out",
-      }}
-    >
+    <div className="space-y-6">
       {/* Category + Type breadcrumb */}
-      <div className="flex items-center gap-2 mb-3">
+      <motion.div
+        {...fadeUp(0.08)}
+        className="flex items-center gap-2 flex-wrap"
+      >
         <span
-          className="px-2.5 py-1 rounded-full font-black uppercase tracking-widest text-[#FF5000] bg-orange-50 border border-orange-200"
-          style={{ fontSize: "clamp(8px, 0.85vw, 10px)" }}
+          className="px-3 py-1.5 rounded-xl font-black uppercase tracking-[0.18em] text-white text-[10px]"
+          style={{ background: "linear-gradient(135deg,#FF5000,#FF7A40)" }}
         >
           {product.categoryName}
         </span>
-        <span className="text-gray-300">·</span>
-        <span
-          className="font-bold text-gray-400"
-          style={{ fontSize: "clamp(10px, 1vw, 12px)" }}
-        >
+        <span className="text-[#D6CEC6]">·</span>
+        <span className="text-[11px] font-bold text-[#B8ADA4] uppercase tracking-widest">
           {product.typeName}
         </span>
-      </div>
+      </motion.div>
 
       {/* Product name */}
-      <h1
-        className="font-black text-[#101113] tracking-tight leading-[1.06] mb-4"
+      <motion.h1
+        {...fadeUp(0.12)}
+        className="font-black text-[#1C1714] tracking-tight leading-[1.04]"
         style={{
-          fontSize: "clamp(22px, 3.5vw, 44px)",
+          fontSize: "clamp(26px, 3.8vw, 46px)",
           letterSpacing: "-0.03em",
+          fontFamily: "'Fraunces','Georgia',serif",
         }}
       >
         {product.productName}
-      </h1>
+      </motion.h1>
 
-      {/* Price + stock row */}
-      <div className="flex items-center gap-4 mb-5 flex-wrap">
+      {/* Price + Stock row */}
+      <motion.div {...fadeUp(0.16)} className="flex items-end gap-4 flex-wrap">
         <div>
-          <span
-            className="font-black text-[#FF5000]"
-            style={{ fontSize: "clamp(24px, 3.5vw, 42px)", lineHeight: 1 }}
+          <div
+            className="font-black text-[#FF5000] leading-none"
+            style={{
+              fontSize: "clamp(28px, 4vw, 46px)",
+              fontFamily: "'Fraunces','Georgia',serif",
+            }}
           >
             {formattedPrice}
-          </span>
+          </div>
           {showOriginalPrice && (
+            <div className="text-[11px] text-[#B8ADA4] font-semibold mt-1">
+              LKR {product.price.toFixed(2)} original
+            </div>
+          )}
+          <div className="text-[10px] font-bold uppercase tracking-widest text-[#B8ADA4] mt-0.5">
+            per unit
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 mb-1">
+          {inStock ? (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200">
+              <CheckCircle2 size={11} strokeWidth={2.5} />
+              {product.stockQuantity} in stock
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold text-rose-600 bg-rose-50 border border-rose-200">
+              <XCircle size={11} strokeWidth={2.5} />
+              Out of stock
+            </span>
+          )}
+
+          {product.isCustomizable && (
             <span
-              className="ml-2 text-sm text-gray-400 line-through"
-              style={{ fontSize: "clamp(12px, 1.5vw, 14px)" }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-black text-white"
+              style={{ background: "linear-gradient(135deg,#1A1A1A,#3D3530)" }}
             >
-              LKR {originalPrice.toFixed(2)}
+              <Wrench size={10} strokeWidth={2.5} />
+              Customizable
             </span>
           )}
         </div>
+      </motion.div>
 
-        <div className="flex items-center gap-1.5">
-          <div
-            className="w-2 h-2 rounded-full"
-            style={{ background: inStock ? "#22c55e" : "#ef4444" }}
-          />
-          <span
-            className="font-bold"
-            style={{
-              fontSize: "clamp(11px, 1.1vw, 13px)",
-              color: inStock ? "#22c55e" : "#ef4444",
-            }}
-          >
-            {inStock ? `${product.stockQuantity} in stock` : "Out of stock"}
-          </span>
-        </div>
-
-        {product.isCustomizable && (
-          <span
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#1A1A1A] text-white font-black uppercase tracking-widest"
-            style={{ fontSize: "clamp(8px, 0.85vw, 10px)" }}
-          >
-            <Wrench size={10} />
-            Customizable
-          </span>
-        )}
-      </div>
-
-      {/* Description */}
-      <p
-        className="text-[#2b2e33] font-medium leading-relaxed mb-6"
-        style={{ fontSize: "clamp(13px, 1.4vw, 16px)" }}
-      >
-        {product.productDescription}
-      </p>
-
-      {/* Colors */}
-      {product.colors && product.colors.length > 0 && (
-        <div className="mb-6">
-          <ColorSwatches colors={product.colors} />
-        </div>
-      )}
-
-      {/* CTA buttons */}
-      <ProductActions
-        inStock={inStock}
-        isWished={isWished}
-        onWishlistToggle={onWishlistToggle}
-        productId={product.productId}
-        productName={product.productName}
-        productPrice={product.price}
-        stockQuantity={product.stockQuantity}
-        colors={product.colors || []}
-        material={product.materialName || undefined}
-        materialId={product.materialId || undefined}
-        type={product.typeName}
-        typeId={product.typeId}
+      {/* Divider */}
+      <motion.div
+        initial={{ scaleX: 0, opacity: 0 }}
+        animate={{ scaleX: 1, opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
+        style={{ transformOrigin: "left" }}
+        className="h-px bg-gradient-to-r from-[#FF5000]/20 via-[#EAE4DC] to-transparent"
       />
 
-      {/* Specs card */}
+      {/* Description */}
+      <motion.div
+        {...fadeUp(0.22)}
+        className="relative p-5 rounded-2xl overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg,#F7F5F2,#FDF8F5)",
+          border: "1px solid #EAE4DC",
+        }}
+      >
+        <div
+          className="absolute top-0 right-0 w-20 h-20 rounded-bl-full opacity-10 pointer-events-none"
+          style={{ background: "linear-gradient(225deg,#FF5000,transparent)" }}
+        />
+        <p className="text-[14px] text-[#6B5F56] leading-relaxed font-medium relative z-10">
+          {product.productDescription}
+        </p>
+      </motion.div>
+
+      {/* Colors */}
+      {product.colors?.length > 0 && (
+        <motion.div {...fadeUp(0.26)}>
+          <ColorSwatches colors={product.colors} />
+        </motion.div>
+      )}
+
+      {/* CTA Buttons */}
+      <motion.div {...fadeUp(0.3)}>
+        <ProductActions
+          inStock={inStock}
+          isWished={isWished}
+          onWishlistToggle={onWishlistToggle}
+          productId={product.productId}
+          productName={product.productName}
+          productPrice={product.price}
+          stockQuantity={product.stockQuantity}
+          colors={product.colors || []}
+          material={product.materialName || undefined}
+          materialId={product.materialId || undefined}
+          type={product.typeName}
+          typeId={product.typeId}
+        />
+      </motion.div>
+
+      {/* Specs */}
       <ProductSpecs product={product} />
     </div>
   );

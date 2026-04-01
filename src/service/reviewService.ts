@@ -218,7 +218,7 @@ export class ReviewService {
         method: "POST",
         headers: this.getAuthHeaders(),
         credentials: "include",
-        body: JSON.stringify({ productId }), // ✅ This is correct - sends { productId: 5 }
+        body: JSON.stringify({ productId }),
       });
 
       if (!response.ok) {

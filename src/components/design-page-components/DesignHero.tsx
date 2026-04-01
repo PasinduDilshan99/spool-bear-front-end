@@ -53,7 +53,7 @@ const DesignHero: React.FC<DesignHeroProps> = ({ onScrollToForm }) => {
       <div
         className="absolute inset-0 pointer-events-none hidden md:block"
         style={{
-          backgroundImage: 'url("/images/design-hero.png")',
+          backgroundImage: 'url("https://res.cloudinary.com/dkfonkmwr/image/upload/v1773844362/cld-sample-2.jpg")',
           backgroundRepeat: "no-repeat",
           backgroundPosition: "right center",
           backgroundSize: "min(1000px, 65vw)",

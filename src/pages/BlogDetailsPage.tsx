@@ -468,120 +468,122 @@ const BlogDetailsPage = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-[#e4e7ec] relative">
-        {/* Decorative Grid Pattern */}
+      <div
+        className="bg-[#e4e7ec] relative overflow-x-hidden min-h-screen"
+        style={{ fontFamily: "'Faculty Glyphic', sans-serif" }}
+      >
         <div
-          className="absolute inset-0 opacity-[0.02] pointer-events-none"
+          className="min-h-screen relative overflow-x-hidden"
           style={{
-            backgroundImage: `linear-gradient(${spoolbearTheme.colors.accent}1a 1px, transparent 1px), 
-                             linear-gradient(90deg, ${spoolbearTheme.colors.accent}1a 1px, transparent 1px)`,
+            backgroundImage:
+              "linear-gradient(rgba(255,80,0,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,80,0,0.045) 1px, transparent 1px)",
             backgroundSize: "44px 44px",
           }}
-        />
+        >
+          {/* Back Button */}
+          <div className="container mx-auto px-4 py-6 relative z-10">
+            <button
+              onClick={() => router.push("/blogs")}
+              className="flex items-center gap-2 text-[#2b2e33] hover:text-[#ff5000] font-medium transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              Back to All Blogs
+            </button>
+          </div>
 
-        {/* Back Button */}
-        <div className="container mx-auto px-4 py-6 relative z-10">
-          <button
-            onClick={() => router.push("/blogs")}
-            className="flex items-center gap-2 text-[#2b2e33] hover:text-[#ff5000] font-medium transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            Back to All Blogs
-          </button>
-        </div>
+          <main className="container mx-auto px-4 py-6 md:py-8 lg:py-12 relative z-10">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
+              {/* Main Content */}
+              <div className="lg:col-span-2">
+                <div
+                  className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl p-6 md:p-8 mb-8 border"
+                  style={{ borderColor: `${spoolbearTheme.colors.accent}20` }}
+                >
+                  <BlogHeader
+                    blogId={blogData.blog_id}
+                    title={blogData.title}
+                    views={blogData.views}
+                    isBookmark={blogData.isBookmark}
+                    subtitle={blogData.subtitle}
+                    writerName={blogData.writer_name}
+                    writerImageUrl={blogData.writer_image_url}
+                    date={blogData.blog_created_at}
+                    readTime={readTime}
+                    totalReactions={totalReactions}
+                    totalComments={totalComments}
+                    imageCount={blogData.images?.length || 0}
+                    onShare={handleShare}
+                    onBookmark={handleBookmark}
+                    onNeedLogin={() => setShowLoginDialog(true)}
+                  />
 
-        <main className="container mx-auto px-4 py-6 md:py-8 lg:py-12 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
-            {/* Main Content */}
-            <div className="lg:col-span-2">
-              <div
-                className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl p-6 md:p-8 mb-8 border"
-                style={{ borderColor: `${spoolbearTheme.colors.accent}20` }}
-              >
-                <BlogHeader
-                  blogId={blogData.blog_id}
-                  title={blogData.title}
-                  views={blogData.views}
-                  isBookmark={blogData.isBookmark}
-                  subtitle={blogData.subtitle}
-                  writerName={blogData.writer_name}
-                  writerImageUrl={blogData.writer_image_url}
-                  date={blogData.blog_created_at}
-                  readTime={readTime}
-                  totalReactions={totalReactions}
+                  <BlogImages
+                    images={blogData.images || []}
+                    currentIndex={currentImageIndex}
+                    onNext={nextImage}
+                    onPrev={prevImage}
+                    onSelectImage={setCurrentImageIndex}
+                    title={blogData.title}
+                  />
+
+                  <BlogContent description={blogData.description} />
+
+                  <BlogTags
+                    tags={tags}
+                    loadingTags={loadingTags}
+                    onTagClick={handleTagClick}
+                  />
+
+                  <BlogActions
+                    userReaction={userReaction}
+                    isBookmarked={blogData.isBookmark}
+                    totalReactions={totalReactions}
+                    onReact={handleBlogReact}
+                    onShare={handleShare}
+                    onBookmark={handleBookmark}
+                    onNeedLogin={() => setShowLoginDialog(true)}
+                  />
+                </div>
+
+                <CommentsSection
+                  comments={blogData.comments || []}
                   totalComments={totalComments}
-                  imageCount={blogData.images?.length || 0}
-                  onShare={handleShare}
-                  onBookmark={handleBookmark}
-                  onNeedLogin={() => setShowLoginDialog(true)}
-                />
-
-                <BlogImages
-                  images={blogData.images || []}
-                  currentIndex={currentImageIndex}
-                  onNext={nextImage}
-                  onPrev={prevImage}
-                  onSelectImage={setCurrentImageIndex}
-                  title={blogData.title}
-                />
-
-                <BlogContent description={blogData.description} />
-
-                <BlogTags
-                  tags={tags}
-                  loadingTags={loadingTags}
-                  onTagClick={handleTagClick}
-                />
-
-                <BlogActions
-                  userReaction={userReaction}
-                  isBookmarked={blogData.isBookmark}
-                  totalReactions={totalReactions}
-                  onReact={handleBlogReact}
-                  onShare={handleShare}
-                  onBookmark={handleBookmark}
+                  commentText={commentText}
+                  setCommentText={setCommentText}
+                  isSubmittingComment={isSubmittingComment}
+                  replyTexts={replyTexts}
+                  setReplyTexts={setReplyTexts}
+                  showReplyInput={showReplyInput}
+                  setShowReplyInput={setShowReplyInput}
+                  onSubmitComment={handleSubmitComment}
+                  onSubmitReply={handleSubmitReply}
+                  onCommentReact={handleCommentReact}
+                  commentReactions={commentReactions}
+                  formatDate={BlogService.formatDate}
                   onNeedLogin={() => setShowLoginDialog(true)}
                 />
               </div>
 
-              <CommentsSection
-                comments={blogData.comments || []}
-                totalComments={totalComments}
-                commentText={commentText}
-                setCommentText={setCommentText}
-                isSubmittingComment={isSubmittingComment}
-                replyTexts={replyTexts}
-                setReplyTexts={setReplyTexts}
-                showReplyInput={showReplyInput}
-                setShowReplyInput={setShowReplyInput}
-                onSubmitComment={handleSubmitComment}
-                onSubmitReply={handleSubmitReply}
-                onCommentReact={handleCommentReact}
-                commentReactions={commentReactions}
-                formatDate={BlogService.formatDate}
-                onNeedLogin={() => setShowLoginDialog(true)}
+              {/* Sidebar */}
+              <Sidebar
+                writerName={blogData.writer_name}
+                writerImageUrl={blogData.writer_image_url}
+                blogCount={blogData.comments?.length || 0}
+                relatedBlogs={relatedBlogs}
+                tags={tags}
+                loadingTags={loadingTags}
+                onTagClick={handleTagClick}
               />
             </div>
+          </main>
+        </div>
 
-            {/* Sidebar */}
-            <Sidebar
-              writerName={blogData.writer_name}
-              writerImageUrl={blogData.writer_image_url}
-              blogCount={blogData.comments?.length || 0}
-              relatedBlogs={relatedBlogs}
-              tags={tags}
-              loadingTags={loadingTags}
-              onTagClick={handleTagClick}
-            />
-          </div>
-        </main>
+        <BlogLoginDialog
+          isOpen={showLoginDialog}
+          onClose={() => setShowLoginDialog(false)}
+          message="You need to login to interact with this blog and access other features."
+        />
       </div>
-
-      <BlogLoginDialog
-        isOpen={showLoginDialog}
-        onClose={() => setShowLoginDialog(false)}
-        message="You need to login to interact with this blog and access other features."
-      />
     </>
   );
 };

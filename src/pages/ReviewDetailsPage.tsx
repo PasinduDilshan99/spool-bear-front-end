@@ -50,10 +50,10 @@ const ReviewDetailPage = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Use the dedicated API to fetch review by ID
       const response = await reviewService.getReviewById(reviewId!);
-      
+
       if (response.code === 200 && response.data) {
         setReview(response.data);
       } else {
@@ -220,7 +220,7 @@ const ReviewDetailPage = () => {
               {error || "Review not found"}
             </h3>
             <p className="text-gray-600 mb-6">
-              {error?.includes("not found") 
+              {error?.includes("not found")
                 ? `The review you're looking for doesn't exist or has been removed.`
                 : "Something went wrong while loading the review."}
             </p>
@@ -237,9 +237,19 @@ const ReviewDetailPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+    <div
+      className="bg-[#e4e7ec] relative overflow-x-hidden min-h-screen"
+      style={{ fontFamily: "'Faculty Glyphic', sans-serif" }}
+    >
+      <div
+        className="fixed inset-0 pointer-events-none z-0"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,80,0,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,80,0,0.045) 1px, transparent 1px)",
+          backgroundSize: "44px 44px",
+        }}
+      />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-        {/* Back Button */}
         <motion.button
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}

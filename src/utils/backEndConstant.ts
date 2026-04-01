@@ -101,6 +101,9 @@ export const GET_PRODUCT_DETAILS_BY_ID_DATA = `${BASE_PATH}${API}${VERSION}${PRO
 // Browser History
 export const ADD_BROWSER_HISTORY_REQUEST_DATA = `${BASE_PATH}${API}${VERSION}${BROWSER_HISTORY}/add`;
 export const GET_BROWSER_HISTORY_DATA = `${BASE_PATH}${API}${VERSION}${BROWSER_HISTORY}/history-data`;
+export const REMOVE_BROWSER_HISTORY_BY_ID_DATA = `${BASE_PATH}${API}${VERSION}${BROWSER_HISTORY}/remove`;
+export const REMOVE_ALL_BROWSER_HISTORY_DATA = `${BASE_PATH}${API}${VERSION}${BROWSER_HISTORY}/remove-all`;
+export const REMOVE_LIST_OF_BROWSER_HISTORY_DATA = `${BASE_PATH}${API}${VERSION}${BROWSER_HISTORY}/remove-list`;
 
 // Others
 export const UPLOAD_IMAGE_TO_CLOUDINARY =
@@ -118,6 +121,7 @@ export const GET_REVIEW_BY_PRODUCT_ID_DATA = `${BASE_PATH}${API}${VERSION}${REVI
 
 // Orders
 export const GET_ORDERS_DETAILS_BY_USER_ID_DATA = `${BASE_PATH}${API}${VERSION}${ORDERS}/orders-by-user`;
+export const GET_ORDERS_DETAILS_BY_USER_ID_FOR_ADD_REVIEW_DATA = `${BASE_PATH}${API}${VERSION}${ORDERS}/orders-by-user-for-review`;
 export const ADD_PRINTING_ORDER_DATA = `${BASE_PATH}${API}${VERSION}${ORDERS}/add-printing-order`;
 export const ADD_DESIGN_ORDER_DATA = `${BASE_PATH}${API}${VERSION}${ORDERS}/add-design-order`;
 export const ADD_PRODUCT_ORDER_DATA = `${BASE_PATH}${API}${VERSION}${ORDERS}/add-product-order`;

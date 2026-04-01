@@ -1,4 +1,4 @@
-// components/reviews/ReviewFilters.tsx
+// components/review-details-page-components/ReviewFilters.tsx
 "use client";
 import React from "react";
 import { motion } from "framer-motion";
@@ -25,37 +25,111 @@ export const ReviewFilters: React.FC<ReviewFiltersProps> = ({
       <div className="flex flex-wrap gap-3">
         <button
           onClick={() => onFilterChange("all")}
-          className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 ${
+          className={`group relative overflow-hidden inline-flex items-center justify-center gap-2 font-black uppercase tracking-[0.08em] transition-all duration-300 hover:-translate-y-0.5 ${
             activeFilter === "all"
-              ? "bg-gradient-to-r from-[#FF5000] to-[#ff6b2c] text-white shadow-md"
-              : "bg-white text-gray-700 border border-gray-200 hover:border-[#FF5000] hover:shadow-sm"
+              ? "text-white"
+              : "text-[#101113] bg-white border border-black/18"
           }`}
+          style={{
+            fontSize: "clamp(11px, 1.1vw, 14px)",
+            padding: "clamp(10px, 1.2vw, 12px) clamp(18px, 2vw, 24px)",
+            borderRadius: "clamp(10px, 1.2vw, 14px)",
+            background:
+              activeFilter === "all"
+                ? "linear-gradient(145deg, #FF5000 0%, #e34800 100%)"
+                : "rgba(255,255,255,0.55)",
+            boxShadow:
+              activeFilter === "all"
+                ? "0 6px 24px rgba(255,80,0,0.36)"
+                : "none",
+          }}
         >
-          All Reviews
+          {activeFilter === "all" && (
+            <span
+              className="absolute top-0 bottom-0 w-16 pointer-events-none"
+              style={{
+                background:
+                  "linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent)",
+                animation: "reviewShimmer 2.5s 1s ease-in-out infinite",
+                left: "-100%",
+              }}
+            />
+          )}
+          <span className="relative z-10">All Reviews</span>
         </button>
+
         <button
           onClick={() => onFilterChange("recent")}
-          className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 ${
+          className={`group relative overflow-hidden inline-flex items-center justify-center gap-2 font-black uppercase tracking-[0.08em] transition-all duration-300 hover:-translate-y-0.5 ${
             activeFilter === "recent"
-              ? "bg-gradient-to-r from-[#FF5000] to-[#ff6b2c] text-white shadow-md"
-              : "bg-white text-gray-700 border border-gray-200 hover:border-[#FF5000] hover:shadow-sm"
+              ? "text-white"
+              : "text-[#101113] bg-white border border-black/18"
           }`}
+          style={{
+            fontSize: "clamp(11px, 1.1vw, 14px)",
+            padding: "clamp(10px, 1.2vw, 12px) clamp(18px, 2vw, 24px)",
+            borderRadius: "clamp(10px, 1.2vw, 14px)",
+            background:
+              activeFilter === "recent"
+                ? "linear-gradient(145deg, #FF5000 0%, #e34800 100%)"
+                : "rgba(255,255,255,0.55)",
+            boxShadow:
+              activeFilter === "recent"
+                ? "0 6px 24px rgba(255,80,0,0.36)"
+                : "none",
+          }}
         >
-          Recent (30d)
+          {activeFilter === "recent" && (
+            <span
+              className="absolute top-0 bottom-0 w-16 pointer-events-none"
+              style={{
+                background:
+                  "linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent)",
+                animation: "reviewShimmer 2.5s 1s ease-in-out infinite",
+                left: "-100%",
+              }}
+            />
+          )}
+          <span className="relative z-10">Recent (30d)</span>
         </button>
+
         <button
           onClick={() => onFilterChange("top-rated")}
-          className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 ${
+          className={`group relative overflow-hidden inline-flex items-center justify-center gap-2 font-black uppercase tracking-[0.08em] transition-all duration-300 hover:-translate-y-0.5 ${
             activeFilter === "top-rated"
-              ? "bg-gradient-to-r from-[#FF5000] to-[#ff6b2c] text-white shadow-md"
-              : "bg-white text-gray-700 border border-gray-200 hover:border-[#FF5000] hover:shadow-sm"
+              ? "text-white"
+              : "text-[#101113] bg-white border border-black/18"
           }`}
+          style={{
+            fontSize: "clamp(11px, 1.1vw, 14px)",
+            padding: "clamp(10px, 1.2vw, 12px) clamp(18px, 2vw, 24px)",
+            borderRadius: "clamp(10px, 1.2vw, 14px)",
+            background:
+              activeFilter === "top-rated"
+                ? "linear-gradient(145deg, #FF5000 0%, #e34800 100%)"
+                : "rgba(255,255,255,0.55)",
+            boxShadow:
+              activeFilter === "top-rated"
+                ? "0 6px 24px rgba(255,80,0,0.36)"
+                : "none",
+          }}
         >
-          Top Rated ⭐
+          {activeFilter === "top-rated" && (
+            <span
+              className="absolute top-0 bottom-0 w-16 pointer-events-none"
+              style={{
+                background:
+                  "linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent)",
+                animation: "reviewShimmer 2.5s 1s ease-in-out infinite",
+                left: "-100%",
+              }}
+            />
+          )}
+          <span className="relative z-10">Top Rated ⭐</span>
         </button>
       </div>
 
-      <div className="flex flex-wrap gap-2 border-b border-gray-200 pb-2">
+      <div className="flex flex-wrap gap-2 pb-2">
         <button
           onClick={() => onOrderTypeChange("all")}
           className={`px-4 py-2 text-sm font-medium transition-all duration-300 relative ${
@@ -69,6 +143,9 @@ export const ReviewFilters: React.FC<ReviewFiltersProps> = ({
             <motion.div
               layoutId="activeTab"
               className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#FF5000]"
+              initial={{ width: 0 }}
+              animate={{ width: "100%" }}
+              transition={{ duration: 0.3 }}
             />
           )}
         </button>
@@ -86,6 +163,9 @@ export const ReviewFilters: React.FC<ReviewFiltersProps> = ({
             <motion.div
               layoutId="activeTab"
               className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#FF5000]"
+              initial={{ width: 0 }}
+              animate={{ width: "100%" }}
+              transition={{ duration: 0.3 }}
             />
           )}
         </button>
@@ -103,6 +183,9 @@ export const ReviewFilters: React.FC<ReviewFiltersProps> = ({
             <motion.div
               layoutId="activeTab"
               className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#FF5000]"
+              initial={{ width: 0 }}
+              animate={{ width: "100%" }}
+              transition={{ duration: 0.3 }}
             />
           )}
         </button>

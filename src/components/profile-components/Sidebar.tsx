@@ -444,7 +444,7 @@ export default function Sidebar() {
 
   if (error) {
     return (
-      <div className="hidden md:flex flex-col w-64 bg-white border-r border-gray-100 p-4 fixed md:sticky md:top-0 z-40" style={{ height: "100vh" }}>
+      <div className="hidden md:flex flex-col w-64 bg-white border-r border-gray-100 p-4 fixed md:sticky md:top-0 z-1" style={{ height: "100vh" }}>
         <div className="text-center p-4 space-y-3">
           <div className="h-12 w-12 mx-auto rounded-full bg-orange-50 flex items-center justify-center">
             <X className="text-[#FF5000]" size={24} />
@@ -467,7 +467,7 @@ export default function Sidebar() {
       {isMobile && (
         <button
           onClick={() => setIsMobileOpen(!isMobileOpen)}
-          className="fixed top-1/2 left-0 transform -translate-y-1/2 z-50 h-14 w-6 bg-[#FF5000] text-white rounded-r-lg flex items-center justify-center shadow-lg hover:w-8 transition-all duration-300 group md:hidden"
+          className="fixed top-1/2 left-0 transform -translate-y-1/2 z-1 h-14 w-6 bg-[#FF5000] text-white rounded-r-lg flex items-center justify-center shadow-lg hover:w-8 transition-all duration-300 group md:hidden"
           aria-label={isMobileOpen ? "Close sidebar" : "Open sidebar"}
         >
           {isMobileOpen
@@ -480,7 +480,7 @@ export default function Sidebar() {
       {/* Mobile overlay */}
       {isMobileOpen && isMobile && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          className="fixed inset-0 bg-black/50 z-1 md:hidden"
           onClick={() => setIsMobileOpen(false)}
         />
       )}
@@ -489,7 +489,7 @@ export default function Sidebar() {
       <aside
         ref={sidebarRef}
         className={`
-          fixed md:sticky md:top-0 z-50
+          fixed md:sticky md:top-0 z-1
           bg-white border-r border-gray-100
           transition-all duration-300 ease-out
           flex flex-col

@@ -23,6 +23,7 @@ interface ProductCardProps {
   getProductImage: (product: Product) => string;
   onAddToCart: (product: Product) => void;
   onWishlistToggle: (product: Product) => void;
+  handleDetailsPageNavgation: (product: Product) => void;
   isAddingToCart: boolean;
   isTogglingWishlist: boolean;
 }
@@ -56,6 +57,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   onWishlistToggle,
   isAddingToCart,
   isTogglingWishlist,
+  handleDetailsPageNavgation,
 }) => {
   const [imgError, setImgError] = useState(false);
   const inStock = product.stockQuantity > 0;
@@ -133,15 +135,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         </button>
 
         {/* Quick action bar */}
-        <div className="absolute bottom-3 left-3 flex gap-2 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-          <Link
-            href={`${SHOP_PAGE_PATH}/${product.productId}`}
-            onClick={(e) => e.stopPropagation()}
+        <div className="cursor-pointer absolute bottom-3 left-3 flex gap-2 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDetailsPageNavgation(product);
+            }}
           >
-            <div className="w-9 h-9 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-[#FF5000] hover:text-white transition-colors duration-200 text-gray-700">
+            <div className="cursor-pointer w-9 h-9 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-[#FF5000] hover:text-white transition-colors duration-200 text-gray-700">
               <Eye size={15} />
             </div>
-          </Link>
+          </button>
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -178,14 +182,19 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         </div>
 
         {/* Name */}
-        <Link href={`${SHOP_PAGE_PATH}/${product.productId}`}>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDetailsPageNavgation(product);
+          }}
+        >
           <h3
             className="font-black text-[#101113] leading-snug mb-1.5 line-clamp-2 hover:text-[#FF5000] transition-colors duration-200"
             style={{ fontSize: "clamp(14px, 1.5vw, 16px)" }}
           >
             {product.productName}
           </h3>
-        </Link>
+        </button>
 
         {/* Description */}
         <p className="text-xs text-gray-500 line-clamp-2 mb-3 leading-relaxed flex-1">

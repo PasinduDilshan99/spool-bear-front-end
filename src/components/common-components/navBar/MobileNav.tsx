@@ -11,6 +11,7 @@ import { spoolbearTheme } from "@/theme/spoolbear-theme";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 import { useCart } from "@/context/CartContext";
 import { CurrencySelector } from "../CurrencySelector";
+import { MobileCurrencySelector } from "../currency/MobileCurrencySelector";
 
 interface MobileNavProps {
   visibleNavBarItems: NavBarItem[];
@@ -53,23 +54,21 @@ const MobileNav: React.FC<MobileNavProps> = ({
           borderColor: "rgba(0,0,0,0.08)",
         }}
       >
-        <div className="px-4 pt-4 pb-6 space-y-2">
+        <div className="px-4 pt-1 pb-6 space-y-2">
           {visibleNavBarItems.map((item) => (
             <MobileMenuItem key={item.id} item={item} onClose={handleClose} />
           ))}
 
           {/* Currency Selector - Only for logged-in users */}
-          {user && (
-            <div className="px-4 py-3">
-              <CurrencySelector />
-            </div>
-          )}
+          <div className="px-4 py-3">
+            <MobileCurrencySelector />
+          </div>
 
           {/* Cart Link - Only for logged-in users */}
           {user && (
             <Link
               href="/cart"
-              className="flex items-center justify-between px-4 py-3 rounded-lg font-medium transition-all duration-200 border border-transparent"
+              className="flex items-center justify-between px-4 py-1 rounded-lg font-medium transition-all duration-200 border border-transparent"
               style={{ color: spoolbearTheme.colors.text }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor =

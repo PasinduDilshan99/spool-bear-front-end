@@ -1,9 +1,12 @@
-import React from 'react'
+import AddReviewPage from "@/pages/AddReviewPage";
+import React from "react";
 
 const page = () => {
   return (
-    <div>page</div>
-  )
-}
+    <div>
+      <AddReviewPage />
+    </div>
+  );
+};
 
-export default page
+export default page;

@@ -11,6 +11,7 @@ import {
   ADD_PRINTING_ORDER_DATA_FE,
   ADD_PRODUCT_ORDER_DATA_FE,
   GET_ORDERS_DETAILS_BY_USER_ID_DATA_FE,
+  GET_ORDERS_DETAILS_BY_USER_ID_FOR_ADD_REVIEW_DATA_FE,
 } from "@/utils/frontEndConstant";
 
 export class OrderService {
@@ -29,6 +30,29 @@ export class OrderService {
         headers: this.getAuthHeaders(),
         credentials: "include",
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data: OrdersResponse = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error fetching user orders:", error);
+      throw error;
+    }
+  }
+
+  async getUserOrdersForAddReview(): Promise<OrdersResponse> {
+    try {
+      const response = await fetch(
+        GET_ORDERS_DETAILS_BY_USER_ID_FOR_ADD_REVIEW_DATA_FE,
+        {
+          method: "GET",
+          headers: this.getAuthHeaders(),
+          credentials: "include",
+        },
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

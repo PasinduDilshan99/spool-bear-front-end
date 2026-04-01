@@ -4,10 +4,17 @@ import {
   ApiResponse,
   BrowsingHistoryRequest,
   HistoryResponse,
+  RemoveBrowserHistoryRequest,
+  RemoveBrowserHistoryResponse,
+  RemoveListBrowserHistoryRequest,
+  RemoveListBrowserHistoryResponse,
 } from "@/types/browser-history-types";
 import {
   ADD_BROWSER_HISTORY_REQUEST_DATA_FE,
   GET_BROWSER_HISTORY_DATA_FE,
+  REMOVE_ALL_BROWSER_HISTORY_DATA_FE,
+  REMOVE_BROWSER_HISTORY_BY_ID_DATA_FE,
+  REMOVE_LIST_OF_BROWSER_HISTORY_DATA_FE,
 } from "@/utils/frontEndConstant";
 
 export class BrowserHistoryService {
@@ -78,6 +85,95 @@ export class BrowserHistoryService {
     } catch (error) {
       console.error("Error adding browser history:", error);
       throw new Error("Something went wrong while adding browser history");
+    }
+  }
+
+  async removeBrowserHistory(
+    requestBody: RemoveBrowserHistoryRequest,
+  ): Promise<ApiResponse<RemoveBrowserHistoryResponse>> {
+    try {
+      const response = await fetch(REMOVE_BROWSER_HISTORY_BY_ID_DATA_FE, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...this.getAuthHeaders(),
+        },
+        credentials: "include",
+        body: JSON.stringify(requestBody),
+      });
+
+      const data: ApiResponse<RemoveBrowserHistoryResponse> =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to remove browser history");
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Error removing browser history:", error);
+      throw new Error("Something went wrong while removing browser history");
+    }
+  }
+
+  async removeAllBrowserHistory(): Promise<
+    ApiResponse<RemoveBrowserHistoryResponse>
+  > {
+    try {
+      const response = await fetch(REMOVE_ALL_BROWSER_HISTORY_DATA_FE, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...this.getAuthHeaders(),
+        },
+        credentials: "include",
+      });
+
+      const data: ApiResponse<RemoveBrowserHistoryResponse> =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to remove all browser history");
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Error removing all browser history:", error);
+      throw new Error(
+        "Something went wrong while removing all browser history",
+      );
+    }
+  }
+
+  async removeListBrowserHistory(
+    requestBody: RemoveListBrowserHistoryRequest,
+  ): Promise<ApiResponse<RemoveListBrowserHistoryResponse>> {
+    try {
+      const response = await fetch(REMOVE_LIST_OF_BROWSER_HISTORY_DATA_FE, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...this.getAuthHeaders(),
+        },
+        credentials: "include",
+        body: JSON.stringify(requestBody),
+      });
+
+      const data: ApiResponse<RemoveListBrowserHistoryResponse> =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Failed to remove browser history list",
+        );
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Error removing browser history list:", error);
+      throw new Error(
+        "Something went wrong while removing browser history list",
+      );
     }
   }
 }

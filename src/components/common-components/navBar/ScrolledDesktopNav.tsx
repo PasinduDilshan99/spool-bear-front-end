@@ -423,10 +423,10 @@ const ScrolledDesktopNav: React.FC<ScrolledDesktopNavProps> = ({
 
       {/* Compact User Auth Section - Desktop with SpoolBear styling */}
       <div className="hidden md:flex items-center space-x-3">
+        <CurrencySelector />
         {user ? (
           <>
             {/* Currency Selector - Added before cart */}
-            <CurrencySelector />
 
             {/* Cart Icon - Only shown when user is logged in */}
             <CartIcon onCloseAll={closeAllDropdowns} />

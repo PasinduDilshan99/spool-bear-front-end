@@ -8,12 +8,12 @@ import { MaterialSearchBar } from "@/components/material-page-components/Materia
 import { MaterialGrid } from "@/components/material-page-components/MaterialGrid";
 import { MaterialListView } from "@/components/material-page-components/MaterialListView";
 import { MaterialQuickViewModal } from "@/components/material-page-components/MaterialQuickViewModal";
-import { MaterialsSkeleton } from "@/components/material-page-components/MaterialsSkeleton";
 import { MaterialsErrorState } from "@/components/material-page-components/MaterialsErrorState";
 import { MaterialsEmptyState } from "@/components/material-page-components/MaterialsEmptyState";
 import { MaterialsStats } from "@/components/material-page-components/MaterialsStats";
 import { MaterialsHeader } from "@/components/material-page-components/MaterialsHeader";
 import { MaterialFilters } from "@/components/material-page-components/MaterialFilters";
+import MaterialsLoading from "@/components/material-page-components/MaterialsLoading";
 
 // Types for filters
 export interface FilterState {
@@ -176,7 +176,7 @@ const MaterialsPage = () => {
   };
 
   if (loading) {
-    return <MaterialsSkeleton />;
+    return <MaterialsLoading />;
   }
 
   if (error) {
@@ -184,65 +184,77 @@ const MaterialsPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
-        <MaterialsHeader />
+    <div
+      className="bg-[#e4e7ec] relative overflow-x-hidden min-h-screen"
+      style={{ fontFamily: "'Faculty Glyphic', sans-serif" }}
+    >
+      <div
+        className="min-h-screen"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,80,0,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,80,0,0.045) 1px, transparent 1px)",
+          backgroundSize: "44px 44px",
+        }}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+          <MaterialsHeader />
 
-        <div className="mb-8">
-          <MaterialSearchBar
-            searchValue={filters.search}
-            onSearchChange={handleSearchChange}
-            sortBy={sortBy}
-            onSortChange={handleSortChange}
-            viewMode={viewMode}
-            onViewModeChange={handleViewModeChange}
+          <div className="mb-8">
+            <MaterialSearchBar
+              searchValue={filters.search}
+              onSearchChange={handleSearchChange}
+              sortBy={sortBy}
+              onSortChange={handleSortChange}
+              viewMode={viewMode}
+              onViewModeChange={handleViewModeChange}
+            />
+          </div>
+
+          <div className="mb-8">
+            <MaterialFilters
+              filterOptions={filterOptions}
+              filters={filters}
+              materials={materials}
+              onFilterChange={handleFilterChange}
+              onClearFilters={handleClearFilters}
+            />
+          </div>
+
+          <MaterialsStats
+            filteredCount={filteredMaterials.length}
+            totalCount={materials.length}
+          />
+
+          {filteredMaterials.length === 0 ? (
+            <MaterialsEmptyState />
+          ) : (
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={viewMode}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+              >
+                {viewMode === "grid" ? (
+                  <MaterialGrid
+                    materials={filteredMaterials}
+                    onQuickView={setSelectedMaterial}
+                  />
+                ) : (
+                  <MaterialListView
+                    materials={filteredMaterials}
+                    onQuickView={setSelectedMaterial}
+                  />
+                )}
+              </motion.div>
+            </AnimatePresence>
+          )}
+
+          <MaterialQuickViewModal
+            material={selectedMaterial}
+            onClose={() => setSelectedMaterial(null)}
           />
         </div>
-
-        <div className="mb-8">
-          <MaterialFilters
-            filterOptions={filterOptions}
-            filters={filters}
-            materials={materials}
-            onFilterChange={handleFilterChange}
-            onClearFilters={handleClearFilters}
-          />
-        </div>
-
-        <MaterialsStats
-          filteredCount={filteredMaterials.length}
-          totalCount={materials.length}
-        />
-
-        {filteredMaterials.length === 0 ? (
-          <MaterialsEmptyState />
-        ) : (
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={viewMode}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-            >
-              {viewMode === "grid" ? (
-                <MaterialGrid
-                  materials={filteredMaterials}
-                  onQuickView={setSelectedMaterial}
-                />
-              ) : (
-                <MaterialListView
-                  materials={filteredMaterials}
-                  onQuickView={setSelectedMaterial}
-                />
-              )}
-            </motion.div>
-          </AnimatePresence>
-        )}
-
-        <MaterialQuickViewModal
-          material={selectedMaterial}
-          onClose={() => setSelectedMaterial(null)}
-        />
       </div>
     </div>
   );

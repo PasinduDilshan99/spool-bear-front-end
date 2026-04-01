@@ -16,7 +16,6 @@ const ORDERS = "/orders";
 const CONTACT_US = "/contact-us";
 const MATERIAL = "/material";
 
-
 // Auth endpoints for frontend (relative paths for proxy)
 export const LOGIN_FE = `${API}${AUTH}/login`;
 export const LOGOUT_FE = `${API}${AUTH}/logout`;
@@ -76,6 +75,9 @@ export const GET_PRODUCT_DETAILS_BY_ID_DATA_FE = `${API}${PRODUCTS}/product-deta
 // Browser History
 export const ADD_BROWSER_HISTORY_REQUEST_DATA_FE = `${API}${BROWSER_HISTORY}/add`;
 export const GET_BROWSER_HISTORY_DATA_FE = `${API}${BROWSER_HISTORY}/history-data`;
+export const REMOVE_BROWSER_HISTORY_BY_ID_DATA_FE = `${API}${BROWSER_HISTORY}/remove`;
+export const REMOVE_ALL_BROWSER_HISTORY_DATA_FE = `${API}${BROWSER_HISTORY}/remove-all`;
+export const REMOVE_LIST_OF_BROWSER_HISTORY_DATA_FE = `${API}${BROWSER_HISTORY}/remove-list`;
 
 // Others
 export const UPLOAD_IMAGE_TO_CLOUDINARY_FE = `${API}${OTHERS}/save-images`;
@@ -93,6 +95,7 @@ export const GET_REVIEW_BY_PRODUCT_ID_DATA_FE = `${API}${REVIEWS}/reviews-by-pro
 
 // Orders
 export const GET_ORDERS_DETAILS_BY_USER_ID_DATA_FE = `${API}${ORDERS}/orders-by-user`;
+export const GET_ORDERS_DETAILS_BY_USER_ID_FOR_ADD_REVIEW_DATA_FE = `${API}${ORDERS}/orders-by-user-for-review`;
 export const ADD_PRINTING_ORDER_DATA_FE = `${API}${ORDERS}/add-printing-order`;
 export const ADD_DESIGN_ORDER_DATA_FE = `${API}${ORDERS}/add-design-order`;
 export const ADD_PRODUCT_ORDER_DATA_FE = `${API}${ORDERS}/add-product-order`;

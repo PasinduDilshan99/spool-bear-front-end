@@ -38,6 +38,9 @@ import { ProductPagination } from "@/components/product-components/ProductPagina
 import { EmptyState } from "@/components/product-components/EmptyState";
 import { ProductService } from "@/service/productService";
 import { useCurrency } from "@/context/CurrencyContext";
+import ProductLoading from "@/components/product-components/ProductLoading";
+import { BrowserHistoryService } from "@/service/browserHistoryService";
+import { SHOP_PAGE_PATH } from "@/utils/urls";
 
 interface FilterState {
   categoryId?: number;
@@ -238,6 +241,22 @@ const ProductsPage = () => {
       showToast(`Failed to update wishlist`, "error");
     } finally {
       setTogglingWishlist(null);
+    }
+  };
+
+  const handleDetailsPageNavgation = async (product: Product) => {
+    try {
+      const browserHistoryService = new BrowserHistoryService();
+
+      await browserHistoryService.addBrowserHistory({
+        productId: product.productId,
+        name: product.productName,
+      });
+      router.push(
+        `${SHOP_PAGE_PATH}/${product.productId}?name=${product.productName}`,
+      );
+    } catch (error) {
+      console.error("Failed to add browser history", error);
     }
   };
 
@@ -573,18 +592,8 @@ const ProductsPage = () => {
 
   // ── Initial loading ──
   if (initialLoading) {
-    return (
-      <div className="min-h-screen bg-[#e4e7ec] flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 rounded-2xl bg-orange-50 border border-orange-200 flex items-center justify-center mx-auto mb-4">
-            <Loader2 size={28} className="text-[#FF5000] animate-spin" />
-          </div>
-          <p className="font-bold text-[#2b2e33] text-sm">Loading products…</p>
-        </div>
-      </div>
-    );
+    return <ProductLoading />;
   }
-
   // ── Error ──
   if (error) {
     return (
@@ -990,27 +999,7 @@ const ProductsPage = () => {
             />
 
             {loading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                {[...Array(6)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="bg-white rounded-2xl overflow-hidden border border-gray-100"
-                    style={{ animationDelay: `${i * 60}ms` }}
-                  >
-                    <div className="aspect-[4/3] bg-gray-100 animate-pulse" />
-                    <div className="p-4 space-y-2">
-                      <div className="h-3 w-16 bg-gray-100 rounded animate-pulse" />
-                      <div className="h-4 w-3/4 bg-gray-100 rounded animate-pulse" />
-                      <div className="h-3 w-full bg-gray-100 rounded animate-pulse" />
-                      <div className="h-3 w-2/3 bg-gray-100 rounded animate-pulse" />
-                      <div className="flex justify-between items-center pt-2">
-                        <div className="h-5 w-16 bg-orange-100 rounded animate-pulse" />
-                        <div className="h-8 w-20 bg-orange-100 rounded-xl animate-pulse" />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <ProductLoading />
             ) : filteredProducts.length === 0 ? (
               <EmptyState onClearFilters={clearAllFilters} />
             ) : (
@@ -1032,6 +1021,9 @@ const ProductsPage = () => {
                           getProductImage={getProductImage}
                           onAddToCart={openColorSelection}
                           onWishlistToggle={handleWishlistToggle}
+                          handleDetailsPageNavgation={
+                            handleDetailsPageNavgation
+                          }
                           isAddingToCart={addingToCart === product.productId}
                           isTogglingWishlist={
                             togglingWishlist === product.productId
@@ -1059,6 +1051,9 @@ const ProductsPage = () => {
                           getProductImage={getProductImage}
                           onAddToCart={openColorSelection}
                           onWishlistToggle={handleWishlistToggle}
+                          handleDetailsPageNavgation={
+                            handleDetailsPageNavgation
+                          }
                           isAddingToCart={addingToCart === product.productId}
                           isTogglingWishlist={
                             togglingWishlist === product.productId

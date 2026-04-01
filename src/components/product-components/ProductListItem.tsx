@@ -15,6 +15,7 @@ interface ProductListItemProps {
   getProductImage: (product: Product) => string;
   onAddToCart: (product: Product) => void;
   onWishlistToggle: (product: Product) => void;
+  handleDetailsPageNavgation: (product: Product) => void;
   isAddingToCart: boolean;
   isTogglingWishlist: boolean;
 }
@@ -22,10 +23,17 @@ interface ProductListItemProps {
 const parseColorCode = (colorStr: string): string => {
   if (colorStr.includes("|")) return colorStr.split("|")[1].trim();
   const defaults: Record<string, string> = {
-    Red: "#FF0000", Blue: "#0000FF", Green: "#00FF00",
-    Black: "#000000", White: "#F5F5F5", Yellow: "#FFFF00",
-    Purple: "#800080", Orange: "#FFA500", Pink: "#FFC0CB",
-    Gray: "#808080", Brown: "#A52A2A",
+    Red: "#FF0000",
+    Blue: "#0000FF",
+    Green: "#00FF00",
+    Black: "#000000",
+    White: "#F5F5F5",
+    Yellow: "#FFFF00",
+    Purple: "#800080",
+    Orange: "#FFA500",
+    Pink: "#FFC0CB",
+    Gray: "#808080",
+    Brown: "#A52A2A",
   };
   return defaults[colorStr] || "#888";
 };
@@ -39,6 +47,7 @@ export const ProductListItem: React.FC<ProductListItemProps> = ({
   getProductImage,
   onAddToCart,
   onWishlistToggle,
+  handleDetailsPageNavgation,
   isAddingToCart,
   isTogglingWishlist,
 }) => {
@@ -48,12 +57,18 @@ export const ProductListItem: React.FC<ProductListItemProps> = ({
   return (
     <div className="group bg-white rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-xl transition-all duration-300 overflow-hidden">
       <div className="flex flex-col sm:flex-row">
-
         {/* ── Image ── */}
         <Link
           href={`${SHOP_PAGE_PATH}/${product.productId}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDetailsPageNavgation(product);
+          }}
           className="relative flex-shrink-0 overflow-hidden bg-gray-100"
-          style={{ width: "clamp(120px, 16vw, 200px)", minHeight: "clamp(120px, 16vw, 200px)" }}
+          style={{
+            width: "clamp(120px, 16vw, 200px)",
+            minHeight: "clamp(120px, 16vw, 200px)",
+          }}
         >
           <Image
             src={imgError ? PLACE_HOLDER_IMAGE : getProductImage(product)}
@@ -87,28 +102,36 @@ export const ProductListItem: React.FC<ProductListItemProps> = ({
                 {product.typeName && (
                   <>
                     <span className="text-gray-300">·</span>
-                    <span className="text-[10px] font-medium text-gray-400">{product.typeName}</span>
+                    <span className="text-[10px] font-medium text-gray-400">
+                      {product.typeName}
+                    </span>
                   </>
                 )}
                 {product.materialName && (
                   <>
                     <span className="text-gray-300">·</span>
                     <span className="text-[10px] font-medium text-gray-400 flex items-center gap-0.5">
-                      <Box size={9} />{product.materialName}
+                      <Box size={9} />
+                      {product.materialName}
                     </span>
                   </>
                 )}
               </div>
 
               {/* Name */}
-              <Link href={`${SHOP_PAGE_PATH}/${product.productId}`}>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDetailsPageNavgation(product);
+                }}
+              >
                 <h3
                   className="font-black text-[#101113] leading-snug hover:text-[#FF5000] transition-colors duration-200 truncate"
                   style={{ fontSize: "clamp(14px, 1.5vw, 18px)" }}
                 >
                   {product.productName}
                 </h3>
-              </Link>
+              </button>
             </div>
 
             {/* Price + wishlist */}
@@ -125,10 +148,15 @@ export const ProductListItem: React.FC<ProductListItemProps> = ({
                 className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center hover:border-orange-300 hover:bg-orange-50 transition-all duration-200 disabled:opacity-50"
                 style={{ color: product.isWish ? "#FF5000" : "#9ca3af" }}
               >
-                {isTogglingWishlist
-                  ? <Loader2 size={13} className="animate-spin" />
-                  : <Heart size={13} fill={product.isWish ? "#FF5000" : "none"} stroke={product.isWish ? "#FF5000" : "currentColor"} />
-                }
+                {isTogglingWishlist ? (
+                  <Loader2 size={13} className="animate-spin" />
+                ) : (
+                  <Heart
+                    size={13}
+                    fill={product.isWish ? "#FF5000" : "none"}
+                    stroke={product.isWish ? "#FF5000" : "currentColor"}
+                  />
+                )}
               </button>
             </div>
           </div>
@@ -158,8 +186,14 @@ export const ProductListItem: React.FC<ProductListItemProps> = ({
           {/* Stock + CTA */}
           <div className="flex items-center justify-between gap-3 pt-3 border-t border-gray-100">
             <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full" style={{ background: inStock ? "#22c55e" : "#9ca3af" }} />
-              <span className="text-xs font-medium" style={{ color: inStock ? "#22c55e" : "#9ca3af" }}>
+              <div
+                className="w-2 h-2 rounded-full"
+                style={{ background: inStock ? "#22c55e" : "#9ca3af" }}
+              />
+              <span
+                className="text-xs font-medium"
+                style={{ color: inStock ? "#22c55e" : "#9ca3af" }}
+              >
                 {inStock ? `${product.stockQuantity} in stock` : "Out of stock"}
               </span>
             </div>
@@ -171,12 +205,18 @@ export const ProductListItem: React.FC<ProductListItemProps> = ({
               style={{
                 fontSize: "clamp(10px, 1.1vw, 13px)",
                 padding: "clamp(7px, 0.9vw, 10px) clamp(12px, 1.6vw, 20px)",
-                background: inStock ? "linear-gradient(145deg, #FF5000, #e34800)" : "#ccc",
+                background: inStock
+                  ? "linear-gradient(145deg, #FF5000, #e34800)"
+                  : "#ccc",
                 borderRadius: "clamp(8px, 1vw, 12px)",
                 boxShadow: inStock ? "0 4px 12px rgba(255,80,0,0.28)" : "none",
               }}
             >
-              {isAddingToCart ? <Loader2 size={13} className="animate-spin" /> : <ShoppingCart size={13} />}
+              {isAddingToCart ? (
+                <Loader2 size={13} className="animate-spin" />
+              ) : (
+                <ShoppingCart size={13} />
+              )}
               {isAddingToCart ? "Adding…" : "Add to Cart"}
             </button>
           </div>

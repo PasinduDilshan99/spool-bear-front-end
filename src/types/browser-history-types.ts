@@ -33,16 +33,37 @@ export interface AddBrowserHistoryRequest {
   name: string;
 }
 
-// Backend response structure
-export interface ApiResponse<AddBrowserHistoryResponse> {
+// Specific response for browser history insertion
+export interface AddBrowserHistoryResponse {
+  message: string;
+}
+
+export interface ApiResponse<T> {
   code: number;
   status: string;
   message: string;
-  data: AddBrowserHistoryResponse;
+  data: T;
   timestamp: string;
 }
 
 // Specific response for browser history insertion
-export interface AddBrowserHistoryResponse {
+
+
+// New interfaces for remove operations
+export interface RemoveBrowserHistoryRequest {
+  historyDataId: number;
+}
+
+export interface RemoveBrowserHistoryResponse {
   message: string;
+  id: number | null;
+}
+
+export interface RemoveListBrowserHistoryRequest {
+  historyDataIds: number[];
+}
+
+export interface RemoveListBrowserHistoryResponse {
+  message: string;
+  id: null;
 }

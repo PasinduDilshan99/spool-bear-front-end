@@ -1,6 +1,6 @@
 // components/ScrolledMobileNav.tsx
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import { NavBarItem } from "@/types/nav-bar-types";
 import { User } from "@/context/AuthContext";
@@ -10,7 +10,7 @@ import Image from "next/image";
 import { spoolbearTheme } from "@/theme/spoolbear-theme";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 import { useCart } from "@/context/CartContext";
-import { CurrencySelector } from "../CurrencySelector";
+import { MobileCurrencySelector } from "../currency/MobileCurrencySelector";
 
 interface ScrolledMobileNavProps {
   visibleNavBarItems: NavBarItem[];
@@ -37,6 +37,15 @@ const ScrolledMobileNav: React.FC<ScrolledMobileNavProps> = ({
     logout();
     setIsScrolledMenuOpen(false);
   };
+
+  // Close the currency selector modal when the mobile menu closes
+  useEffect(() => {
+    if (!isScrolledMenuOpen) {
+      // Force close any open modals by triggering a custom event or using a ref
+      const event = new CustomEvent('closeMobileModals');
+      window.dispatchEvent(event);
+    }
+  }, [isScrolledMenuOpen]);
 
   return (
     <div
@@ -66,7 +75,7 @@ const ScrolledMobileNav: React.FC<ScrolledMobileNavProps> = ({
           {/* Currency Selector - Only for logged-in users (compact version for scrolled state) */}
           {user && (
             <div className="px-3 py-2">
-              <CurrencySelector />
+              <MobileCurrencySelector />
             </div>
           )}
 
