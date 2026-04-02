@@ -1,13 +1,38 @@
+// Footer.tsx
 "use client";
-import Link from "next/link";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { FooterProps } from "@/types/footer-types";
 import { footerData as defaultFooterData } from "@/data/footer-data";
+import SmoothScrollLink from "./SmoothScrollLink";
+import FooterSkeleton, { ResponsiveFooterSkeleton } from "./FooterSkeleton";
 
-const Footer: React.FC<FooterProps> = ({
+interface FooterWithLoadingProps extends FooterProps {
+  loading?: boolean;
+  minLoadTime?: number;
+}
+
+const Footer: React.FC<FooterWithLoadingProps> = ({
   data = defaultFooterData,
   className = "",
+  loading = false,
+  minLoadTime = 2000,
 }) => {
+  const [showContent, setShowContent] = useState(false);
+
+  useEffect(() => {
+    if (!loading) {
+      const timer = setTimeout(() => {
+        setShowContent(true);
+      }, minLoadTime);
+
+      return () => clearTimeout(timer);
+    }
+  }, [loading, minLoadTime]);
+
+  if (loading || !showContent) {
+    return <ResponsiveFooterSkeleton />;
+  }
+
   return (
     <footer
       className={`relative py-20 ${className}`}
@@ -21,7 +46,6 @@ const Footer: React.FC<FooterProps> = ({
         position: "relative" as const,
       }}
     >
-      {/* Optional background image overlay */}
       {data.backgroundImage && (
         <div
           className="absolute inset-0 opacity-10"
@@ -42,24 +66,27 @@ const Footer: React.FC<FooterProps> = ({
           {data.columns.map(({ title, links, class: columnClass }) => (
             <div key={title} className={columnClass || ""}>
               <p
-                className="mb-5 text-xs font-black uppercase tracking-[0.10em]"
+                className="mb-5 text-xs font-black uppercase tracking-widest"
                 style={{ color: "#ff5000" }}
               >
                 {title}
               </p>
               {links.map((link) => (
-                <Link
+                <SmoothScrollLink
                   key={link.label}
                   href={link.href}
                   className="mb-3 block text-[17px] font-semibold no-underline transition-colors"
-                  style={{ color: "rgba(255,255,255,0.75)" }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.color = "rgba(255,255,255,0.75)")
-                  }
                 >
-                  {link.label}
-                </Link>
+                  <span
+                    style={{ color: "rgba(255,255,255,0.75)" }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.color = "rgba(255,255,255,0.75)")
+                    }
+                  >
+                    {link.label}
+                  </span>
+                </SmoothScrollLink>
               ))}
             </div>
           ))}
@@ -67,7 +94,7 @@ const Footer: React.FC<FooterProps> = ({
 
         <div className="mt-14 flex flex-col items-center gap-4">
           <div
-            className="h-[2px] w-[min(720px,78%)]"
+            className="h-0.5 w-[min(720px,78%)]"
             style={{ background: "rgba(255,255,255,0.14)" }}
           />
           <span

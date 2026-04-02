@@ -1,130 +1,150 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import { WhyCardType, WhyChooseUsProps } from "@/types/home-page-types";
+import { whyChooseUsData } from "@/data/home-page-data";
 
-interface WhyCard {
-  iconWrapClass: string;
-  icon: {
-    src: string;
-    alt: string;
-    ariaHidden?: boolean;
-  };
-  headingHtml: string;
-  textHtml: string;
-}
-
-interface WhyChooseUsProps {
-  className?: string;
-  title?: string;
-  cards?: WhyCard[];
-}
-
-/* ══════════════════════════════════════════
-   WHY CARD
-══════════════════════════════════════════ */
-function WhyCard({ card, index, visible }: { card: WhyCard; index: number; visible: boolean }) {
+function WhyCard({
+  card,
+  index,
+  visible,
+}: {
+  card: WhyCardType;
+  index: number;
+  visible: boolean;
+}) {
   const [hovered, setHovered] = useState(false);
-  const delay = `${0.15 + index * 0.12}s`;
-  
+  const [isMobile, setIsMobile] = useState(false);
+  const delay = `${0.1 + index * 0.1}s`;
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  const stripBr = (html: string) =>
+    isMobile ? html.replace(/<br\s*\/?>/gi, " ") : html;
+
   return (
     <div
       className="group relative flex flex-col items-center text-center"
       style={{
-        animation: visible ? `whyReveal 0.7s ${delay} ease-out both` : "none",
+        animation: visible ? `whyReveal 0.65s ${delay} ease-out both` : "none",
         opacity: visible ? undefined : 0,
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Card container */}
       <div
-        className="relative w-full rounded-3xl p-8 transition-all duration-500"
+        className="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-500"
         style={{
+          padding: "clamp(20px, 3vw, 36px) clamp(16px, 2.5vw, 28px)",
           background: hovered
-            ? "linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%)"
-            : "rgba(255,255,255,0.85)",
-          backdropFilter: "blur(12px)",
+            ? "linear-gradient(160deg, #ffffff 0%, #fff8f5 100%)"
+            : "rgba(255,255,255,0.88)",
+          backdropFilter: "blur(14px)",
           boxShadow: hovered
-            ? "0 20px 60px rgba(0,0,0,0.16), inset 0 2px 6px rgba(255,255,255,0.50)"
-            : "0 8px 32px rgba(0,0,0,0.10), inset 0 2px 6px rgba(255,255,255,0.50)",
-          border: `1.5px solid ${hovered ? "rgba(255,80,0,0.25)" : "rgba(255,255,255,0.60)"}`,
-          transform: hovered ? "translateY(-8px)" : "none",
+            ? "0 24px 64px rgba(0,0,0,0.14), 0 0 0 1.5px rgba(255,80,0,0.28), inset 0 1px 0 rgba(255,255,255,0.9)"
+            : "0 6px 28px rgba(0,0,0,0.09), 0 0 0 1.5px rgba(255,255,255,0.7), inset 0 1px 0 rgba(255,255,255,0.9)",
+          transform: hovered
+            ? "translateY(-10px) scale(1.015)"
+            : "translateY(0) scale(1)",
         }}
       >
-        {/* Step number watermark */}
         <div
-          className="absolute top-4 right-6 font-black leading-none pointer-events-none"
+          className="absolute top-3 right-4 sm:top-4 sm:right-5 font-black leading-none pointer-events-none select-none transition-colors duration-300"
           style={{
-            fontSize: "clamp(40px, 4vw, 56px)",
-            color: hovered ? "rgba(255,80,0,0.12)" : "rgba(0,0,0,0.04)",
-            transition: "color 0.3s",
+            fontSize: "clamp(36px, 4vw, 52px)",
+            color: hovered ? "rgba(255,80,0,0.11)" : "rgba(0,0,0,0.04)",
           }}
         >
           {String(index + 1).padStart(2, "0")}
         </div>
 
-        {/* Gradient overlay on hover */}
-        {hovered && (
+        <div
+          className="absolute inset-0 pointer-events-none rounded-2xl sm:rounded-3xl transition-opacity duration-400"
+          style={{
+            background:
+              "linear-gradient(160deg, rgba(255,80,0,0.07) 0%, transparent 60%)",
+            opacity: hovered ? 1 : 0,
+          }}
+        />
+
+        <div className="relative mb-5 sm:mb-6 flex items-center justify-center">
           <div
-            className="absolute inset-0 rounded-3xl pointer-events-none"
+            className="absolute pointer-events-none transition-opacity duration-500"
             style={{
-              background: "linear-gradient(145deg, rgba(255,80,0,0.06) 0%, transparent 100%)",
-              animation: "whyFadeIn 0.3s ease-out both",
+              width: "clamp(80px, 10vw, 120px)",
+              height: "clamp(80px, 10vw, 120px)",
+              borderRadius: "50%",
+              background:
+                "radial-gradient(circle, rgba(255,80,0,0.22) 0%, transparent 70%)",
+              filter: "blur(24px)",
+              opacity: hovered ? 1 : 0.4,
+              animation: hovered ? "whyGlow 2.5s ease-in-out infinite" : "none",
             }}
           />
-        )}
 
-        {/* Icon container */}
-        <div className="relative mb-6 flex items-center justify-center">
-          {/* Orbit ring (spins) */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <svg className="w-36 h-36" viewBox="0 0 140 140" fill="none" aria-hidden="true">
-              <circle cx="70" cy="70" r="62"
-                stroke="rgba(255,80,0,0.12)" strokeWidth="1.5" strokeDasharray="6 8"
-                style={{
-                  animation: hovered ? "whyOrbitCW 12s linear infinite" : "none",
-                  transformOrigin: "70px 70px",
-                }} />
-              <g style={{ animation: hovered ? "whyOrbitCW 12s linear infinite" : "none", transformOrigin: "70px 70px" }}>
-                <circle cx="132" cy="70" r="3" fill="#ff5000" opacity="0.6" />
-                <circle cx="8"   cy="70" r="2" fill="#ff5000" opacity="0.35" />
-              </g>
-            </svg>
-          </div>
-
-          {/* Glow blob */}
-          <div
-            className="absolute inset-0 flex items-center justify-center pointer-events-none"
+          <svg
+            className="absolute pointer-events-none"
             style={{
-              opacity: hovered ? 1 : 0.5,
-              transition: "opacity 0.5s",
+              width: "clamp(100px, 12vw, 148px)",
+              height: "clamp(100px, 12vw, 148px)",
             }}
+            viewBox="0 0 148 148"
+            fill="none"
+            aria-hidden="true"
           >
-            <div
-              className="w-28 h-28 rounded-full"
+            <circle
+              cx="74"
+              cy="74"
+              r="66"
+              stroke="rgba(255,80,0,0.13)"
+              strokeWidth="1.5"
+              strokeDasharray="6 8"
               style={{
-                background: "radial-gradient(circle at center, rgba(255,80,0,0.18) 0%, transparent 70%)",
-                filter: "blur(28px)",
-                animation: hovered ? "whyGlow 2.5s ease-in-out infinite" : "none",
+                animation: hovered ? "whyOrbitCW 14s linear infinite" : "none",
+                transformOrigin: "74px 74px",
               }}
             />
-          </div>
+            {hovered && (
+              <circle
+                cx="140"
+                cy="74"
+                r="3.5"
+                fill="#FF5000"
+                opacity="0.65"
+                style={{
+                  animation: "whyOrbitCW 14s linear infinite",
+                  transformOrigin: "74px 74px",
+                }}
+              />
+            )}
+          </svg>
 
-          {/* Rotating diamond */}
           <div
-            className="relative w-28 h-28 rounded-2xl flex items-center justify-center transition-all duration-500"
+            className="relative flex items-center justify-center transition-all duration-500 flex-shrink-0"
             style={{
-              background: "linear-gradient(145deg, #ffffff 0%, #f8f8f8 100%)",
+              width: "clamp(72px, 9vw, 108px)",
+              height: "clamp(72px, 9vw, 108px)",
+              borderRadius: "clamp(12px, 1.5vw, 18px)",
+              background: "linear-gradient(145deg, #ffffff 0%, #f7f7f7 100%)",
               boxShadow: hovered
-                ? "0 12px 36px rgba(0,0,0,0.14), inset 0 2px 5px rgba(255,255,255,0.70)"
-                : "0 6px 24px rgba(0,0,0,0.10), inset 0 2px 5px rgba(255,255,255,0.70)",
+                ? "0 14px 40px rgba(0,0,0,0.13), inset 0 2px 4px rgba(255,255,255,0.8)"
+                : "0 6px 20px rgba(0,0,0,0.09), inset 0 2px 4px rgba(255,255,255,0.8)",
               transform: `rotate(${hovered ? "90deg" : "45deg"})`,
+              border: hovered
+                ? "1.5px solid rgba(255,80,0,0.18)"
+                : "1.5px solid rgba(0,0,0,0.06)",
             }}
           >
-            {/* Icon wrapper (counter-rotates) */}
             <div
-              className="w-16 h-16 flex items-center justify-center transition-transform duration-500"
+              className="flex items-center justify-center transition-transform duration-500"
               style={{
+                width: "clamp(40px, 5vw, 60px)",
+                height: "clamp(40px, 5vw, 60px)",
                 transform: `rotate(${hovered ? "-90deg" : "-45deg"})`,
               }}
             >
@@ -135,55 +155,58 @@ function WhyCard({ card, index, visible }: { card: WhyCard; index: number; visib
                   fill
                   className="object-contain"
                   aria-hidden={card.icon.ariaHidden}
-                  sizes="64px"
+                  sizes="(max-width: 640px) 40px, (max-width: 1024px) 50px, 60px"
                 />
               </div>
             </div>
           </div>
 
-          {/* Decorative rings on hover */}
           <div
-            className="absolute -inset-3 border-2 rounded-full transition-all duration-500"
+            className="absolute rounded-full pointer-events-none transition-all duration-500"
             style={{
-              borderColor: "rgba(255,80,0,0.20)",
+              inset: "-10px",
+              border: "1.5px solid rgba(255,80,0,0.18)",
               opacity: hovered ? 1 : 0,
-              transform: hovered ? "scale(1.08)" : "scale(1)",
+              transform: hovered ? "scale(1.05)" : "scale(0.95)",
             }}
           />
           <div
-            className="absolute -inset-5 border rounded-full transition-all duration-700"
+            className="absolute rounded-full pointer-events-none transition-all duration-700"
             style={{
-              borderColor: "rgba(255,80,0,0.10)",
+              inset: "-18px",
+              border: "1px solid rgba(255,80,0,0.08)",
               opacity: hovered ? 1 : 0,
-              transform: hovered ? "scale(1.08)" : "scale(1)",
+              transform: hovered ? "scale(1.05)" : "scale(0.95)",
             }}
           />
         </div>
 
-        {/* Title */}
         <h3
-          className="font-black leading-tight mb-3"
+          className="font-black leading-tight mb-2 sm:mb-3 transition-colors duration-300"
           style={{
-            fontSize: "clamp(18px, 1.6vw, 22px)",
+            fontSize: "clamp(16px, 1.5vw, 21px)",
             letterSpacing: "-0.02em",
-            color: "#101113",
+            color: hovered ? "#FF5000" : "#101113",
           }}
-          dangerouslySetInnerHTML={{ __html: card.headingHtml }}
+          dangerouslySetInnerHTML={{ __html: stripBr(card.headingHtml) }}
         />
 
-        {/* Description */}
         <p
-          className="font-medium text-[14px] leading-relaxed"
-          style={{ color: "#2b2e33" }}
-          dangerouslySetInnerHTML={{ __html: card.textHtml }}
+          className="leading-relaxed"
+          style={{
+            fontSize: "clamp(12px, 1.1vw, 14px)",
+            color: "#2b2e33",
+            fontWeight: 500,
+          }}
+          dangerouslySetInnerHTML={{ __html: stripBr(card.textHtml) }}
         />
 
-        {/* Bottom accent bar */}
         <div
-          className="absolute bottom-0 left-1/2 -translate-x-1/2 h-1 rounded-full transition-all duration-500"
+          className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[3px] rounded-full transition-all duration-500"
           style={{
-            width: hovered ? "64px" : "0",
-            background: "linear-gradient(90deg, transparent, #ff5000, transparent)",
+            width: hovered ? "56px" : "0px",
+            background:
+              "linear-gradient(90deg, transparent, #FF5000, transparent)",
           }}
         />
       </div>
@@ -191,44 +214,10 @@ function WhyCard({ card, index, visible }: { card: WhyCard; index: number; visib
   );
 }
 
-/* ══════════════════════════════════════════
-   MAIN COMPONENT
-══════════════════════════════════════════ */
 const WhyChooseUsSection: React.FC<WhyChooseUsProps> = ({
   className = "",
   title = "WHY CHOOSE US?",
-  cards = [
-    {
-      iconWrapClass: "why-icon why-icon-instant",
-      icon: { src: "/images/quote.png", alt: "", ariaHidden: true },
-      headingHtml: "Instant<br />Quotation",
-      textHtml: "Get a real-time price<br />the moment you<br />upload your design or<br />request a print.",
-    },
-    {
-      iconWrapClass: "why-icon why-icon-design",
-      icon: { src: "/images/design.png", alt: "", ariaHidden: true },
-      headingHtml: "Design +<br />Print",
-      textHtml: "From idea to<br />finished part —<br />everything handled<br />in one place.",
-    },
-    {
-      iconWrapClass: "why-icon why-icon-quality",
-      icon: { src: "/images/quality.png", alt: "", ariaHidden: true },
-      headingHtml: "Reliable<br />Quality",
-      textHtml: "Accurate prints<br />made for both<br />functional and<br />visual use.",
-    },
-    {
-      iconWrapClass: "why-icon why-icon-pricing",
-      icon: { src: "/images/price.png", alt: "", ariaHidden: true },
-      headingHtml: "Transparent<br />Pricing",
-      textHtml: "Clear pricing<br />with no hidden<br />costs or<br />surprises.",
-    },
-    {
-      iconWrapClass: "why-icon why-icon-support",
-      icon: { src: "/images/support.png", alt: "", ariaHidden: true },
-      headingHtml: "Local<br />Support",
-      textHtml: "Fast, reliable<br />help whenever<br />you need<br />assistance.",
-    },
-  ],
+  cards = whyChooseUsData,
 }) => {
   const sectionRef = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
@@ -237,8 +226,13 @@ const WhyChooseUsSection: React.FC<WhyChooseUsProps> = ({
     const el = sectionRef.current;
     if (!el) return;
     const obs = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.disconnect(); } },
-      { threshold: 0.1 }
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          obs.disconnect();
+        }
+      },
+      { threshold: 0.08 },
     );
     obs.observe(el);
     return () => obs.disconnect();
@@ -247,125 +241,232 @@ const WhyChooseUsSection: React.FC<WhyChooseUsProps> = ({
   return (
     <>
       <style global jsx>{`
-        @import url('https://fonts.googleapis.com/css2?family=Faculty+Glyphic&display=swap');
-
-        /* ── reveal on scroll ── */
         @keyframes whyReveal {
-          from { opacity: 0; transform: translateY(28px); }
-          to   { opacity: 1; transform: translateY(0);    }
+          from {
+            opacity: 0;
+            transform: translateY(32px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
-        /* ── fade in overlay ── */
-        @keyframes whyFadeIn {
-          from { opacity: 0; }
-          to   { opacity: 1; }
-        }
-        /* ── orbit ring ── */
         @keyframes whyOrbitCW {
-          to { transform: rotate(360deg); }
+          to {
+            transform: rotate(360deg);
+          }
         }
-        /* ── glow pulse ── */
         @keyframes whyGlow {
-          0%,100% { opacity: 0.18; transform: scale(1);    }
-          50%     { opacity: 0.38; transform: scale(1.15); }
+          0%,
+          100% {
+            opacity: 0.4;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1.18);
+          }
         }
-        /* ── filament scroll ── */
         @keyframes whyFilament {
-          from { stroke-dashoffset: 0;   }
-          to   { stroke-dashoffset: -60; }
+          from {
+            stroke-dashoffset: 0;
+          }
+          to {
+            stroke-dashoffset: -60;
+          }
         }
-        /* ── underline draw ── */
-        @keyframes whyUnderline {
-          from { width: 0;    }
-          to   { width: 100%; }
+        @keyframes whyUnderlineDraw {
+          from {
+            width: 0;
+          }
+          to {
+            width: clamp(80px, 10vw, 140px);
+          }
+        }
+        @keyframes whyHeadingReveal {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
       `}</style>
 
       <section
         ref={sectionRef}
-        className={`relative py-20 md:py-28 overflow-hidden ${className}`}
-        style={{ background: "#e4e7ec", fontFamily: "'Faculty Glyphic', sans-serif" }}
+        className={`relative overflow-hidden ${className}`}
+        style={{
+          background: "#e4e7ec",
+          padding: "clamp(48px, 7vw, 112px) 0",
+        }}
       >
-        {/* ── Grid texture ── */}
-        <div className="absolute inset-0 pointer-events-none" style={{
-          backgroundImage:
-            "linear-gradient(rgba(255,80,0,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,80,0,0.05) 1px, transparent 1px)",
-          backgroundSize: "44px 44px",
-        }} />
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(255,80,0,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,80,0,0.045) 1px, transparent 1px)",
+            backgroundSize: "44px 44px",
+          }}
+        />
 
-        {/* ── Corner glows (multiple) ── */}
-        <div className="absolute top-0 left-0 w-96 h-96 pointer-events-none"
-          style={{ background: "radial-gradient(circle at top left, rgba(255,80,0,0.06) 0%, transparent 65%)" }} />
-        <div className="absolute top-1/3 right-0 w-80 h-80 pointer-events-none"
-          style={{ background: "radial-gradient(circle at center right, rgba(255,80,0,0.05) 0%, transparent 60%)" }} />
-        <div className="absolute bottom-0 left-1/4 w-96 h-96 pointer-events-none"
-          style={{ background: "radial-gradient(circle at bottom, rgba(255,80,0,0.05) 0%, transparent 60%)" }} />
+        <div
+          className="absolute top-0 left-0 w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(circle at top left, rgba(255,80,0,0.07) 0%, transparent 65%)",
+          }}
+        />
+        <div
+          className="absolute bottom-0 right-0 w-[35vw] h-[35vw] max-w-[500px] max-h-[500px] pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(circle at bottom right, rgba(255,80,0,0.06) 0%, transparent 60%)",
+          }}
+        />
 
-        {/* ── Filament threads at top ── */}
-        <svg className="absolute top-0 left-0 right-0 w-full pointer-events-none"
-          style={{ height: "36px" }} viewBox="0 0 1200 36" preserveAspectRatio="none">
-          <path d="M 0 18 Q 300 4, 600 18 T 1200 18"
-            stroke="rgba(255,80,0,0.14)" strokeWidth="2" strokeDasharray="8 6" fill="none"
-            style={{ animation: "whyFilament 5s linear infinite" }} />
-          <path d="M 0 28 Q 300 14, 600 28 T 1200 28"
-            stroke="rgba(255,80,0,0.07)" strokeWidth="1.5" strokeDasharray="5 8" fill="none"
-            style={{ animation: "whyFilament 5s linear infinite reverse" }} />
+        <svg
+          className="absolute top-0 left-0 right-0 w-full pointer-events-none"
+          style={{ height: "36px" }}
+          viewBox="0 0 1200 36"
+          preserveAspectRatio="none"
+        >
+          <path
+            d="M 0 18 Q 300 4, 600 18 T 1200 18"
+            stroke="rgba(255,80,0,0.14)"
+            strokeWidth="2"
+            strokeDasharray="8 6"
+            fill="none"
+            style={{ animation: "whyFilament 5s linear infinite" }}
+          />
+          <path
+            d="M 0 28 Q 300 14, 600 28 T 1200 28"
+            stroke="rgba(255,80,0,0.07)"
+            strokeWidth="1.5"
+            strokeDasharray="5 8"
+            fill="none"
+            style={{ animation: "whyFilament 5s linear infinite reverse" }}
+          />
         </svg>
 
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10"
-          style={{ maxWidth: "1540px" }}>
-
-          {/* ── Section heading ── */}
-          <div className="text-center mb-16 md:mb-20">
-            {/* Eyebrow */}
-            <div className="inline-flex items-center gap-2 mb-5"
-              style={{ animation: visible ? "whyReveal 0.6s 0.0s ease-out both" : "none", opacity: visible ? undefined : 0 }}>
-              <div className="h-[2px] w-8 rounded-full" style={{ background: "#ff5000" }} />
-              <span className="text-[11px] font-black uppercase tracking-[0.18em]"
-                style={{ color: "#ff5000" }}>
+        <div
+          className="container mx-auto relative z-10"
+          style={{
+            maxWidth: "1540px",
+            padding: "0 clamp(16px, 4vw, 64px)",
+          }}
+        >
+          <div className="text-center mb-10 sm:mb-14 md:mb-16 lg:mb-20">
+            <div
+              className="inline-flex items-center gap-2 sm:gap-3 mb-4 sm:mb-5"
+              style={{
+                animation: visible
+                  ? "whyHeadingReveal 0.6s 0s ease-out both"
+                  : "none",
+                opacity: visible ? undefined : 0,
+              }}
+            >
+              <div
+                className="h-[2px] rounded-full bg-[#FF5000]"
+                style={{ width: "clamp(20px, 3vw, 36px)" }}
+              />
+              <span
+                className="font-black uppercase tracking-[0.2em] text-[#FF5000]"
+                style={{ fontSize: "clamp(10px, 1.1vw, 12px)" }}
+              >
                 Why SpoolBear
               </span>
-              <div className="h-[2px] w-8 rounded-full" style={{ background: "#ff5000" }} />
+              <div
+                className="h-[2px] rounded-full bg-[#FF5000]"
+                style={{ width: "clamp(20px, 3vw, 36px)" }}
+              />
             </div>
 
-            {/* Headline */}
-            <h2 className="font-black leading-tight mb-4"
+            <h2
+              className="font-black leading-tight text-[#101113] mb-4"
               style={{
-                fontSize: "clamp(38px, 6vw, 64px)",
+                fontSize: "clamp(30px, 5.5vw, 64px)",
                 letterSpacing: "-0.03em",
-                color: "#101113",
-                animation: visible ? "whyReveal 0.6s 0.10s ease-out both" : "none",
+                animation: visible
+                  ? "whyHeadingReveal 0.6s 0.1s ease-out both"
+                  : "none",
                 opacity: visible ? undefined : 0,
-              }}>
+              }}
+            >
               {title}
             </h2>
 
-            {/* Underline */}
-            <div className="h-1 rounded-full mx-auto"
+            <div
+              className="h-[3px] sm:h-[4px] rounded-full mx-auto bg-[#FF5000]"
               style={{
-                background: "#ff5000",
-                animation: visible ? "whyUnderline 0.9s 0.60s ease-out both" : "none",
+                animation: visible
+                  ? "whyUnderlineDraw 0.9s 0.55s ease-out both"
+                  : "none",
                 width: 0,
-                maxWidth: "140px",
-              }} />
+              }}
+            />
 
-            {/* Subtitle */}
-            <p className="text-lg font-medium mt-6 max-w-2xl mx-auto"
+            <p
+              className="font-medium text-[#2b2e33] mt-4 sm:mt-5 mx-auto"
               style={{
-                color: "#2b2e33",
-                animation: visible ? "whyReveal 0.6s 0.30s ease-out both" : "none",
+                fontSize: "clamp(13px, 1.5vw, 18px)",
+                maxWidth: "clamp(280px, 55vw, 640px)",
+                animation: visible
+                  ? "whyHeadingReveal 0.6s 0.25s ease-out both"
+                  : "none",
                 opacity: visible ? undefined : 0,
-              }}>
-              We combine expertise, technology, and passion to deliver exceptional 3D printing services
+              }}
+            >
+              We combine expertise, technology, and passion to deliver
+              exceptional 3D printing services
             </p>
           </div>
 
-          {/* ── Cards grid (5 columns on XL) ── */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 md:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-5 md:gap-6 lg:gap-7">
             {cards.map((card, index) => (
-              <WhyCard key={index} card={card} index={index} visible={visible} />
+              <WhyCard
+                key={index}
+                card={card}
+                index={index}
+                visible={visible}
+              />
             ))}
           </div>
 
+          <div
+            className="mt-12 sm:mt-16 flex justify-center items-center gap-2 sm:gap-3"
+            style={{
+              animation: visible
+                ? "whyHeadingReveal 0.6s 0.8s ease-out both"
+                : "none",
+              opacity: visible ? undefined : 0,
+            }}
+          >
+            {[0, 1, 2, 3, 4].map((i) => (
+              <React.Fragment key={i}>
+                <div
+                  className="rounded-full bg-[#FF5000] animate-pulse"
+                  style={{
+                    width: "clamp(6px, 0.8vw, 9px)",
+                    height: "clamp(6px, 0.8vw, 9px)",
+                    opacity: 0.3,
+                    animationDelay: `${i * 180}ms`,
+                  }}
+                />
+                {i < 4 && (
+                  <div
+                    className="h-px bg-[#FF5000]"
+                    style={{
+                      width: "clamp(14px, 2vw, 28px)",
+                      opacity: 0.2,
+                    }}
+                  />
+                )}
+              </React.Fragment>
+            ))}
+          </div>
         </div>
       </section>
     </>

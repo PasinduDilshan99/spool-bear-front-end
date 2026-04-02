@@ -9,6 +9,7 @@ import MobileNav from "./MobileNav";
 import ScrolledDesktopNav from "./ScrolledDesktopNav";
 import ScrolledMobileNav from "./ScrolledMobileNav";
 import { NavBarService } from "@/service/navBarService";
+import NavBarSkeleton from "./NavBarSkeleton";
 
 const NavBar = () => {
   const [loading, setLoading] = useState(true);
@@ -26,13 +27,13 @@ const NavBar = () => {
   const getMaxVisibleItems = () => {
     switch (screenSize) {
       case "laptop":
-        return 6;
+        return 5;
       case "desktop":
-        return 8;
+        return 7;
       case "large":
-        return 10;
+        return 8;
       default:
-        return 6;
+        return 4;
     }
   };
 
@@ -95,12 +96,8 @@ const NavBar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [isScrolled]);
 
-  if (loading || authLoading)
-    return (
-      <div className="bg-gradient-to-br from-slate-900 via-gray-900 to-teal-950  ">
-        {/* <BasicLoading width="w-full" height="h-16" /> */}
-      </div>
-    );
+  if (loading || authLoading) return <NavBarSkeleton />;
+
   if (error) return null;
 
   const visibleNavBarItems = navBarData.filter(
@@ -137,7 +134,7 @@ const NavBar = () => {
           borderColor: "rgba(14, 165, 233, 0.2)",
         }}
       >
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-360 mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             {/* Desktop Navigation */}
             <DesktopNav
@@ -151,14 +148,14 @@ const NavBar = () => {
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className="inline-flex items-center justify-center p-2 rounded-lg transition-all duration-300"
-                style={{ color: "#075985" }}
+                style={{ color: "#FF5000" }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.color = "#0ea5e9";
+                  e.currentTarget.style.color = "#FF6B33";
                   e.currentTarget.style.backgroundColor =
-                    "rgba(14, 165, 233, 0.08)";
+                    "rgba(255, 80, 0, 0.08)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.color = "#075985";
+                  e.currentTarget.style.color = "#FF5000";
                   e.currentTarget.style.backgroundColor = "transparent";
                 }}
               >
@@ -209,8 +206,8 @@ const NavBar = () => {
           borderColor: "rgba(14, 165, 233, 0.3)",
         }}
       >
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-14">
+        <div className="max-w-360 mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
             {/* Scrolled Desktop Navigation */}
             <ScrolledDesktopNav
               {...navBarProps}
@@ -223,14 +220,14 @@ const NavBar = () => {
               <button
                 onClick={() => setIsScrolledMenuOpen(!isScrolledMenuOpen)}
                 className="inline-flex items-center justify-center p-1.5 rounded-md transition-all duration-300"
-                style={{ color: "#075985" }}
+                style={{ color: "#FF5000" }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.color = "#0ea5e9";
+                  e.currentTarget.style.color = "#FF6B33";
                   e.currentTarget.style.backgroundColor =
-                    "rgba(14, 165, 233, 0.08)";
+                    "rgba(255, 80, 0, 0.08)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.color = "#075985";
+                  e.currentTarget.style.color = "#FF5000";
                   e.currentTarget.style.backgroundColor = "transparent";
                 }}
               >

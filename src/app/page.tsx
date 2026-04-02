@@ -1,19 +1,17 @@
-import DesignQuestionSection from "@/components/home-page-components/DesignQuestionSection";
-import GalleryHome from "@/components/home-page-components/GalleryHome";
-import HeroSection from "@/components/home-page-components/HeroSection";
-import HowItWorksSection from "@/components/home-page-components/HowItWorksSection";
-import NoDesignSection from "@/components/home-page-components/NoDesignSection";
-import WhyChooseUsSection from "@/components/home-page-components/WhyChooseUsSection";
+import HomePage from "@/pages/HomePage";
+import { HOME_PAGE_TITLE } from "@/utils/headerTitle";
+import { Metadata } from "next";
 
-export default function Home() {
+export const metadata: Metadata = {
+  title: HOME_PAGE_TITLE,
+};
+
+const page = () => {
   return (
     <div>
-      <HeroSection />
-      <DesignQuestionSection />
-      <HowItWorksSection />
-      <GalleryHome />
-      <WhyChooseUsSection />
-      <NoDesignSection />
+      <HomePage />
     </div>
   );
-}
+};
+
+export default page;
