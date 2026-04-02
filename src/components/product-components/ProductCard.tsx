@@ -1,32 +1,9 @@
-// components/product-components/ProductCard.tsx
 "use client";
-
 import React, { useState } from "react";
-import Link from "next/link";
 import Image from "next/image";
-import {
-  Heart,
-  ShoppingCart,
-  Eye,
-  Loader2,
-  Box,
-  Palette,
-  CheckCircle,
-} from "lucide-react";
-import { Product } from "@/types/product-types";
+import { Heart, ShoppingCart, Eye, Loader2, Box, Palette } from "lucide-react";
 import { PLACE_HOLDER_IMAGE } from "@/utils/constant";
-import { SHOP_PAGE_PATH } from "@/utils/urls";
-
-interface ProductCardProps {
-  product: Product;
-  formatPrice: (price: number) => string;
-  getProductImage: (product: Product) => string;
-  onAddToCart: (product: Product) => void;
-  onWishlistToggle: (product: Product) => void;
-  handleDetailsPageNavgation: (product: Product) => void;
-  isAddingToCart: boolean;
-  isTogglingWishlist: boolean;
-}
+import { ProductCardProps } from "@/types/product-types";
 
 const parseColorCode = (colorStr: string): string => {
   if (colorStr.includes("|")) return colorStr.split("|")[1].trim();
@@ -64,7 +41,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
   return (
     <div className="group relative bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-orange-200 hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col">
-      {/* ── Image ── */}
       <div
         className="relative overflow-hidden bg-gray-100"
         style={{ aspectRatio: "4/3" }}
@@ -78,13 +54,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           onError={() => setImgError(true)}
         />
 
-        {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-        {/* Orange corner tag */}
         <div className="absolute top-0 left-0 w-0 h-0 border-l-[48px] border-l-[#FF5000] border-b-[48px] border-b-transparent" />
 
-        {/* Category label */}
         <div className="absolute top-1 left-1.5">
           <span
             className="text-[9px] font-black text-white uppercase tracking-wider"
@@ -94,7 +67,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </span>
         </div>
 
-        {/* Stock badge */}
         <div className="absolute top-3 right-3">
           <span
             className="flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold text-white"
@@ -113,7 +85,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </span>
         </div>
 
-        {/* Wishlist button */}
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -134,7 +105,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           )}
         </button>
 
-        {/* Quick action bar */}
         <div className="cursor-pointer absolute bottom-3 left-3 flex gap-2 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
           <button
             onClick={(e) => {
@@ -163,9 +133,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         </div>
       </div>
 
-      {/* ── Info ── */}
       <div className="flex flex-col flex-1 p-4 sm:p-5">
-        {/* Type + material */}
         <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
           <span className="text-[10px] font-bold uppercase tracking-widest text-[#FF5000]">
             {product.typeName}
@@ -181,7 +149,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           )}
         </div>
 
-        {/* Name */}
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -196,12 +163,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </h3>
         </button>
 
-        {/* Description */}
         <p className="text-xs text-gray-500 line-clamp-2 mb-3 leading-relaxed flex-1">
           {product.productDescription}
         </p>
 
-        {/* Colors */}
         {product.colors?.length > 0 && (
           <div className="flex items-center gap-1.5 mb-3">
             <Palette size={11} className="text-[#FF5000] flex-shrink-0" />
@@ -223,10 +188,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </div>
         )}
 
-        {/* Price + CTA */}
         <div className="flex items-center justify-between gap-2 mt-auto pt-3 border-t border-gray-100">
           <span
-            className="font-black text-[#FF5000]"
+            className="font-black text-[#FF5000] tracking-wider"
             style={{ fontSize: "clamp(16px, 2vw, 20px)" }}
           >
             {formatPrice(product.price)}

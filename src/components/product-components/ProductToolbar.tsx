@@ -1,16 +1,7 @@
-// components/product-components/ProductToolbar.tsx
 "use client";
-
 import React from "react";
 import { Grid3x3, List } from "lucide-react";
-
-interface ProductToolbarProps {
-  totalProducts: number;
-  viewMode: "grid" | "list";
-  onViewModeChange: (mode: "grid" | "list") => void;
-  sortBy: string;
-  onSortChange: (sort: string) => void;
-}
+import { ProductToolbarProps } from "@/types/product-types";
 
 export const ProductToolbar: React.FC<ProductToolbarProps> = ({
   totalProducts,
@@ -21,7 +12,6 @@ export const ProductToolbar: React.FC<ProductToolbarProps> = ({
 }) => {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-4 sm:px-5 py-3 mb-5 flex flex-wrap items-center justify-between gap-3">
-      {/* Left: count + view toggles */}
       <div className="flex items-center gap-3 sm:gap-4">
         <p className="text-sm text-gray-500 font-medium">
           <span className="font-black text-[#101113]">{totalProducts}</span>{" "}
@@ -47,7 +37,6 @@ export const ProductToolbar: React.FC<ProductToolbarProps> = ({
         </div>
       </div>
 
-      {/* Right: sort */}
       <div className="flex items-center gap-2">
         <span className="text-xs font-bold uppercase tracking-widest text-gray-400 hidden sm:block">
           Sort
@@ -64,7 +53,6 @@ export const ProductToolbar: React.FC<ProductToolbarProps> = ({
             <option value="name-asc">Name: A → Z</option>
             <option value="name-desc">Name: Z → A</option>
           </select>
-          {/* Chevron */}
           <svg
             className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
             width="12"

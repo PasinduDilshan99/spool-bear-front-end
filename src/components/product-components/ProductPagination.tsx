@@ -1,15 +1,8 @@
-// components/products/ProductPagination.tsx
 "use client";
-
 import React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { spoolbearTheme } from "@/theme/spoolbear-theme";
-
-interface ProductPaginationProps {
-  currentPage: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
-}
+import { ProductPaginationProps } from "@/types/product-types";
 
 export const ProductPagination: React.FC<ProductPaginationProps> = ({
   currentPage,

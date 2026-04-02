@@ -1,14 +1,7 @@
-// components/product-components/Toast.tsx
 "use client";
-
 import React, { useEffect, useState } from "react";
 import { AlertCircle, CheckCircle, Info, X } from "lucide-react";
-
-interface ToastProps {
-  message: string;
-  type: "success" | "error" | "info";
-  onClose: () => void;
-}
+import { ToastProps } from "@/types/product-types";
 
 export const Toast: React.FC<ToastProps> = ({ message, type, onClose }) => {
   const [leaving, setLeaving] = useState(false);
@@ -59,10 +52,11 @@ export const Toast: React.FC<ToastProps> = ({ message, type, onClose }) => {
           : "toastIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both",
       }}
     >
-      {/* Accent bar */}
-      <div className="w-1 flex-shrink-0" style={{ background: config.accent }} />
+      <div
+        className="w-1 flex-shrink-0"
+        style={{ background: config.accent }}
+      />
 
-      {/* Body */}
       <div
         className="flex items-center gap-3 px-4 py-3.5 flex-1"
         style={{ background: config.bg }}
@@ -73,7 +67,9 @@ export const Toast: React.FC<ToastProps> = ({ message, type, onClose }) => {
         >
           <Icon size={16} style={{ color: config.accent }} />
         </div>
-        <p className="text-sm font-medium text-white/90 leading-snug flex-1">{message}</p>
+        <p className="text-sm font-medium text-white/90 leading-snug flex-1">
+          {message}
+        </p>
         <button
           onClick={handleClose}
           className="flex-shrink-0 w-6 h-6 rounded-lg flex items-center justify-center text-white/30 hover:text-white/70 transition-colors duration-150"
@@ -84,12 +80,24 @@ export const Toast: React.FC<ToastProps> = ({ message, type, onClose }) => {
 
       <style jsx>{`
         @keyframes toastIn {
-          from { opacity: 0; transform: translateX(24px) scale(0.95); }
-          to   { opacity: 1; transform: translateX(0) scale(1); }
+          from {
+            opacity: 0;
+            transform: translateX(24px) scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+          }
         }
         @keyframes toastOut {
-          from { opacity: 1; transform: translateX(0) scale(1); }
-          to   { opacity: 0; transform: translateX(24px) scale(0.95); }
+          from {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+          }
+          to {
+            opacity: 0;
+            transform: translateX(24px) scale(0.95);
+          }
         }
       `}</style>
     </div>
