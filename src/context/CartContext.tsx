@@ -35,6 +35,22 @@ interface CartContextType {
   getCartItemCount: () => number;
 }
 
+// Default mock values for prerendering
+const defaultCartContext: CartContextType = {
+  cartItems: [],
+  cartId: null,
+  isLoading: false,
+  error: null,
+  fetchCart: async () => {},
+  addToCart: async () => {},
+  updateCartItemQuantity: async () => {},
+  removeFromCart: async () => {},
+  removeProductAllItemsFromCart: async () => {},
+  clearCart: async () => {},
+  getCartTotal: () => 0,
+  getCartItemCount: () => 0,
+};
+
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 const CART_ID_COOKIE = CART_NAME;
@@ -44,23 +60,37 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cartId, setCartId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
   const { user } = useAuth();
 
-  // Load cart ID from cookie on initial render
+  // Mark when component is mounted on client
   useEffect(() => {
-    const savedCartId = Cookies.get(CART_ID_COOKIE);
-    if (savedCartId) {
-      setCartId(parseInt(savedCartId));
-    }
+    setIsMounted(true);
   }, []);
 
+  // Load cart ID from cookie on initial render (only on client)
   useEffect(() => {
+    if (!isMounted) return;
+    
+    try {
+      const savedCartId = Cookies.get(CART_ID_COOKIE);
+      if (savedCartId) {
+        setCartId(parseInt(savedCartId));
+      }
+    } catch (err) {
+      console.error("Error reading cookie:", err);
+    }
+  }, [isMounted]);
+
+  useEffect(() => {
+    if (!isMounted) return;
+    
     if (cartId) {
       fetchCart();
-    } else {
+    } else if (user) {
       fetchCartId();
     }
-  }, [cartId, user]);
+  }, [cartId, user, isMounted]);
 
   const fetchCartId = useCallback(async () => {
     if (!user) return;
@@ -319,10 +349,21 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 
+// FIXED: This hook now returns default values during prerendering instead of throwing
 export function useCart() {
   const context = useContext(CartContext);
+  
+  // Return default values during prerendering or if context is missing
+  // This prevents the build from failing on static pages
   if (context === undefined) {
+    // Check if we're in a browser environment
+    if (typeof window === 'undefined') {
+      // During SSR/prerendering, return default mock context
+      return defaultCartContext;
+    }
+    // In browser, throw error as normal
     throw new Error("useCart must be used within a CartProvider");
   }
+  
   return context;
 }
