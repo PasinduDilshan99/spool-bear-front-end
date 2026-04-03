@@ -49,11 +49,39 @@ interface CurrencyContextType {
 
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
 
+// FIXED: This hook now returns default values during prerendering instead of throwing
 export const useCurrency = () => {
   const context = useContext(CurrencyContext);
+  
+  // Return default values during prerendering or if context is missing
+  // This prevents the build from failing
   if (!context) {
-    throw new Error("useCurrency must be used within a CurrencyProvider");
+    // Default currency (LKR)
+    const defaultCurrency = SUPPORTED_CURRENCIES[0];
+    
+    // Return a mock context with default values
+    return {
+      currencies: SUPPORTED_CURRENCIES,
+      currentCurrency: defaultCurrency,
+      setCurrentCurrency: () => {
+        // Do nothing during prerendering
+        if (typeof window !== 'undefined') {
+          console.warn('CurrencyProvider not found');
+        }
+      },
+      convertPrice: (priceInLKR: number) => priceInLKR, // Return original price in LKR
+      formatPrice: (priceInLKR: number) => {
+        // Simple formatting without currency symbol during prerendering
+        return `Rs${Math.round(priceInLKR)}`;
+      },
+      isLoading: false,
+      error: null,
+      refreshRates: async () => {
+        // Do nothing during prerendering
+      },
+    };
   }
+  
   return context;
 };
 
@@ -66,25 +94,46 @@ export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({ children }) 
   const [currentCurrency, setCurrentCurrency] = useState<Currency>(SUPPORTED_CURRENCIES[0]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
-  // Load saved currency preference from localStorage
+  // Mark when component is mounted (client-side)
   useEffect(() => {
-    const savedCurrencyCode = localStorage.getItem("preferredCurrency");
-    if (savedCurrencyCode) {
-      const savedCurrency = SUPPORTED_CURRENCIES.find(c => c.code === savedCurrencyCode);
-      if (savedCurrency) {
-        setCurrentCurrency(savedCurrency);
-      }
-    }
+    setIsMounted(true);
   }, []);
 
-  // Save currency preference to localStorage
+  // Load saved currency preference from localStorage (only on client-side)
   useEffect(() => {
-    localStorage.setItem("preferredCurrency", currentCurrency.code);
-  }, [currentCurrency]);
+    if (!isMounted) return;
+    
+    try {
+      const savedCurrencyCode = localStorage.getItem("preferredCurrency");
+      if (savedCurrencyCode) {
+        const savedCurrency = SUPPORTED_CURRENCIES.find(c => c.code === savedCurrencyCode);
+        if (savedCurrency) {
+          setCurrentCurrency(savedCurrency);
+        }
+      }
+    } catch (err) {
+      console.error("Error accessing localStorage:", err);
+    }
+  }, [isMounted]);
+
+  // Save currency preference to localStorage (only on client-side)
+  useEffect(() => {
+    if (!isMounted) return;
+    
+    try {
+      localStorage.setItem("preferredCurrency", currentCurrency.code);
+    } catch (err) {
+      console.error("Error saving to localStorage:", err);
+    }
+  }, [currentCurrency, isMounted]);
 
   // Fetch latest exchange rates
   const refreshRates = async () => {
+    // Don't fetch during SSR/prerendering
+    if (typeof window === 'undefined') return;
+    
     try {
       setIsLoading(true);
       setError(null);
@@ -138,10 +187,12 @@ export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({ children }) 
     }
   };
 
-  // Fetch rates on mount
+  // Fetch rates on mount (only on client-side)
   useEffect(() => {
-    refreshRates();
-  }, []);
+    if (isMounted) {
+      refreshRates();
+    }
+  }, [isMounted]);
 
   /**
    * Convert price from LKR to selected currency

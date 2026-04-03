@@ -34,15 +34,15 @@ export default function RootLayout({
         className="min-h-screen"
       >
         {" "}
-        <AuthProvider>
-          <CartProvider>
-            <CurrencyProvider>
+        <CurrencyProvider>
+          <AuthProvider>
+            <CartProvider>
               <NavBar />
               {children}
               <Footer />
-            </CurrencyProvider>
-          </CartProvider>
-        </AuthProvider>
+            </CartProvider>
+          </AuthProvider>
+        </CurrencyProvider>
       </body>
     </html>
   );
