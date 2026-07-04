@@ -1,4 +1,3 @@
-// components/print/PrintUploadForm.tsx
 "use client";
 import React, { useRef, useState } from "react";
 import { CheckCircle, AlertCircle, Upload, Loader2 } from "lucide-react";
@@ -7,22 +6,8 @@ import { AddPrintingOrderRequest } from "@/types/order-types";
 import { OtherService } from "@/service/otherService";
 import { materials } from "@/data/materials-data";
 import { useAuth } from "@/context/AuthContext";
-
-interface PrintFormData {
-  customText: string;
-  description: string;
-  size: string;
-  color: string;
-  quantity: number;
-  materiel: string;
-  file: File | null;
-  fileName: string;
-}
-
-interface UploadStatus {
-  type: "success" | "error" | "info" | null;
-  message: string;
-}
+import { PrintFormData, PrintFormUploadStatus } from "@/types/print-page-types";
+import { LOGIN_PAGE_PATH, SIGNUP_PAGE_PATH } from "@/utils/urls";
 
 const inputClass =
   "w-full px-4 py-3 text-sm text-[#101113] bg-white/80 border border-gray-200 rounded-xl outline-none placeholder:text-gray-400 focus:border-[#FF5000] focus:ring-2 focus:ring-[#FF5000]/10 focus:bg-white transition-all duration-200";
@@ -34,7 +19,7 @@ const selectClass =
   "w-full px-4 py-3 text-sm text-[#101113] bg-white/80 border border-gray-200 rounded-xl outline-none focus:border-[#FF5000] focus:ring-2 focus:ring-[#FF5000]/10 focus:bg-white transition-all duration-200 cursor-pointer";
 
 const PrintUploadForm: React.FC = () => {
-  const { user } = useAuth(); // Get user from auth context
+  const { user } = useAuth();
   const [formData, setFormData] = useState<PrintFormData>({
     customText: "",
     description: "",
@@ -46,7 +31,7 @@ const PrintUploadForm: React.FC = () => {
     fileName: "",
   });
   const [uploading, setUploading] = useState(false);
-  const [status, setStatus] = useState<UploadStatus>({
+  const [status, setStatus] = useState<PrintFormUploadStatus>({
     type: null,
     message: "",
   });
@@ -56,7 +41,6 @@ const PrintUploadForm: React.FC = () => {
 
   const orderService = new OrderService();
 
-  // Helper function to upload file to a temporary storage
   const uploadFileToTempStorage = async (file: File): Promise<string> => {
     try {
       const result = await OtherService.uploadFile(file);
@@ -161,16 +145,13 @@ const PrintUploadForm: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    // Check if user is logged in
     if (!user) {
       setShowAuthModal(true);
       return;
     }
 
-    // Reset status
     setStatus({ type: null, message: "" });
 
-    // Validate form
     if (!validateForm()) {
       return;
     }
@@ -182,7 +163,6 @@ const PrintUploadForm: React.FC = () => {
     });
 
     try {
-      // Step 1: Upload the file to get a URL
       let fileUrl: string;
       try {
         fileUrl = await uploadFileToTempStorage(formData.file!);
@@ -196,7 +176,6 @@ const PrintUploadForm: React.FC = () => {
         return;
       }
 
-      // Step 2: Prepare the order data
       const orderData: AddPrintingOrderRequest = {
         customText: formData.customText || "No title provided",
         description: formData.description,
@@ -212,7 +191,6 @@ const PrintUploadForm: React.FC = () => {
         ],
       };
 
-      // Step 3: Submit the order
       const result = await orderService.addPrintingOrder(orderData);
 
       setStatus({
@@ -222,7 +200,6 @@ const PrintUploadForm: React.FC = () => {
           "Printing order added successfully! We'll contact you soon.",
       });
 
-      // Reset form on success
       setFormData({
         customText: "",
         description: "",
@@ -249,7 +226,6 @@ const PrintUploadForm: React.FC = () => {
     }
   };
 
-  // Auth Modal Component
   const AuthModal = () => {
     if (!showAuthModal) return null;
 
@@ -279,8 +255,7 @@ const PrintUploadForm: React.FC = () => {
             <button
               onClick={() => {
                 setShowAuthModal(false);
-                // Navigate to login page or open login modal
-                window.location.href = "/login";
+                window.location.href = LOGIN_PAGE_PATH;
               }}
               className="flex-1 px-4 py-2.5 bg-white border-2 border-[#FF5000] text-[#FF5000] rounded-lg font-bold hover:bg-orange-50 transition-colors"
             >
@@ -289,8 +264,7 @@ const PrintUploadForm: React.FC = () => {
             <button
               onClick={() => {
                 setShowAuthModal(false);
-                // Navigate to signup page or open signup modal
-                window.location.href = "/signup";
+                window.location.href = SIGNUP_PAGE_PATH;
               }}
               className="flex-1 px-4 py-2.5 bg-[#FF5000] text-white rounded-lg font-bold hover:bg-[#e34800] transition-colors"
             >
@@ -308,7 +282,6 @@ const PrintUploadForm: React.FC = () => {
         id="upload-form"
         className="bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl border border-gray-100 scroll-mt-8"
       >
-        {/* Header */}
         <div className="bg-[#1A1A1A] relative overflow-hidden">
           <div
             className="absolute inset-0 opacity-[0.05]"
@@ -334,10 +307,8 @@ const PrintUploadForm: React.FC = () => {
           </div>
         </div>
 
-        {/* Body */}
         <div className="p-6 sm:p-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            {/* Custom Text/Title - Optional now */}
             <div className="sm:col-span-2">
               <label className={labelClass}>
                 Custom Text / Title{" "}
@@ -353,7 +324,6 @@ const PrintUploadForm: React.FC = () => {
               />
             </div>
 
-            {/* Description */}
             <div className="sm:col-span-2">
               <label className={labelClass}>
                 Description <span className="text-[#FF5000]">*</span>
@@ -368,7 +338,6 @@ const PrintUploadForm: React.FC = () => {
               />
             </div>
 
-            {/* Size */}
             <div>
               <label className={labelClass}>
                 Size / Dimensions <span className="text-[#FF5000]">*</span>
@@ -383,7 +352,6 @@ const PrintUploadForm: React.FC = () => {
               />
             </div>
 
-            {/* Color */}
             <div>
               <label className={labelClass}>
                 Color <span className="text-[#FF5000]">*</span>
@@ -398,7 +366,6 @@ const PrintUploadForm: React.FC = () => {
               />
             </div>
 
-            {/* Quantity */}
             <div>
               <label className={labelClass}>
                 Quantity <span className="text-[#FF5000]">*</span>
@@ -413,7 +380,6 @@ const PrintUploadForm: React.FC = () => {
               />
             </div>
 
-            {/* Material - Select dropdown */}
             <div>
               <label className={labelClass}>
                 Material <span className="text-[#FF5000]">*</span>
@@ -433,7 +399,6 @@ const PrintUploadForm: React.FC = () => {
               </select>
             </div>
 
-            {/* File drop zone */}
             <div className="sm:col-span-2">
               <label className={labelClass}>
                 3D Model File <span className="text-[#FF5000]">*</span>
@@ -455,7 +420,9 @@ const PrintUploadForm: React.FC = () => {
                 <input
                   ref={fileInputRef}
                   type="file"
-                  onChange={(e) => handleFileChange(e.target.files?.[0] || null)}
+                  onChange={(e) =>
+                    handleFileChange(e.target.files?.[0] || null)
+                  }
                   accept=".stl,.obj,.3mf,.step,.stp,.f3d,.iges,.igs"
                   className="hidden"
                 />
@@ -494,7 +461,6 @@ const PrintUploadForm: React.FC = () => {
                 </div>
               </div>
 
-              {/* Selected file badge */}
               {formData.file && (
                 <div className="flex items-center gap-2 mt-2 px-3 py-2 bg-orange-50 border border-orange-200 rounded-lg">
                   <CheckCircle
@@ -509,7 +475,6 @@ const PrintUploadForm: React.FC = () => {
             </div>
           </div>
 
-          {/* Status */}
           {status.type && (
             <div
               className={`flex items-start gap-3 p-4 rounded-xl mb-4 border ${
@@ -530,7 +495,6 @@ const PrintUploadForm: React.FC = () => {
             </div>
           )}
 
-          {/* Submit */}
           <button
             onClick={handleSubmit}
             disabled={uploading}
@@ -560,7 +524,6 @@ const PrintUploadForm: React.FC = () => {
         </div>
       </div>
 
-      {/* Auth Modal */}
       <AuthModal />
     </>
   );

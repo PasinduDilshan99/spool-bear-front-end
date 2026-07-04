@@ -1,6 +1,4 @@
-// components/product-components/ColorSelectionModal.tsx
 "use client";
-
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import {
@@ -12,17 +10,9 @@ import {
   Minus,
   Plus,
 } from "lucide-react";
-import { Product } from "@/types/product-types";
 import { PLACE_HOLDER_IMAGE } from "@/utils/constant";
 import { useCurrency } from "@/context/CurrencyContext";
-
-interface ColorSelectionModalProps {
-  product: Product;
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: (color: string, colorCode: string, quantity: number) => void;
-  isLoading: boolean;
-}
+import { ColorSelectionModalProps } from "@/types/product-types";
 
 const parseColor = (colorStr: string): { name: string; code: string } => {
   if (colorStr.includes("|")) {
@@ -83,15 +73,13 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
 
   const inStock = product.stockQuantity > 0;
 
-  // Calculate prices using currency conversion
-  const pricePerItem = product.price; // This is in LKR from database
+
+  const pricePerItem = product.price;
   const totalPrice = pricePerItem * quantity;
 
-  // Format prices with current currency
   const formattedPricePerItem = formatPrice(pricePerItem);
   const formattedTotalPrice = formatPrice(totalPrice);
 
-  // Get original price in LKR to show if different currency is selected
   const showOriginalPrice = currentCurrency.code !== "LKR";
   const originalPriceInLKR = totalPrice;
 
@@ -100,13 +88,11 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
       style={{ animation: "modalBackdropIn 0.2s ease-out both" }}
     >
-      {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/55 backdrop-blur-sm"
         onClick={onClose}
       />
 
-      {/* Sheet / Modal */}
       <div
         className="relative bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl overflow-hidden shadow-2xl"
         style={{
@@ -114,15 +100,12 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Orange top bar */}
         <div className="h-1 bg-[#FF5000]" />
 
-        {/* Handle (mobile) */}
         <div className="flex justify-center pt-3 pb-1 sm:hidden">
           <div className="w-10 h-1 rounded-full bg-gray-200" />
         </div>
 
-        {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-orange-50 flex items-center justify-center">
@@ -140,7 +123,6 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
           </button>
         </div>
 
-        {/* Product summary */}
         <div className="flex items-center gap-4 px-6 py-4 bg-gray-50 border-b border-gray-100">
           <div className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 border border-gray-200">
             <Image
@@ -169,7 +151,6 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
                 </span>
               )}
             </div>
-            {/* Stock indicator */}
             <div className="flex items-center gap-1 mt-1">
               <div
                 className="w-1.5 h-1.5 rounded-full"
@@ -187,13 +168,11 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
           </div>
         </div>
 
-        {/* Color picker */}
         <div className="px-6 py-5">
           <div className="flex items-center justify-between mb-4">
             <p className="text-xs font-black uppercase tracking-widest text-gray-400">
               Choose Color
             </p>
-            {/* Selected preview */}
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100">
               <div
                 className="w-3.5 h-3.5 rounded-full border border-black/10"
@@ -250,7 +229,6 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
             })}
           </div>
 
-          {/* Quantity Selection */}
           <div className="mb-6">
             <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-3">
               Quantity
@@ -292,7 +270,6 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
             </div>
           </div>
 
-          {/* Total Price */}
           <div className="mb-6 p-4 bg-gradient-to-r from-orange-50 to-gray-50 rounded-xl border border-orange-100">
             <div className="flex justify-between items-center">
               <span className="font-bold text-[#2b2e33] text-sm">Total:</span>
@@ -314,7 +291,6 @@ export const ColorSelectionModal: React.FC<ColorSelectionModalProps> = ({
             </div>
           </div>
 
-          {/* Actions */}
           <div className="flex gap-3">
             <button
               onClick={onClose}

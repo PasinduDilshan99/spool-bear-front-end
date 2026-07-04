@@ -4,18 +4,9 @@ import React, { useEffect, useState } from "react";
 import { ActiveImagesType } from "@/types/gallery-types";
 import { PLACE_HOLDER_IMAGE } from "@/utils/constant";
 import { GalleryService } from "@/service/galleryService";
-import {
-  X,
-  ImageOff,
-  User,
-  MapPin,
-  Info,
-  Calendar,
-  Layers,
-} from "lucide-react";
-import GalleryHomeSkeleton, { GalleryHomeSkeletonWithAnimation } from "./loadings/GalleryHomeSkeleton";
+import { X, ImageOff, User, Info, Calendar, Layers } from "lucide-react";
+import { GalleryHomeSkeletonWithAnimation } from "./loadings/GalleryHomeSkeleton";
 
-// ── Gallery Image Tile ──────────────────────────────────────────────────────
 const GalleryImage = React.memo(
   ({
     image,
@@ -67,7 +58,6 @@ const GalleryImage = React.memo(
           priority={priority}
           onError={handleError}
         />
-        {/* Hover overlay */}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300 flex items-end">
           <div className="w-full px-3 py-2.5 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
             <p className="text-white text-xs font-bold truncate drop-shadow">
@@ -75,7 +65,6 @@ const GalleryImage = React.memo(
             </p>
           </div>
         </div>
-        {/* Orange corner accent on hover */}
         <div className="absolute top-0 left-0 w-0 h-0 group-hover:w-8 group-hover:h-8 transition-all duration-300 overflow-hidden">
           <div className="absolute top-0 left-0 w-8 h-8 bg-[#FF5000] rotate-45 -translate-x-4 -translate-y-4" />
         </div>
@@ -85,7 +74,6 @@ const GalleryImage = React.memo(
 );
 GalleryImage.displayName = "GalleryImage";
 
-// ── Modal Image ─────────────────────────────────────────────────────────────
 const ModalImage = React.memo(
   ({
     image,
@@ -118,7 +106,6 @@ const ModalImage = React.memo(
 );
 ModalImage.displayName = "ModalImage";
 
-// ── Main Component ───────────────────────────────────────────────────────────
 const GalleryHome = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -221,16 +208,15 @@ const GalleryHome = () => {
   if (loading) {
     return (
       <GalleryHomeSkeletonWithAnimation
-        // isMobile={isMobile}
-        // isTablet={isTablet}
-        // isLaptop={isLaptop}
+      // isMobile={isMobile}
+      // isTablet={isTablet}
+      // isLaptop={isLaptop}
       />
     );
   }
 
   if (error) return null;
 
-  // ── Carousel Row ──
   const CarouselRow = ({
     images,
     direction,
@@ -245,9 +231,8 @@ const GalleryHome = () => {
     const duplicatedImages = [...images, ...images];
     return (
       <div className="relative overflow-hidden py-2">
-        {/* Fade edges */}
-        <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-r from-[#F7F7F7] to-transparent z-10 pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-l from-[#F7F7F7] to-transparent z-10 pointer-events-none" />
+        <div className="absolute left-0 top-0 bottom-0 w-16 sm:w-24 bg-linear-to-r from-[#F7F7F7] to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-24 bg-linear-to-l from-[#F7F7F7] to-transparent z-10 pointer-events-none" />
         <div
           className={`flex gap-3 sm:gap-4 ${direction === "left" ? "animate-scroll-left" : "animate-scroll-right"}`}
           style={{ width: "fit-content" }}
@@ -271,7 +256,31 @@ const GalleryHome = () => {
   };
 
   return (
-    <div className="bg-[#F7F7F7] py-6 lg:py-8 xl:py-10">
+    <div className="relative overflow-hidden bg-[#F7F7F7] py-6 lg:py-8 xl:py-10">
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,80,0,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,80,0,0.04) 1px, transparent 1px)",
+          backgroundSize: "44px 44px",
+        }}
+      />
+
+      <div
+        className="absolute top-0 right-0 w-[40vw] h-[40vw] max-w-[520px] max-h-[520px] pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(circle at top right, rgba(255,80,0,0.04) 0%, transparent 65%)",
+        }}
+      />
+      <div
+        className="absolute bottom-0 left-0 w-[35vw] h-[35vw] max-w-[440px] max-h-[440px] pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(circle at bottom left, rgba(255,80,0,0.03) 0%, transparent 65%)",
+        }}
+      />
+
       <style jsx global>{`
         @keyframes scroll-left {
           0% {
@@ -320,8 +329,7 @@ const GalleryHome = () => {
         }
       `}</style>
 
-      {/* ── Carousel rows ── */}
-      <div className="max-w-full mx-auto space-y-2 sm:space-y-3">
+      <div className="max-w-full mx-auto space-y-2 sm:space-y-3 relative z-10">
         {visibleRows.map(
           (rowImages, index) =>
             rowImages.length > 0 && (
@@ -334,7 +342,6 @@ const GalleryHome = () => {
             ),
         )}
 
-        {/* ── Empty state ── */}
         {openImages.length === 0 && (
           <div className="flex justify-center py-16 px-4">
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 max-w-sm text-center relative overflow-hidden">
@@ -353,17 +360,14 @@ const GalleryHome = () => {
         )}
       </div>
 
-      {/* ── Image Detail Modal ── */}
       {selectedImage && (
         <>
-          {/* Backdrop */}
           <div
             className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9998]"
             style={{ animation: "fadeIn 0.2s ease-out" }}
             onClick={() => setSelectedImage(null)}
           />
 
-          {/* Modal */}
           <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-5">
             <div
               className={`bg-white rounded-2xl shadow-2xl w-full overflow-hidden flex flex-col ${
@@ -378,7 +382,6 @@ const GalleryHome = () => {
               }}
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Modal header — dark */}
               <div className="bg-[#1A1A1A] relative flex-shrink-0 overflow-hidden">
                 <div
                   className="absolute inset-0 opacity-[0.04]"
@@ -408,9 +411,7 @@ const GalleryHome = () => {
                 </div>
               </div>
 
-              {/* Scrollable content */}
               <div className="flex-1 overflow-y-auto">
-                {/* Image */}
                 <div
                   className={`${getModalImageHeight()} relative w-full bg-gray-100`}
                 >
@@ -421,31 +422,20 @@ const GalleryHome = () => {
                   />
                 </div>
 
-                {/* Detail tiles */}
                 <div className="p-5 sm:p-6">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {/* Image Name */}
                     <DetailTile
                       icon={<User size={14} className="text-[#FF5000]" />}
                       label="Image Name"
                       value={selectedImage.imageName || "Unknown"}
                     />
 
-                    {/* Image Owner */}
-                    {/* <DetailTile
-                      icon={<User size={14} className="text-[#FF5000]" />}
-                      label="Owner"
-                      value={selectedImage.imageOwner || "Unknown"}
-                    /> */}
-
-                    {/* Uploaded Date */}
                     <DetailTile
                       icon={<Calendar size={14} className="text-[#FF5000]" />}
                       label="Uploaded"
                       value={formatDate(selectedImage.createdAt)}
                     />
 
-                    {/* Material */}
                     {selectedImage.material && (
                       <DetailTile
                         icon={<Layers size={14} className="text-[#FF5000]" />}
@@ -454,7 +444,6 @@ const GalleryHome = () => {
                       />
                     )}
 
-                    {/* Color */}
                     {selectedImage.color && (
                       <DetailTile
                         icon={
@@ -468,16 +457,6 @@ const GalleryHome = () => {
                       />
                     )}
 
-                    {/* Image Source */}
-                    {/* {selectedImage.imageSource && (
-                      <DetailTile
-                        icon={<Info size={14} className="text-[#FF5000]" />}
-                        label="Source"
-                        value={selectedImage.imageSource}
-                      />
-                    )} */}
-
-                    {/* Description - Full width */}
                     {selectedImage.imageDescription && (
                       <div className="sm:col-span-2 bg-gray-50 border border-gray-100 rounded-xl p-4 hover:border-orange-200 transition-colors duration-200">
                         <div className="flex items-center gap-2 mb-1.5">
@@ -493,7 +472,6 @@ const GalleryHome = () => {
                     )}
                   </div>
 
-                  {/* Decorative dots */}
                   <div className="flex items-center justify-center gap-1.5 mt-5 pt-4 border-t border-gray-100">
                     {[0, 0.15, 0.3, 0.45, 0.6].map((delay, i) => (
                       <div
@@ -537,7 +515,6 @@ const GalleryHome = () => {
   );
 };
 
-// ── Detail Tile ──────────────────────────────────────────────────────────────
 function DetailTile({
   icon,
   label,

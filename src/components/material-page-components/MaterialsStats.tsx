@@ -1,7 +1,4 @@
-interface MaterialsStatsProps {
-  filteredCount: number;
-  totalCount: number;
-}
+import { MaterialsStatsProps } from "@/types/material-types";
 
 export const MaterialsStats: React.FC<MaterialsStatsProps> = ({
   filteredCount,

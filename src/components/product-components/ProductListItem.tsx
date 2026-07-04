@@ -1,24 +1,11 @@
-// components/product-components/ProductListItem.tsx
 "use client";
-
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Heart, ShoppingCart, Loader2, Box, Palette, Eye } from "lucide-react";
-import { Product } from "@/types/product-types";
 import { PLACE_HOLDER_IMAGE } from "@/utils/constant";
 import { SHOP_PAGE_PATH } from "@/utils/urls";
-
-interface ProductListItemProps {
-  product: Product;
-  formatPrice: (price: number) => string;
-  getProductImage: (product: Product) => string;
-  onAddToCart: (product: Product) => void;
-  onWishlistToggle: (product: Product) => void;
-  handleDetailsPageNavgation: (product: Product) => void;
-  isAddingToCart: boolean;
-  isTogglingWishlist: boolean;
-}
+import { ProductListItemProps } from "@/types/product-types";
 
 const parseColorCode = (colorStr: string): string => {
   if (colorStr.includes("|")) return colorStr.split("|")[1].trim();
@@ -57,9 +44,8 @@ export const ProductListItem: React.FC<ProductListItemProps> = ({
   return (
     <div className="group bg-white rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-xl transition-all duration-300 overflow-hidden">
       <div className="flex flex-col sm:flex-row">
-        {/* ── Image ── */}
         <Link
-          href={`${SHOP_PAGE_PATH}/${product.productId}`}
+          href={`${SHOP_PAGE_PATH}/${product.productId}?name=${product.productName}`}
           onClick={(e) => {
             e.stopPropagation();
             handleDetailsPageNavgation(product);
@@ -78,10 +64,8 @@ export const ProductListItem: React.FC<ProductListItemProps> = ({
             sizes="200px"
             onError={() => setImgError(true)}
           />
-          {/* Orange corner */}
           <div className="absolute top-0 left-0 w-0 h-0 border-l-[36px] border-l-[#FF5000] border-b-[36px] border-b-transparent" />
 
-          {/* View overlay */}
           <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
             <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center">
               <Eye size={16} className="text-[#FF5000]" />
@@ -89,12 +73,9 @@ export const ProductListItem: React.FC<ProductListItemProps> = ({
           </div>
         </Link>
 
-        {/* ── Info ── */}
         <div className="flex-1 p-4 sm:p-5 flex flex-col">
-          {/* Top row */}
           <div className="flex items-start justify-between gap-3 mb-2">
             <div className="min-w-0 flex-1">
-              {/* Category + type */}
               <div className="flex items-center gap-1.5 mb-1 flex-wrap">
                 <span className="text-[10px] font-black uppercase tracking-widest text-[#FF5000]">
                   {product.materialType}
@@ -118,7 +99,6 @@ export const ProductListItem: React.FC<ProductListItemProps> = ({
                 )}
               </div>
 
-              {/* Name */}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -134,7 +114,6 @@ export const ProductListItem: React.FC<ProductListItemProps> = ({
               </button>
             </div>
 
-            {/* Price + wishlist */}
             <div className="flex items-center gap-2 flex-shrink-0">
               <span
                 className="font-black text-[#FF5000]"
@@ -161,12 +140,10 @@ export const ProductListItem: React.FC<ProductListItemProps> = ({
             </div>
           </div>
 
-          {/* Description */}
           <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed mb-3 flex-1">
             {product.productDescription}
           </p>
 
-          {/* Colors */}
           {product.colors?.length > 0 && (
             <div className="flex items-center gap-1.5 mb-3">
               <Palette size={11} className="text-[#FF5000] flex-shrink-0" />
@@ -183,7 +160,6 @@ export const ProductListItem: React.FC<ProductListItemProps> = ({
             </div>
           )}
 
-          {/* Stock + CTA */}
           <div className="flex items-center justify-between gap-3 pt-3 border-t border-gray-100">
             <div className="flex items-center gap-1.5">
               <div

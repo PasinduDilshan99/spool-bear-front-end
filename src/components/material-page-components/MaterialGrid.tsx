@@ -1,13 +1,7 @@
-// components/materials/MaterialGrid.tsx
 "use client";
 import React from "react";
-import { Material } from "@/types/material-types";
 import { MaterialCard } from "./MaterialCard";
-
-interface MaterialGridProps {
-  materials: Material[];
-  onQuickView: (material: Material) => void;
-}
+import { MaterialGridProps } from "@/types/material-types";
 
 export const MaterialGrid: React.FC<MaterialGridProps> = ({
   materials,

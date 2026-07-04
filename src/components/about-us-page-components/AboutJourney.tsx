@@ -1,39 +1,11 @@
-// components/about/AboutJourney.tsx
 "use client";
 import React from "react";
 import { Quote } from "lucide-react";
 import { useScrollReveal } from "./aboutUtils";
 import Image from "next/image";
 import { COMPANY_OWNER } from "@/utils/constant";
-
-const milestones = [
-  {
-    year: "2026",
-    title: "Company Founded",
-    description: "Started with a single printer in a small garage.",
-  },
-  {
-    year: "2026",
-    title: "First 100 Prints",
-    description:
-      "Reached our first major milestone with 1000 successful prints.",
-  },
-  {
-    year: "2026",
-    title: "Expanded Facility",
-    description: "Moved to our current facility and expanded to 5 printers.",
-  },
-  {
-    year: "2026",
-    title: "20+ Clients",
-    description: "Served over 1000 happy clients across the country.",
-  },
-  {
-    year: "2026",
-    title: "4 Materials",
-    description: "Now offering over 50 different materials for any project.",
-  },
-];
+import { milestonesData } from "@/data/about-us-page-data";
+import { ABOUT_US_PAGE_OUR_JOURNEY_SECTION } from "@/utils/imagesUrl";
 
 const AboutJourney: React.FC = () => {
   const { ref, visible } = useScrollReveal();
@@ -45,7 +17,6 @@ const AboutJourney: React.FC = () => {
         style={{ maxWidth: "1400px", padding: "0 clamp(16px, 4vw, 64px)" }}
       >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 xl:gap-20 items-center">
-          {/* ── Timeline ── */}
           <div
             style={{
               opacity: visible ? 1 : 0,
@@ -53,7 +24,6 @@ const AboutJourney: React.FC = () => {
               transition: "opacity 0.65s ease-out, transform 0.65s ease-out",
             }}
           >
-            {/* Heading */}
             <div className="inline-flex items-center gap-2 sm:gap-3 mb-5">
               <div
                 className="h-0.5 rounded-full bg-[#FF5000]"
@@ -76,11 +46,9 @@ const AboutJourney: React.FC = () => {
               Our <span className="text-[#FF5000]">Journey</span>
             </h2>
 
-            {/* Milestones */}
             <div className="space-y-0">
-              {milestones.map((m, i) => (
+              {milestonesData.map((m, i) => (
                 <div key={i} className="flex gap-4 sm:gap-5">
-                  {/* Left — year badge + connector */}
                   <div className="relative flex flex-col items-center">
                     <div
                       className="flex items-center justify-center font-black text-white rounded-xl shrink-0 shadow-md shadow-orange-200"
@@ -96,7 +64,7 @@ const AboutJourney: React.FC = () => {
                     >
                       {m.year}
                     </div>
-                    {i < milestones.length - 1 && (
+                    {i < milestonesData.length - 1 && (
                       <div
                         className="flex-1 w-px mt-1"
                         style={{
@@ -107,9 +75,8 @@ const AboutJourney: React.FC = () => {
                     )}
                   </div>
 
-                  {/* Right — text */}
                   <div
-                    className={`flex-1 ${i < milestones.length - 1 ? "pb-6 sm:pb-8" : ""}`}
+                    className={`flex-1 ${i < milestonesData.length - 1 ? "pb-6 sm:pb-8" : ""}`}
                     style={{
                       opacity: visible ? 1 : 0,
                       transform: visible ? "none" : "translateX(12px)",
@@ -134,7 +101,6 @@ const AboutJourney: React.FC = () => {
             </div>
           </div>
 
-          {/* ── Image + quote ── */}
           <div
             className="relative"
             style={{
@@ -146,7 +112,7 @@ const AboutJourney: React.FC = () => {
           >
             <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl">
               <Image
-                src="https://res.cloudinary.com/dkfonkmwr/image/upload/v1773844362/cld-sample-2.jpg"
+                src={ABOUT_US_PAGE_OUR_JOURNEY_SECTION}
                 alt="3D Printing in action"
                 width={2000}
                 height={2000}
@@ -161,7 +127,6 @@ const AboutJourney: React.FC = () => {
               />
             </div>
 
-            {/* Floating quote card */}
             <div
               className="absolute bg-white rounded-xl sm:rounded-2xl shadow-xl"
               style={{

@@ -1,11 +1,7 @@
-// components/material-details/MaterialDetailsError.tsx
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
-
-interface MaterialDetailsErrorProps {
-  error: string;
-}
+import { MaterialDetailsErrorProps } from "@/types/material-types";
 
 export const MaterialDetailsError: React.FC<MaterialDetailsErrorProps> = ({
   error,

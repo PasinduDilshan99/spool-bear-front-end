@@ -1,4 +1,3 @@
-// components/contact/ContactHero.tsx
 "use client";
 import React from "react";
 
@@ -8,7 +7,6 @@ const ContactHero: React.FC = () => {
       className="relative overflow-hidden text-center"
       style={{ padding: "clamp(48px, 7vw, 100px) 0 clamp(32px, 4vw, 60px)" }}
     >
-      {/* Corner glows */}
       <div
         className="absolute top-0 left-0 pointer-events-none"
         style={{
@@ -35,7 +33,6 @@ const ContactHero: React.FC = () => {
           padding: "0 clamp(16px, 4vw, 64px)",
         }}
       >
-        {/* Eyebrow */}
         <div className="inline-flex items-center gap-2 sm:gap-3 mb-5 sm:mb-6 animate-fade-in-up">
           <div
             className="h-[2px] rounded-full bg-[#FF5000]"
@@ -53,7 +50,6 @@ const ContactHero: React.FC = () => {
           />
         </div>
 
-        {/* Headline */}
         <h1
           className="font-black text-[#101113] tracking-tight mb-4 sm:mb-5 animate-fade-in-up-delay-1"
           style={{
@@ -73,7 +69,6 @@ const ContactHero: React.FC = () => {
           </span>
         </h1>
 
-        {/* Sub */}
         <p
           className="font-medium text-[#2b2e33] leading-relaxed animate-fade-in-up-delay-2"
           style={{

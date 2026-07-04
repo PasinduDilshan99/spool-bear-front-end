@@ -1,15 +1,10 @@
-// components/material-details-page-components/MaterialProsCons.tsx
 "use client";
 import React from "react";
 import { motion } from "framer-motion";
 import { CheckCircle2, XCircle, TrendingUp } from "lucide-react";
+import { MaterialDetailsProsConsProps } from "@/types/material-types";
 
-interface MaterialProsConsProps {
-  pros: string[];
-  cons: string[];
-}
-
-export const MaterialProsCons: React.FC<MaterialProsConsProps> = ({
+export const MaterialProsCons: React.FC<MaterialDetailsProsConsProps> = ({
   pros,
   cons,
 }) => {
@@ -31,7 +26,6 @@ export const MaterialProsCons: React.FC<MaterialProsConsProps> = ({
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {/* Pros */}
         {pros && pros.length > 0 && (
           <motion.div
             initial={{ opacity: 0, x: -12 }}
@@ -70,7 +64,6 @@ export const MaterialProsCons: React.FC<MaterialProsConsProps> = ({
           </motion.div>
         )}
 
-        {/* Cons */}
         {cons && cons.length > 0 && (
           <motion.div
             initial={{ opacity: 0, x: 12 }}

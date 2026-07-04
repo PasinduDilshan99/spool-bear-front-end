@@ -1,6 +1,4 @@
-// app/about/page.tsx
 "use client";
-
 import AboutCTA from "@/components/about-us-page-components/AboutCTA";
 import AboutHero from "@/components/about-us-page-components/AboutHero";
 import AboutJourney from "@/components/about-us-page-components/AboutJourney";
@@ -94,11 +92,7 @@ const AboutPage = () => {
         }
       `}</style>
 
-      <div
-        className=" bg-[#e4e7ec] relative overflow-x-hidden"
-        style={{ fontFamily: "'Faculty Glyphic', sans-serif" }}
-      >
-        {/* Global grid texture */}
+      <div className=" bg-[#e4e7ec] relative overflow-x-hidden">
         <div
           className="fixed inset-0 pointer-events-none z-0"
           style={{
@@ -109,40 +103,28 @@ const AboutPage = () => {
         />
 
         <div className="relative z-10 ">
-          {/* 1 — Hero */}
           <AboutHero />
 
-          {/* Dot divider */}
           <Divider />
 
-          {/* 2 — Stats */}
           <AboutStats />
 
-          {/* Dot divider */}
           <Divider />
 
-          {/* 3 — Journey / milestones */}
           <AboutJourney />
 
-          {/* Dot divider */}
           <Divider />
 
-          {/* 4 — Values */}
           <AboutValues />
 
-          {/* Dot divider */}
           <Divider />
 
-          {/* 5 — Why Us */}
           <AboutWhyUs />
 
-          {/* Dot divider */}
           <Divider />
 
-          {/* 6 — Team */}
-          {/* <AboutTeam /> */}
+          <AboutTeam />
 
-          {/* 7 — CTA */}
           <AboutCTA />
         </div>
       </div>
@@ -150,7 +132,6 @@ const AboutPage = () => {
   );
 };
 
-/* Subtle dot divider between sections */
 function Divider() {
   return (
     <div

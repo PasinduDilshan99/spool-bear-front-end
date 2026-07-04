@@ -106,12 +106,6 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
                 </div>
               )}
 
-              {/* Primary badge */}
-              {image.isPrimary && (
-                <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded-full bg-[#FF5000] text-[9px] font-black text-white uppercase tracking-wider">
-                  Main
-                </div>
-              )}
             </div>
           );
         })}

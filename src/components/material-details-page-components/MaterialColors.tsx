@@ -1,17 +1,10 @@
-// components/material-details-page-components/MaterialColors.tsx
 "use client";
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Palette } from "lucide-react";
-import { MaterialColor } from "@/types/material-types";
+import { MaterialDetailsColorsProps } from "@/types/material-types";
 
-interface MaterialColorsProps {
-  colors: MaterialColor[];
-  selectedColor: string | null;
-  onColorSelect: (colorName: string) => void;
-}
-
-export const MaterialColors: React.FC<MaterialColorsProps> = ({
+export const MaterialColors: React.FC<MaterialDetailsColorsProps> = ({
   colors,
   selectedColor,
   onColorSelect,
@@ -38,7 +31,6 @@ export const MaterialColors: React.FC<MaterialColorsProps> = ({
         </span>
       </div>
 
-      {/* Selected color label */}
       <AnimatePresence mode="wait">
         {selectedColor && (
           <motion.div
@@ -84,7 +76,6 @@ export const MaterialColors: React.FC<MaterialColorsProps> = ({
                     : "0 2px 8px rgba(0,0,0,0.12)",
               }}
             />
-            {/* Tooltip */}
             <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[9px] font-bold text-[#6B5F56] whitespace-nowrap opacity-0 group-hover/sw:opacity-100 transition-opacity duration-150 bg-white px-1.5 py-0.5 rounded-lg shadow-sm border border-[#EAE4DC]">
               {color.colorName}
             </span>

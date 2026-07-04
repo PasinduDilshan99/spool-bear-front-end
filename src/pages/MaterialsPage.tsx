@@ -1,8 +1,7 @@
-// app/materials/page.tsx
 "use client";
 import React, { useState, useEffect, useMemo } from "react";
 import { MaterialService } from "@/service/materialService";
-import { Material } from "@/types/material-types";
+import { FilterState, Material, SortByType, ViewModeType } from "@/types/material-types";
 import { motion, AnimatePresence } from "framer-motion";
 import { MaterialSearchBar } from "@/components/material-page-components/MaterialSearchBar";
 import { MaterialGrid } from "@/components/material-page-components/MaterialGrid";
@@ -14,19 +13,6 @@ import { MaterialsStats } from "@/components/material-page-components/MaterialsS
 import { MaterialsHeader } from "@/components/material-page-components/MaterialsHeader";
 import { MaterialFilters } from "@/components/material-page-components/MaterialFilters";
 import MaterialsLoading from "@/components/material-page-components/MaterialsLoading";
-
-// Types for filters
-export interface FilterState {
-  search: string;
-  strengths: string[];
-  flexibilities: string[];
-  materialTypes: string[];
-  isAvailable: boolean | null;
-  isPopular: boolean | null;
-}
-
-export type SortByType = "name" | "price_asc" | "price_desc" | "popularity";
-export type ViewModeType = "grid" | "list";
 
 const MaterialsPage = () => {
   const [materials, setMaterials] = useState<Material[]>([]);
@@ -186,7 +172,6 @@ const MaterialsPage = () => {
   return (
     <div
       className="bg-[#e4e7ec] relative overflow-x-hidden min-h-screen"
-      style={{ fontFamily: "'Faculty Glyphic', sans-serif" }}
     >
       <div
         className="min-h-screen"

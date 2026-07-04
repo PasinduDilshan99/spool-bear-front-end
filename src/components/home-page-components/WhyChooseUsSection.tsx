@@ -1,29 +1,15 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import { WhyCardType, WhyChooseUsProps } from "@/types/home-page-types";
+import { whyChooseUsData } from "@/data/home-page-data";
 
-interface WhyCard {
-  iconWrapClass: string;
-  icon: { src: string; alt: string; ariaHidden?: boolean };
-  headingHtml: string;
-  textHtml: string;
-}
-
-interface WhyChooseUsProps {
-  className?: string;
-  title?: string;
-  cards?: WhyCard[];
-}
-
-/* ══════════════════════════════════════════
-   SINGLE CARD
-══════════════════════════════════════════ */
 function WhyCard({
   card,
   index,
   visible,
 }: {
-  card: WhyCard;
+  card: WhyCardType;
   index: number;
   visible: boolean;
 }) {
@@ -51,7 +37,6 @@ function WhyCard({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* ── Card shell ── */}
       <div
         className="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-500"
         style={{
@@ -68,7 +53,6 @@ function WhyCard({
             : "translateY(0) scale(1)",
         }}
       >
-        {/* Step watermark */}
         <div
           className="absolute top-3 right-4 sm:top-4 sm:right-5 font-black leading-none pointer-events-none select-none transition-colors duration-300"
           style={{
@@ -79,7 +63,6 @@ function WhyCard({
           {String(index + 1).padStart(2, "0")}
         </div>
 
-        {/* Hover orange gradient wash */}
         <div
           className="absolute inset-0 pointer-events-none rounded-2xl sm:rounded-3xl transition-opacity duration-400"
           style={{
@@ -89,9 +72,7 @@ function WhyCard({
           }}
         />
 
-        {/* ── Icon area ── */}
         <div className="relative mb-5 sm:mb-6 flex items-center justify-center">
-          {/* Glow blob */}
           <div
             className="absolute pointer-events-none transition-opacity duration-500"
             style={{
@@ -106,7 +87,6 @@ function WhyCard({
             }}
           />
 
-          {/* Orbit ring SVG */}
           <svg
             className="absolute pointer-events-none"
             style={{
@@ -144,7 +124,6 @@ function WhyCard({
             )}
           </svg>
 
-          {/* Diamond icon tile */}
           <div
             className="relative flex items-center justify-center transition-all duration-500 flex-shrink-0"
             style={{
@@ -182,7 +161,6 @@ function WhyCard({
             </div>
           </div>
 
-          {/* Rings on hover */}
           <div
             className="absolute rounded-full pointer-events-none transition-all duration-500"
             style={{
@@ -203,7 +181,6 @@ function WhyCard({
           />
         </div>
 
-        {/* Title */}
         <h3
           className="font-black leading-tight mb-2 sm:mb-3 transition-colors duration-300"
           style={{
@@ -214,7 +191,6 @@ function WhyCard({
           dangerouslySetInnerHTML={{ __html: stripBr(card.headingHtml) }}
         />
 
-        {/* Body text */}
         <p
           className="leading-relaxed"
           style={{
@@ -225,7 +201,6 @@ function WhyCard({
           dangerouslySetInnerHTML={{ __html: stripBr(card.textHtml) }}
         />
 
-        {/* Bottom accent bar */}
         <div
           className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[3px] rounded-full transition-all duration-500"
           style={{
@@ -239,69 +214,10 @@ function WhyCard({
   );
 }
 
-/* ══════════════════════════════════════════
-   MAIN SECTION
-══════════════════════════════════════════ */
 const WhyChooseUsSection: React.FC<WhyChooseUsProps> = ({
   className = "",
   title = "WHY CHOOSE US?",
-  cards = [
-    {
-      iconWrapClass: "",
-      icon: {
-        src: "https://res.cloudinary.com/dkfonkmwr/image/upload/v1774770166/frt4rjl9yklsagjnnw0s.png",
-        alt: "",
-        ariaHidden: true,
-      },
-      headingHtml: "Instant<br />Quotation",
-      textHtml:
-        "Get a real-time price<br />the moment you<br />upload your design or<br />request a print.",
-    },
-    {
-      iconWrapClass: "",
-      icon: {
-        src: "https://res.cloudinary.com/dkfonkmwr/image/upload/v1774770194/hnn2nrm6qu5zefw7xihp.png",
-        alt: "",
-        ariaHidden: true,
-      },
-      headingHtml: "Design +<br />Print",
-      textHtml:
-        "From idea to<br />finished part —<br />everything handled<br />in one place.",
-    },
-    {
-      iconWrapClass: "",
-      icon: {
-        src: "https://res.cloudinary.com/dkfonkmwr/image/upload/v1774770208/tblsraufsoyblno5zehm.png",
-        alt: "",
-        ariaHidden: true,
-      },
-      headingHtml: "Reliable<br />Quality",
-      textHtml:
-        "Accurate prints<br />made for both<br />functional and<br />visual use.",
-    },
-    {
-      iconWrapClass: "",
-      icon: {
-        src: "https://res.cloudinary.com/dkfonkmwr/image/upload/v1774770222/qzakrl7gee5vpqzdojo5.png",
-        alt: "",
-        ariaHidden: true,
-      },
-      headingHtml: "Transparent<br />Pricing",
-      textHtml:
-        "Clear pricing<br />with no hidden<br />costs or<br />surprises.",
-    },
-    {
-      iconWrapClass: "",
-      icon: {
-        src: "https://res.cloudinary.com/dkfonkmwr/image/upload/v1774770236/f1qu26csdviqkmryd7vt.png",
-        alt: "",
-        ariaHidden: true,
-      },
-      headingHtml: "Local<br />Support",
-      textHtml:
-        "Fast, reliable<br />help whenever<br />you need<br />assistance.",
-    },
-  ],
+  cards = whyChooseUsData,
 }) => {
   const sectionRef = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
@@ -384,11 +300,9 @@ const WhyChooseUsSection: React.FC<WhyChooseUsProps> = ({
         className={`relative overflow-hidden ${className}`}
         style={{
           background: "#e4e7ec",
-          fontFamily: "'Faculty Glyphic', sans-serif",
           padding: "clamp(48px, 7vw, 112px) 0",
         }}
       >
-        {/* ── Grid texture ── */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
@@ -398,7 +312,6 @@ const WhyChooseUsSection: React.FC<WhyChooseUsProps> = ({
           }}
         />
 
-        {/* ── Radial glows ── */}
         <div
           className="absolute top-0 left-0 w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] pointer-events-none"
           style={{
@@ -414,7 +327,6 @@ const WhyChooseUsSection: React.FC<WhyChooseUsProps> = ({
           }}
         />
 
-        {/* ── Filament threads ── */}
         <svg
           className="absolute top-0 left-0 right-0 w-full pointer-events-none"
           style={{ height: "36px" }}
@@ -446,9 +358,7 @@ const WhyChooseUsSection: React.FC<WhyChooseUsProps> = ({
             padding: "0 clamp(16px, 4vw, 64px)",
           }}
         >
-          {/* ── Heading ── */}
           <div className="text-center mb-10 sm:mb-14 md:mb-16 lg:mb-20">
-            {/* Eyebrow */}
             <div
               className="inline-flex items-center gap-2 sm:gap-3 mb-4 sm:mb-5"
               style={{
@@ -474,7 +384,6 @@ const WhyChooseUsSection: React.FC<WhyChooseUsProps> = ({
               />
             </div>
 
-            {/* Headline */}
             <h2
               className="font-black leading-tight text-[#101113] mb-4"
               style={{
@@ -489,7 +398,6 @@ const WhyChooseUsSection: React.FC<WhyChooseUsProps> = ({
               {title}
             </h2>
 
-            {/* Underline draw */}
             <div
               className="h-[3px] sm:h-[4px] rounded-full mx-auto bg-[#FF5000]"
               style={{
@@ -500,7 +408,6 @@ const WhyChooseUsSection: React.FC<WhyChooseUsProps> = ({
               }}
             />
 
-            {/* Subtitle */}
             <p
               className="font-medium text-[#2b2e33] mt-4 sm:mt-5 mx-auto"
               style={{
@@ -517,8 +424,6 @@ const WhyChooseUsSection: React.FC<WhyChooseUsProps> = ({
             </p>
           </div>
 
-          {/* ── Cards grid ── */}
-          {/* Mobile: 1 col → sm: 2 col → lg: 3 col → xl: 5 col */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-5 md:gap-6 lg:gap-7">
             {cards.map((card, index) => (
               <WhyCard
@@ -530,7 +435,6 @@ const WhyChooseUsSection: React.FC<WhyChooseUsProps> = ({
             ))}
           </div>
 
-          {/* ── Bottom divider dots ── */}
           <div
             className="mt-12 sm:mt-16 flex justify-center items-center gap-2 sm:gap-3"
             style={{

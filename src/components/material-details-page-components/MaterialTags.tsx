@@ -1,74 +1,23 @@
-// components/material-details-page-components/MaterialTags.tsx
 "use client";
 import React from "react";
 import { motion } from "framer-motion";
 import { Zap, Layers } from "lucide-react";
+import { MaterialDetailsTagsProps } from "@/types/material-types";
+import {
+  materialDetailsTagFlexConfigData,
+  materialDetailsTagStrengthConfigData,
+} from "@/data/material-details-page-data";
 
-interface MaterialTagsProps {
-  strength: string;
-  flexibility: string;
-}
-
-const strengthConfig: Record<
-  string,
-  { color: string; bar: string; bg: string; width: string; label: string }
-> = {
-  High: {
-    color: "#10b981",
-    bar: "#10b981",
-    bg: "rgba(16,185,129,0.08)",
-    width: "90%",
-    label: "High Strength",
-  },
-  Medium: {
-    color: "#f59e0b",
-    bar: "#f59e0b",
-    bg: "rgba(245,158,11,0.08)",
-    width: "55%",
-    label: "Medium Strength",
-  },
-  Low: {
-    color: "#ef4444",
-    bar: "#ef4444",
-    bg: "rgba(239,68,68,0.08)",
-    width: "22%",
-    label: "Low Strength",
-  },
-};
-
-const flexConfig: Record<
-  string,
-  { color: string; bar: string; bg: string; width: string; label: string }
-> = {
-  High: {
-    color: "#6366f1",
-    bar: "#6366f1",
-    bg: "rgba(99,102,241,0.08)",
-    width: "90%",
-    label: "Flexible",
-  },
-  Medium: {
-    color: "#0ea5e9",
-    bar: "#0ea5e9",
-    bg: "rgba(14,165,233,0.08)",
-    width: "55%",
-    label: "Semi-Flex",
-  },
-  Low: {
-    color: "#64748b",
-    bar: "#64748b",
-    bg: "rgba(100,116,139,0.08)",
-    width: "20%",
-    label: "Rigid",
-  },
-};
-
-export const MaterialTags: React.FC<MaterialTagsProps> = ({
+export const MaterialTags: React.FC<MaterialDetailsTagsProps> = ({
   strength,
   flexibility,
 }) => {
-  const s = strengthConfig[strength] ?? strengthConfig.Medium;
-  const f = flexConfig[flexibility] ?? flexConfig.Medium;
+  const s =
+    materialDetailsTagStrengthConfigData[strength] ??
+    materialDetailsTagStrengthConfigData.Medium;
+  const f =
+    materialDetailsTagFlexConfigData[flexibility] ??
+    materialDetailsTagFlexConfigData.Medium;
 
   return (
     <motion.div
@@ -89,7 +38,6 @@ export const MaterialTags: React.FC<MaterialTagsProps> = ({
       </div>
 
       <div className="space-y-4">
-        {/* Strength */}
         <div>
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-1.5">
@@ -116,7 +64,6 @@ export const MaterialTags: React.FC<MaterialTagsProps> = ({
           </div>
         </div>
 
-        {/* Flexibility */}
         <div>
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-1.5">

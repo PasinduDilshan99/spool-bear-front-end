@@ -1,73 +1,8 @@
-// components/contact/ContactInfoCards.tsx
 "use client";
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import {
-  Mail,
-  Phone,
-  MapPin,
-  Clock,
-  ArrowRight,
-  X,
-  MessageCircle,
-} from "lucide-react";
-import {
-  COMPANY_ADDRESS_LINE1,
-  COMPANY_ADDRESS_LINE2,
-  COMPANY_ADDRESS_NUMBER,
-  COMPANY_CONTACT_NUMBER,
-  COMPANY_CONTACT_NUMBER_FOR_LINK,
-  COMPANY_INFO_EMAIL,
-  COMPANY_WHATSAPP_CONTACT_NUMBER,
-  COMPANY_WHATSAPP_CONTACT_NUMBER_FOR_LINK,
-} from "@/utils/constant";
-
-const contactInfo = [
-  {
-    icon: Mail,
-    title: "Email Us",
-    details: [COMPANY_INFO_EMAIL],
-    action: "email",
-    linkText: "Send email",
-    emailTo: COMPANY_INFO_EMAIL,
-  },
-  {
-    icon: Phone,
-    title: "Call Us",
-    details: [COMPANY_CONTACT_NUMBER],
-    action: "call",
-    linkText: "Contact us",
-    phoneNumber: COMPANY_CONTACT_NUMBER_FOR_LINK,
-    whatsappNumber: COMPANY_WHATSAPP_CONTACT_NUMBER_FOR_LINK,
-  },
-  {
-    icon: MapPin,
-    title: "Visit Us",
-    details: [
-      COMPANY_ADDRESS_NUMBER,
-      COMPANY_ADDRESS_LINE1,
-      COMPANY_ADDRESS_LINE2,
-    ],
-    action: "location",
-    linkText: "Get directions",
-    location: "123+Maker+Street+Tech+City+TC+12345",
-    lat: 6.826789043270704,
-    lng: 79.97634694042084,
-  },
-  {
-    icon: Clock,
-    title: "Business Hours",
-    details: ["Mon – Fri: 9am – 6pm", "Saturday: 10am – 4pm", "Sunday: Closed"],
-    action: null,
-    linkText: null,
-  },
-];
-
-interface DialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onCall: () => void;
-  onWhatsApp: () => void;
-}
+import { Phone, ArrowRight, X, MessageCircle } from "lucide-react";
+import { DialogProps } from "@/types/contact-us-page-types";
+import { contactInfo } from "@/data/contact-us-page-data";
 
 const CallDialog: React.FC<DialogProps> = ({
   isOpen,
@@ -155,7 +90,6 @@ const ContactInfoCards: React.FC = () => {
     return () => obs.disconnect();
   }, []);
 
-  // Use window.open with _self target instead of modifying location.href directly
   const handleEmailClick = useCallback((emailTo: string) => {
     window.open(`mailto:${emailTo}`, "_self");
   }, []);
@@ -244,10 +178,8 @@ const ContactInfoCards: React.FC = () => {
                     transition: `opacity 0.6s ${0.08 + i * 0.09}s ease-out, transform 0.6s ${0.08 + i * 0.09}s ease-out, box-shadow 0.3s, translate 0.3s`,
                   }}
                 >
-                  {/* Orange top bar on hover */}
                   <div className="absolute top-0 left-0 right-0 h-1 bg-gray-100 group-hover:bg-[#FF5000] transition-colors duration-300" />
 
-                  {/* Icon */}
                   <div
                     className="flex items-center justify-center rounded-xl mb-4 group-hover:bg-[#FF5000] transition-colors duration-300"
                     style={{

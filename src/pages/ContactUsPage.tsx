@@ -1,6 +1,4 @@
-// app/contact/page.tsx
 "use client";
-
 import ContactCTA from "@/components/contact-us-page-components/ContactCTA";
 import ContactFAQ from "@/components/contact-us-page-components/ContactFAQ";
 import ContactForm from "@/components/contact-us-page-components/ContactForm";
@@ -36,7 +34,6 @@ function Divider() {
 const ContactPage = () => {
   return (
     <div className="min-h-screen bg-[#e4e7ec] relative overflow-x-hidden">
-      {/* Global grid texture */}
       <div
         className="fixed inset-0 pointer-events-none z-0"
         style={{
@@ -47,27 +44,22 @@ const ContactPage = () => {
       />
 
       <div className="relative z-10">
-        {/* 1 — Hero */}
         <ContactHero />
 
         <Divider />
 
-        {/* 2 — Info cards */}
         <ContactInfoCards />
 
         <Divider />
 
-        {/* 3 — Form + map + social */}
         <ContactForm />
 
         <Divider />
 
-        {/* 4 — FAQ */}
         {/* <ContactFAQ />
 
         <Divider /> */}
 
-        {/* 5 — CTA */}
         <ContactCTA />
       </div>
     </div>

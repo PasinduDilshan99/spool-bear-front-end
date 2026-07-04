@@ -1,16 +1,6 @@
-// components/materials/MaterialSearchBar.tsx
 "use client";
-import { SortByType, ViewModeType } from "@/pages/MaterialsPage";
+import { MaterialSearchBarProps, SortByType } from "@/types/material-types";
 import React from "react";
-
-interface MaterialSearchBarProps {
-  searchValue: string;
-  onSearchChange: (value: string) => void;
-  sortBy: SortByType;
-  onSortChange: (value: SortByType) => void;
-  viewMode: ViewModeType;
-  onViewModeChange: (mode: ViewModeType) => void;
-}
 
 export const MaterialSearchBar: React.FC<MaterialSearchBarProps> = ({
   searchValue,
@@ -28,7 +18,7 @@ export const MaterialSearchBar: React.FC<MaterialSearchBarProps> = ({
           placeholder="Search materials by name, type, or description..."
           value={searchValue}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5000] focus:border-transparent transition-all"
+          className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 text-gray-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5000] focus:border-transparent transition-all"
         />
         <svg
           className="absolute left-3 top-3.5 w-5 h-5 text-gray-400"
@@ -49,7 +39,7 @@ export const MaterialSearchBar: React.FC<MaterialSearchBarProps> = ({
         <select
           value={sortBy}
           onChange={(e) => onSortChange(e.target.value as SortByType)}
-          className="px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5000]"
+          className="px-4 py-3 text-gray-800 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5000]"
         >
           <option value="popularity">Most Popular</option>
           <option value="name">Name A-Z</option>
@@ -60,7 +50,7 @@ export const MaterialSearchBar: React.FC<MaterialSearchBarProps> = ({
         <div className="flex bg-white border border-gray-200 rounded-xl p-1">
           <button
             onClick={() => onViewModeChange("grid")}
-            className={`p-2 rounded-lg transition-all ${
+            className={`p-2 rounded-lg transition-all cursor-pointer ${
               viewMode === "grid"
                 ? "bg-[#FF5000] text-white"
                 : "text-gray-400 hover:text-gray-600"
@@ -82,7 +72,7 @@ export const MaterialSearchBar: React.FC<MaterialSearchBarProps> = ({
           </button>
           <button
             onClick={() => onViewModeChange("list")}
-            className={`p-2 rounded-lg transition-all ${
+            className={`p-2 rounded-lg transition-all cursor-pointer ${
               viewMode === "list"
                 ? "bg-[#FF5000] text-white"
                 : "text-gray-400 hover:text-gray-600"

@@ -1,15 +1,7 @@
 "use client";
-
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ShieldCheck, BookOpen, HelpCircle, Mail } from "lucide-react";
-
-const links = [
-  { href: "/privacy-policy", label: "Privacy Policy",    icon: ShieldCheck },
-  { href: "/faq",            label: "FAQ",                icon: HelpCircle  },
-  { href: "/contact",        label: "Contact Us",         icon: Mail        },
-  { href: "/terms",          label: "Legal",              icon: BookOpen    },
-];
+import { TermsFooterLinks } from "@/data/terms-and-conditions-page-data";
 
 export const TermsFooter = () => {
   const [visible, setVisible] = useState(false);
@@ -27,9 +19,7 @@ export const TermsFooter = () => {
         transform: visible ? "translateY(0)" : "translateY(16px)",
       }}
     >
-      {/* Agree banner */}
       <div className="bg-gradient-to-r from-[#1C1714] to-[#2E2520] rounded-3xl p-6 md:p-8 mb-6 text-center relative overflow-hidden">
-        {/* Decorative circle */}
         <div
           className="absolute -top-10 -right-10 w-48 h-48 rounded-full opacity-10"
           style={{ background: "#FF5000" }}
@@ -46,15 +36,17 @@ export const TermsFooter = () => {
         </p>
       </div>
 
-      {/* Quick links */}
       <div className="flex flex-wrap justify-center gap-3">
-        {links.map(({ href, label, icon: Icon }) => (
+        {TermsFooterLinks.map(({ href, label, icon: Icon }) => (
           <Link
             key={href}
             href={href}
             className="group inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-white border border-[#E8E2DA] text-sm text-[#6B5F56] font-medium hover:text-[#FF5000] hover:border-orange-200 hover:bg-orange-50 transition-all duration-200 shadow-sm"
           >
-            <Icon size={14} className="transition-colors duration-200 group-hover:text-[#FF5000]" />
+            <Icon
+              size={14}
+              className="transition-colors duration-200 group-hover:text-[#FF5000]"
+            />
             {label}
           </Link>
         ))}

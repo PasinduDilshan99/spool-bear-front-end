@@ -1,20 +1,14 @@
-// components/material-details-page-components/LightboxModal.tsx
 "use client";
 import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { X, ZoomIn } from "lucide-react";
+import { MaterialDetailsLightboxModalProps } from "@/types/material-types";
 
-interface LightboxModalProps {
-  imageUrl: string | null;
-  onClose: () => void;
-}
-
-export const LightboxModal: React.FC<LightboxModalProps> = ({
+export const LightboxModal: React.FC<MaterialDetailsLightboxModalProps> = ({
   imageUrl,
   onClose,
 }) => {
-  // Close on Escape key
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -39,14 +33,13 @@ export const LightboxModal: React.FC<LightboxModalProps> = ({
           }}
           onClick={onClose}
         >
-          {/* Close button */}
           <motion.button
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ delay: 0.1 }}
             onClick={onClose}
-            className="absolute top-5 right-5 z-50 w-11 h-11 rounded-2xl flex items-center justify-center transition-colors duration-150"
+            className="absolute top-5 right-5 z-50 w-11 h-11 rounded-2xl flex items-center justify-center transition-colors duration-150 cursor-pointer"
             style={{
               background: "rgba(255,255,255,0.12)",
               backdropFilter: "blur(8px)",
@@ -54,10 +47,13 @@ export const LightboxModal: React.FC<LightboxModalProps> = ({
             }}
             whileHover={{ background: "rgba(255,255,255,0.22)" }}
           >
-            <X size={18} className="text-white" strokeWidth={2.5} />
+            <X
+              size={18}
+              className="text-white hover:text-red-700 transition-colors duration-300"
+              strokeWidth={2.5}
+            />
           </motion.button>
 
-          {/* Hint label */}
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -76,7 +72,6 @@ export const LightboxModal: React.FC<LightboxModalProps> = ({
             </span>
           </motion.div>
 
-          {/* Image */}
           <motion.div
             initial={{ opacity: 0, scale: 0.88, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -104,7 +99,6 @@ export const LightboxModal: React.FC<LightboxModalProps> = ({
               />
             </div>
 
-            {/* Orange glow behind image */}
             <div
               className="absolute inset-0 -z-10 rounded-3xl opacity-30 blur-3xl"
               style={{

@@ -1,4 +1,3 @@
-// components/contact/ContactCTA.tsx
 "use client";
 import React from "react";
 import Link from "next/link";
@@ -16,7 +15,6 @@ const ContactCTA: React.FC = () => {
           className="relative rounded-2xl sm:rounded-3xl overflow-hidden text-center"
           style={{ background: "#1A1A1A" }}
         >
-          {/* Grid texture */}
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
@@ -25,7 +23,6 @@ const ContactCTA: React.FC = () => {
               backgroundSize: "32px 32px",
             }}
           />
-          {/* Dot pattern */}
           <div
             className="absolute inset-0 pointer-events-none opacity-[0.08]"
             style={{
@@ -34,9 +31,7 @@ const ContactCTA: React.FC = () => {
               backgroundSize: "28px 28px",
             }}
           />
-          {/* Orange top bar */}
           <div className="absolute top-0 left-0 right-0 h-1 bg-[#FF5000]" />
-          {/* Glow */}
           <div
             className="absolute -top-20 left-1/2 -translate-x-1/2 pointer-events-none"
             style={{
@@ -73,7 +68,6 @@ const ContactCTA: React.FC = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
-              {/* Print */}
               <Link
                 href={PRINT_PAGE_PATH}
                 className="group inline-flex items-center gap-2.5 font-black uppercase tracking-[0.08em] text-[#101113] bg-white hover:bg-gray-100 transition-all duration-300 hover:-translate-y-0.5 w-full sm:w-auto justify-center"
@@ -88,7 +82,6 @@ const ContactCTA: React.FC = () => {
                 Start a Print
               </Link>
 
-              {/* Design */}
               <Link
                 href={DESIGN_PAGE_PATH}
                 className="inline-flex items-center gap-2.5 font-black uppercase tracking-[0.08em] text-white border-2 border-white/25 hover:bg-white/10 transition-all duration-300 hover:-translate-y-0.5 w-full sm:w-auto justify-center"

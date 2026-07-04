@@ -1,66 +1,19 @@
-// components/material-details-page-components/MaterialSpecifications.tsx
 "use client";
 import React from "react";
 import { motion } from "framer-motion";
-import { Droplets, Thermometer, Ruler, Sparkles } from "lucide-react";
+import { MaterialDetailsSpecificationsProps } from "@/types/material-types";
+import { specItemsData } from "@/data/material-details-page-data";
 
-interface MaterialSpecificationsProps {
-  density: number;
-  temperatureResistance: string;
-  minLayerHeight: number;
-  maxLayerHeight: number;
-  finish: string;
-}
-
-const specItems = (
-  density: number,
-  temperatureResistance: string,
-  minLayerHeight: number,
-  maxLayerHeight: number,
-  finish: string,
-) => [
-  {
-    icon: Droplets,
-    label: "Density",
-    value: `${density} g/cm³`,
-    color: "#0ea5e9",
-    bg: "rgba(14,165,233,0.07)",
-    accent: false,
-  },
-  {
-    icon: Thermometer,
-    label: "Temp Resistance",
-    value: temperatureResistance,
-    color: "#f59e0b",
-    bg: "rgba(245,158,11,0.07)",
-    accent: false,
-  },
-  {
-    icon: Ruler,
-    label: "Layer Height",
-    value: `${minLayerHeight}–${maxLayerHeight} mm`,
-    color: "#6366f1",
-    bg: "rgba(99,102,241,0.07)",
-    accent: false,
-  },
-  {
-    icon: Sparkles,
-    label: "Surface Finish",
-    value: finish,
-    color: "#FF5000",
-    bg: "rgba(255,80,0,0.07)",
-    accent: true,
-  },
-];
-
-export const MaterialSpecifications: React.FC<MaterialSpecificationsProps> = ({
+export const MaterialSpecifications: React.FC<
+  MaterialDetailsSpecificationsProps
+> = ({
   density,
   temperatureResistance,
   minLayerHeight,
   maxLayerHeight,
   finish,
 }) => {
-  const items = specItems(
+  const items = specItemsData(
     density,
     temperatureResistance,
     minLayerHeight,
@@ -133,7 +86,6 @@ export const MaterialSpecifications: React.FC<MaterialSpecificationsProps> = ({
               className="text-[15px] font-black leading-tight"
               style={{
                 color: item.accent ? "#fff" : "#1C1714",
-                fontFamily: "'Fraunces','Georgia',serif",
               }}
             >
               {item.value}

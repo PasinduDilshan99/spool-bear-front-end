@@ -1,13 +1,8 @@
-// components/products/EmptyState.tsx
 "use client";
-
 import React from "react";
 import { Package } from "lucide-react";
 import { spoolbearTheme } from "@/theme/spoolbear-theme";
-
-interface EmptyStateProps {
-  onClearFilters: () => void;
-}
+import { EmptyStateProps } from "@/types/product-types";
 
 export const EmptyState: React.FC<EmptyStateProps> = ({ onClearFilters }) => {
   return (

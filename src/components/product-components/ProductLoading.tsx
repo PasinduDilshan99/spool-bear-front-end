@@ -1,10 +1,6 @@
-// components/product-components/ProductLoading.tsx
 "use client";
-
-import React from "react";
 import {
   Loader2,
-  Sparkles,
   Search,
   SlidersHorizontal,
   Filter,
@@ -20,7 +16,6 @@ import {
 const ProductLoading = () => {
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Simple loading header */}
       <div className="container mx-auto px-4 py-6">
         <div className="flex justify-center mb-4">
           <div className="flex items-center space-x-3 px-4 py-2 bg-white shadow-sm rounded-full border border-gray-200">
@@ -33,7 +28,6 @@ const ProductLoading = () => {
       </div>
 
       <div className="container mx-auto px-4 md:px-6 lg:px-8 py-4 md:py-8">
-        {/* Page Header Skeleton */}
         <div className="mb-8 md:mb-12">
           <div className="flex items-center gap-2 mb-3">
             <div className="h-[2px] w-8 bg-[#FF5000] rounded-full" />
@@ -43,7 +37,6 @@ const ProductLoading = () => {
           <div className="h-4 md:h-5 bg-gray-200 rounded w-96 max-w-full animate-pulse" />
         </div>
 
-        {/* Mobile Filter Button Skeleton */}
         <div className="lg:hidden mb-4">
           <div className="flex items-center gap-2 px-4 py-3 bg-white rounded-xl border border-gray-200 shadow-sm">
             <SlidersHorizontal size={16} className="text-gray-400" />
@@ -51,12 +44,9 @@ const ProductLoading = () => {
           </div>
         </div>
 
-        {/* Main Content Grid */}
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-          {/* Sidebar Skeleton */}
           <div className="lg:w-72 xl:w-80 flex-shrink-0">
             <div className="sticky top-6 bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-              {/* Header */}
               <div className="h-1 bg-[#FF5000]" />
               <div className="px-5 py-4 border-b border-gray-100">
                 <div className="flex items-center justify-between">
@@ -71,7 +61,6 @@ const ProductLoading = () => {
               </div>
 
               <div className="p-4 space-y-6">
-                {/* Search Skeleton */}
                 <div className="pb-4 border-b border-gray-100">
                   <div className="relative">
                     <Search
@@ -82,7 +71,6 @@ const ProductLoading = () => {
                   </div>
                 </div>
 
-                {/* Categories Skeleton */}
                 <div className="pb-4 border-b border-gray-100">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
@@ -104,7 +92,6 @@ const ProductLoading = () => {
                   </div>
                 </div>
 
-                {/* Types Skeleton */}
                 <div className="pb-4 border-b border-gray-100">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
@@ -123,7 +110,6 @@ const ProductLoading = () => {
                   </div>
                 </div>
 
-                {/* Materials Skeleton */}
                 <div className="pb-4 border-b border-gray-100">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
@@ -142,7 +128,6 @@ const ProductLoading = () => {
                   </div>
                 </div>
 
-                {/* Price Range Skeleton */}
                 <div className="pb-4 border-b border-gray-100">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
@@ -163,7 +148,6 @@ const ProductLoading = () => {
                   </div>
                 </div>
 
-                {/* In Stock Skeleton */}
                 <div>
                   <div className="flex items-center gap-3 py-2">
                     <div className="w-9 h-5 bg-gray-200 rounded-full animate-pulse" />
@@ -174,9 +158,7 @@ const ProductLoading = () => {
             </div>
           </div>
 
-          {/* Products Area Skeleton */}
           <div className="flex-1 min-w-0">
-            {/* Toolbar Skeleton */}
             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm px-4 sm:px-5 py-3 mb-5 flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-3 sm:gap-4">
                 <div className="flex items-center gap-2">
@@ -196,7 +178,6 @@ const ProductLoading = () => {
               </div>
             </div>
 
-            {/* Products Grid Skeleton */}
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
               {[...Array(6)].map((_, index) => (
                 <div
@@ -204,14 +185,11 @@ const ProductLoading = () => {
                   className="group bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-sm"
                   style={{ animationDelay: `${index * 80}ms` }}
                 >
-                  {/* Image Skeleton */}
                   <div className="relative aspect-[4/3] bg-gray-100 overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent animate-shimmer" />
 
-                    {/* Corner Tag */}
                     <div className="absolute top-0 left-0 w-0 h-0 border-l-[48px] border-l-[#FF5000]/20 border-b-[48px] border-b-transparent" />
 
-                    {/* Stock Badge Skeleton */}
                     <div className="absolute top-3 right-3">
                       <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-gray-200/80">
                         <div className="w-1.5 h-1.5 rounded-full bg-gray-400" />
@@ -219,12 +197,10 @@ const ProductLoading = () => {
                       </div>
                     </div>
 
-                    {/* Wishlist Button Skeleton */}
                     <div className="absolute bottom-3 right-3 w-9 h-9 rounded-full bg-white shadow-md opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                       <Heart size={15} className="text-gray-300" />
                     </div>
 
-                    {/* Action Buttons Skeleton */}
                     <div className="absolute bottom-3 left-3 flex gap-2 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
                       <div className="w-9 h-9 bg-white rounded-full shadow-md flex items-center justify-center">
                         <Eye size={15} className="text-gray-400" />
@@ -235,28 +211,23 @@ const ProductLoading = () => {
                     </div>
                   </div>
 
-                  {/* Content Skeleton */}
                   <div className="p-4 sm:p-5 space-y-3">
-                    {/* Type + Material */}
                     <div className="flex items-center gap-1.5">
                       <div className="h-3 w-16 bg-gray-200 rounded-full animate-pulse" />
                       <div className="h-1 w-1 bg-gray-300 rounded-full" />
                       <div className="h-3 w-20 bg-gray-200 rounded-full animate-pulse" />
                     </div>
 
-                    {/* Title */}
                     <div className="space-y-2">
                       <div className="h-4 w-3/4 bg-gray-200 rounded-lg animate-pulse" />
                       <div className="h-4 w-1/2 bg-gray-200 rounded-lg animate-pulse" />
                     </div>
 
-                    {/* Description */}
                     <div className="space-y-1.5">
                       <div className="h-3 w-full bg-gray-100 rounded animate-pulse" />
                       <div className="h-3 w-2/3 bg-gray-100 rounded animate-pulse" />
                     </div>
 
-                    {/* Colors */}
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full bg-gray-200 animate-pulse" />
                       <div className="flex gap-1.5">
@@ -269,7 +240,6 @@ const ProductLoading = () => {
                       </div>
                     </div>
 
-                    {/* Price + Button */}
                     <div className="flex items-center justify-between pt-3 border-t border-gray-100">
                       <div className="h-6 w-20 bg-orange-100 rounded-lg animate-pulse" />
                       <div className="h-8 w-16 bg-gray-200 rounded-xl animate-pulse" />
@@ -279,7 +249,6 @@ const ProductLoading = () => {
               ))}
             </div>
 
-            {/* Pagination Skeleton */}
             <div className="mt-8 flex items-center justify-center gap-2">
               <div className="w-10 h-10 rounded-lg bg-gray-100 animate-pulse" />
               {[...Array(5)].map((_, i) => (
@@ -294,7 +263,6 @@ const ProductLoading = () => {
         </div>
       </div>
 
-      {/* Floating Action Button Skeleton */}
       <div className="fixed bottom-6 right-6 lg:hidden">
         <div className="w-12 h-12 rounded-full bg-[#FF5000] shadow-lg flex items-center justify-center animate-pulse">
           <SlidersHorizontal size={20} className="text-white" />

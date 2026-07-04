@@ -1,14 +1,8 @@
-// components/material-details/MaterialActions.tsx
 "use client";
+import { MaterialDetailsActionsProps } from "@/types/material-types";
 import React from "react";
 
-interface MaterialActionsProps {
-  isAvailable: boolean;
-  onAddToCart: () => void;
-  onAddToFavorites: () => void;
-}
-
-export const MaterialActions: React.FC<MaterialActionsProps> = ({
+export const MaterialActions: React.FC<MaterialDetailsActionsProps> = ({
   isAvailable,
   onAddToCart,
   onAddToFavorites,

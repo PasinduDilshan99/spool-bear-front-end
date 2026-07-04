@@ -71,3 +71,26 @@ export interface ApiResponse<T> {
   data: T;
   timestamp: string;
 }
+
+export interface FilterState {
+  categoryId?: number;
+  typeId?: number;
+  materialId?: number;
+  minPrice?: number;
+  maxPrice?: number;
+  inStock?: boolean;
+  name?: string;
+  sortBy: "price-asc" | "price-desc" | "name-asc" | "name-desc" | "newest";
+}
+
+export interface FilterOption {
+  id: number;
+  name: string;
+  count?: number;
+}
+export interface FilterOptions {
+  categories: (FilterOption & { count: number })[];
+  types: (FilterOption & { categoryId: number; count: number })[];
+  materials: (FilterOption & { typeId: number; count: number })[];
+  priceRange: { min: number; max: number };
+}

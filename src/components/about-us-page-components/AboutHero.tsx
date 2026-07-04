@@ -1,4 +1,3 @@
-// components/about/AboutHero.tsx
 "use client";
 import React from "react";
 import Link from "next/link";
@@ -6,6 +5,7 @@ import { ArrowRight, Printer } from "lucide-react";
 import { AnimatedCounter, useScrollReveal } from "./aboutUtils";
 import Image from "next/image";
 import { CONTACT_US_PAGE_PATH, SHOP_PAGE_PATH } from "@/utils/urls";
+import { ABOUT_US_PAGE_HERO_SECTION } from "@/utils/imagesUrl";
 
 const AboutHero: React.FC = () => {
   const { ref, visible } = useScrollReveal(0.05);
@@ -21,7 +21,6 @@ const AboutHero: React.FC = () => {
       className="relative overflow-hidden"
       style={{ padding: "clamp(48px, 7vw, 100px) 0 clamp(40px, 5vw, 80px)" }}
     >
-      {/* Corner glow */}
       <div
         className="absolute top-0 right-0 pointer-events-none"
         style={{
@@ -37,9 +36,7 @@ const AboutHero: React.FC = () => {
         style={{ maxWidth: "1400px", padding: "0 clamp(16px, 4vw, 64px)" }}
       >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-14 lg:gap-20 items-center">
-          {/* ── Left: copy ── */}
           <div>
-            {/* Eyebrow */}
             <div
               className="inline-flex items-center gap-2 sm:gap-3 mb-5 sm:mb-6"
               style={reveal("0s")}
@@ -60,7 +57,6 @@ const AboutHero: React.FC = () => {
               />
             </div>
 
-            {/* Headline */}
             <h1
               className="font-black text-[#101113] tracking-tight leading-[1.3] mb-5 sm:mb-6"
               style={{
@@ -85,7 +81,6 @@ const AboutHero: React.FC = () => {
               </span>
             </h1>
 
-            {/* Body */}
             <p
               className="text-[#2b2e33] font-medium leading-relaxed mb-8 sm:mb-10"
               style={{
@@ -99,7 +94,6 @@ const AboutHero: React.FC = () => {
               into a trusted partner for over 20 clients.
             </p>
 
-            {/* CTAs */}
             <div
               className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4"
               style={reveal("0.3s")}
@@ -170,9 +164,7 @@ const AboutHero: React.FC = () => {
             </div>
           </div>
 
-          {/* ── Right: image + badge ── */}
           <div className="relative" style={reveal("0.15s")}>
-            {/* Orbit rings */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <svg
                 className="max-w-full max-h-full"
@@ -211,7 +203,6 @@ const AboutHero: React.FC = () => {
               </svg>
             </div>
 
-            {/* Glow */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div
                 className="rounded-full"
@@ -226,10 +217,9 @@ const AboutHero: React.FC = () => {
               />
             </div>
 
-            {/* Photo */}
             <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl">
               <Image
-                src="https://res.cloudinary.com/dkfonkmwr/image/upload/v1773844362/cld-sample-2.jpg"
+                src={ABOUT_US_PAGE_HERO_SECTION}
                 alt="3D Printing Workshop"
                 className="w-full h-auto object-cover"
                 width={2000}
@@ -243,7 +233,6 @@ const AboutHero: React.FC = () => {
                 }}
               />
 
-              {/* Floating badge */}
               <div
                 className="absolute flex items-center gap-3 rounded-xl sm:rounded-2xl"
                 style={{

@@ -1,56 +1,25 @@
-// components/contact/ContactForm.tsx
 "use client";
 import React, { useState } from "react";
 import {
   Mail,
   Phone,
   User,
-  Building,
   Send,
   Loader2,
   CheckCircle,
   AlertCircle,
   X,
   MessageSquare,
-  Facebook,
-  Twitter,
-  Instagram,
-  Linkedin,
   Clock,
 } from "lucide-react";
 import { ContactUsService } from "@/service/contactUsService";
-import {
-  FACE_BOOK_LINK,
-  INSTAGRAM_LINK,
-  LINKEDIN_LINK,
-  TWITTER_LINK,
-} from "@/utils/constant";
-
-interface ContactFormData {
-  name: string;
-  email: string;
-  company: string;
-  phone: string;
-  subject: string;
-  message: string;
-}
-
-interface SubmitStatus {
-  type: "success" | "error" | "info" | null;
-  message: string;
-}
+import { ContactFormData, SubmitStatus } from "@/types/contact-us-page-types";
+import { socialLinksData } from "@/data/contact-us-page-data";
 
 const inputClass =
   "w-full py-3 text-sm text-[#101113] bg-white/80 border border-gray-200 rounded-xl outline-none placeholder:text-gray-400 focus:border-[#FF5000] focus:ring-2 focus:ring-[#FF5000]/10 focus:bg-white transition-all duration-200 font-medium";
 const labelClass =
   "block text-[10px] font-black tracking-widest text-gray-400 uppercase mb-1.5";
-
-const socialLinks = [
-  { icon: Facebook, href: FACE_BOOK_LINK, label: "Facebook" },
-  { icon: Twitter, href: TWITTER_LINK, label: "Twitter" },
-  { icon: Instagram, href: INSTAGRAM_LINK, label: "Instagram" },
-  { icon: Linkedin, href: LINKEDIN_LINK, label: "LinkedIn" },
-];
 
 const ContactForm: React.FC = () => {
   const [formData, setFormData] = useState<ContactFormData>({
@@ -67,7 +36,6 @@ const ContactForm: React.FC = () => {
     message: "",
   });
 
-  // Initialize the service
   const contactUsService = new ContactUsService();
 
   const handleInputChange = (
@@ -95,7 +63,6 @@ const ContactForm: React.FC = () => {
     e.preventDefault();
     setStatus({ type: null, message: "" });
 
-    // Validation
     if (!formData.name.trim())
       return setStatus({ type: "error", message: "Please enter your name." });
     if (!formData.email.trim())
@@ -134,19 +101,16 @@ const ContactForm: React.FC = () => {
     setStatus({ type: "info", message: "Sending your message..." });
 
     try {
-      // Prepare the request body according to InsertInquiryRequest interface
       const requestBody = {
         name: formData.name,
         email: formData.email,
-        contactNumber: formData.phone, // Changed from phone to contactNumber
+        contactNumber: formData.phone,
         subject: formData.subject,
         message: formData.message,
       };
 
-      // Call the service
       const response = await contactUsService.addInquiry(requestBody);
 
-      // Check if the response indicates success
       if (response.code === 200 || response.status === "success") {
         setStatus({
           type: "success",
@@ -156,7 +120,6 @@ const ContactForm: React.FC = () => {
         });
         clearForm();
       } else {
-        // Handle non-success response codes
         setStatus({
           type: "error",
           message:
@@ -166,7 +129,6 @@ const ContactForm: React.FC = () => {
     } catch (error) {
       console.error("Submission error:", error);
 
-      // Handle different types of errors
       let errorMessage =
         "Network error. Please check your connection and try again.";
 
@@ -197,9 +159,7 @@ const ContactForm: React.FC = () => {
         style={{ maxWidth: "1400px", padding: "0 clamp(16px, 4vw, 64px)" }}
       >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-12 lg:gap-16">
-          {/* ── Contact Form ── */}
           <div className="bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl border border-gray-100">
-            {/* Dark header */}
             <div className="bg-[#1A1A1A] relative overflow-hidden">
               <div
                 className="absolute inset-0 opacity-[0.05]"
@@ -228,10 +188,8 @@ const ContactForm: React.FC = () => {
               </div>
             </div>
 
-            {/* Form body */}
             <form onSubmit={handleSubmit} className="p-6 sm:p-8">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                {/* Name */}
                 <div>
                   <label className={labelClass}>
                     Full Name <span className="text-[#FF5000]">*</span>
@@ -252,7 +210,6 @@ const ContactForm: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Email */}
                 <div>
                   <label className={labelClass}>
                     Email Address <span className="text-[#FF5000]">*</span>
@@ -273,7 +230,6 @@ const ContactForm: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Phone - Now required */}
                 <div>
                   <label className={labelClass}>
                     Contact Number <span className="text-[#FF5000]">*</span>
@@ -294,7 +250,6 @@ const ContactForm: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Subject */}
                 <div className="">
                   <label className={labelClass}>
                     Subject <span className="text-[#FF5000]">*</span>
@@ -316,7 +271,6 @@ const ContactForm: React.FC = () => {
                   </select>
                 </div>
 
-                {/* Message */}
                 <div className="sm:col-span-2">
                   <label className={labelClass}>
                     Message <span className="text-[#FF5000]">*</span>
@@ -332,7 +286,6 @@ const ContactForm: React.FC = () => {
                 </div>
               </div>
 
-              {/* Status */}
               {status.type && (
                 <div
                   className={`flex items-start gap-3 p-4 rounded-xl mb-4 border ${
@@ -366,7 +319,6 @@ const ContactForm: React.FC = () => {
                 </div>
               )}
 
-              {/* Actions */}
               <div className="flex flex-wrap items-center gap-3">
                 <button
                   type="submit"
@@ -415,9 +367,7 @@ const ContactForm: React.FC = () => {
             </form>
           </div>
 
-          {/* ── Right sidebar ── */}
           <div className="space-y-5">
-            {/* Map - Updated with new coordinates */}
             <div
               className="rounded-2xl overflow-hidden border border-gray-100 shadow-sm"
               style={{ height: "clamp(220px, 28vw, 320px)" }}
@@ -433,7 +383,6 @@ const ContactForm: React.FC = () => {
               />
             </div>
 
-            {/* Social media */}
             <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
               <div className="h-1 bg-[#FF5000]" />
               <div className="p-5 sm:p-6">
@@ -444,7 +393,7 @@ const ContactForm: React.FC = () => {
                   Connect With Us
                 </h3>
                 <div className="flex gap-2.5">
-                  {socialLinks.map(({ icon: Icon, href, label }, si) => (
+                  {socialLinksData.map(({ icon: Icon, href, label }, si) => (
                     <a
                       key={si}
                       href={href}
@@ -465,7 +414,6 @@ const ContactForm: React.FC = () => {
               </div>
             </div>
 
-            {/* Quick response promise */}
             <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
               <div className="h-1 bg-[#FF5000]" />
               <div className="p-5 sm:p-6 flex items-start gap-4">

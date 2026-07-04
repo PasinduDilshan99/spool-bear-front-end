@@ -1,14 +1,5 @@
-// app/products/page.tsx
 "use client";
-
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useMemo,
-  useRef,
-} from "react";
-import Link from "next/link";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
   Search,
@@ -16,7 +7,6 @@ import {
   X,
   ChevronDown,
   ChevronUp,
-  Loader2,
   Filter,
   Tag,
   Layers,
@@ -40,32 +30,9 @@ import { ProductService } from "@/service/productService";
 import { useCurrency } from "@/context/CurrencyContext";
 import ProductLoading from "@/components/product-components/ProductLoading";
 import { BrowserHistoryService } from "@/service/browserHistoryService";
-import { SHOP_PAGE_PATH } from "@/utils/urls";
+import { LOGIN_PAGE_PATH, SHOP_PAGE_PATH } from "@/utils/urls";
+import { FilterOptions, FilterState } from "@/types/user-profile-types";
 
-interface FilterState {
-  categoryId?: number;
-  typeId?: number;
-  materialId?: number;
-  minPrice?: number;
-  maxPrice?: number;
-  inStock?: boolean;
-  name?: string;
-  sortBy: "price-asc" | "price-desc" | "name-asc" | "name-desc" | "newest";
-}
-
-interface FilterOption {
-  id: number;
-  name: string;
-  count?: number;
-}
-interface FilterOptions {
-  categories: (FilterOption & { count: number })[];
-  types: (FilterOption & { categoryId: number; count: number })[];
-  materials: (FilterOption & { typeId: number; count: number })[];
-  priceRange: { min: number; max: number };
-}
-
-/* ── Sidebar filter section ── */
 function FilterSection({
   icon,
   label,
@@ -104,7 +71,6 @@ function FilterSection({
   );
 }
 
-/* ── Filter option button ── */
 function FilterOptionButton({
   label,
   count,
@@ -185,7 +151,6 @@ const ProductsPage = () => {
   const [isColorModalOpen, setIsColorModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(12);
-  // Stagger animation
   const [cardsVisible, setCardsVisible] = useState(false);
 
   const [filters, setFilters] = useState<FilterState>(() => ({
@@ -216,7 +181,7 @@ const ProductsPage = () => {
   const handleWishlistToggle = async (product: Product) => {
     if (!user) {
       showToast("Please login to manage wishlist", "info");
-      router.push("/login");
+      router.push(LOGIN_PAGE_PATH);
       return;
     }
     setTogglingWishlist(product.productId);
@@ -306,7 +271,6 @@ const ProductsPage = () => {
     }
   };
 
-  // Build filter options from products
   useEffect(() => {
     if (!products.length) return;
     const catMap = new Map<number, { name: string; count: number }>();
@@ -438,7 +402,7 @@ const ProductsPage = () => {
     if (filters.name) params.set("search", filters.name);
     if (filters.sortBy !== "newest") params.set("sort", filters.sortBy);
     const qs = params.toString();
-    router.push(qs ? `?${qs}` : "/shop", { scroll: false });
+    router.push(qs ? `?${qs}` : SHOP_PAGE_PATH, { scroll: false });
   }, [filters, applyFilters, router]);
 
   const handleFilterChange = <K extends keyof FilterState>(
@@ -571,16 +535,16 @@ const ProductsPage = () => {
     if (primary?.imageUrl)
       return primary.imageUrl.startsWith("http")
         ? primary.imageUrl
-        : `http://localhost:8080${primary.imageUrl}`;
+        : PLACE_HOLDER_IMAGE;
     if (product.images?.[0]?.imageUrl)
       return product.images[0].imageUrl.startsWith("http")
         ? product.images[0].imageUrl
-        : `http://localhost:8080${product.images[0].imageUrl}`;
+        : PLACE_HOLDER_IMAGE;
     return PLACE_HOLDER_IMAGE;
   };
 
   const formatPrice = (price: number) => {
-    return currentCurrency.symbol + convertPrice(price).toFixed(2);
+    return currentCurrency.symbol + " " + convertPrice(price).toFixed(2);
   };
 
   const paginatedProducts = useMemo(() => {
@@ -590,11 +554,9 @@ const ProductsPage = () => {
 
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
 
-  // ── Initial loading ──
   if (initialLoading) {
     return <ProductLoading />;
   }
-  // ── Error ──
   if (error) {
     return (
       <div className="min-h-screen bg-[#e4e7ec] flex items-center justify-center p-6">
@@ -620,7 +582,6 @@ const ProductsPage = () => {
 
   const FilterSidebar = (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-      {/* Header */}
       <div className="h-1 bg-[#FF5000]" />
       <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -662,7 +623,6 @@ const ProductsPage = () => {
           </div>
         </div>
 
-        {/* Categories */}
         {filterOptions.categories.length > 0 && (
           <FilterSection
             icon={<Tag size={14} />}
@@ -689,7 +649,6 @@ const ProductsPage = () => {
           </FilterSection>
         )}
 
-        {/* Types */}
         {filterOptions.types.length > 0 && (
           <FilterSection
             icon={<Layers size={14} />}
@@ -721,7 +680,6 @@ const ProductsPage = () => {
           </FilterSection>
         )}
 
-        {/* Materials */}
         {filterOptions.materials.length > 0 && (
           <FilterSection
             icon={<Box size={14} />}
@@ -750,7 +708,6 @@ const ProductsPage = () => {
           </FilterSection>
         )}
 
-        {/* Price */}
         <FilterSection
           icon={<DollarSign size={14} />}
           label="Price Range"
@@ -795,7 +752,6 @@ const ProductsPage = () => {
           </div>
         </FilterSection>
 
-        {/* In Stock */}
         <div>
           <label className="flex items-center gap-3 cursor-pointer group py-2">
             <div
@@ -823,7 +779,6 @@ const ProductsPage = () => {
 
   return (
     <div className="min-h-screen bg-[#e4e7ec] relative overflow-x-hidden">
-      {/* Modals */}
       {selectedProductForColor && (
         <ColorSelectionModal
           product={selectedProductForColor}
@@ -844,7 +799,6 @@ const ProductsPage = () => {
         />
       )}
 
-      {/* Grid texture */}
       <div
         className="fixed inset-0 pointer-events-none z-0"
         style={{
@@ -854,7 +808,6 @@ const ProductsPage = () => {
         }}
       />
 
-      {/* Mobile filter overlay */}
       {showMobileFilters && (
         <div className="fixed inset-0 z-50 flex">
           <div
@@ -895,7 +848,6 @@ const ProductsPage = () => {
           padding: "clamp(24px, 4vw, 48px) clamp(16px, 4vw, 64px)",
         }}
       >
-        {/* Page header */}
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-2">
             <div
@@ -927,7 +879,6 @@ const ProductsPage = () => {
           </p>
         </div>
 
-        {/* Mobile filter button */}
         <div className="lg:hidden mb-4">
           <button
             onClick={() => setShowMobileFilters(true)}
@@ -943,7 +894,6 @@ const ProductsPage = () => {
           </button>
         </div>
 
-        {/* Active filter chips */}
         {activeFilterCount > 0 && (
           <div
             className="mb-5 flex flex-wrap items-center gap-2"
@@ -978,7 +928,6 @@ const ProductsPage = () => {
         )}
 
         <div className="flex gap-6 lg:gap-8">
-          {/* Desktop sidebar */}
           <div
             className="hidden lg:block flex-shrink-0"
             style={{ width: "clamp(220px, 22vw, 280px)" }}
@@ -986,7 +935,6 @@ const ProductsPage = () => {
             <div className="sticky top-6">{FilterSidebar}</div>
           </div>
 
-          {/* Products area */}
           <div className="flex-1 min-w-0">
             <ProductToolbar
               totalProducts={filteredProducts.length}

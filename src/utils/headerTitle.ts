@@ -30,3 +30,5 @@ export const ORDER_DETAILS_PAGE_TITLE = `Order Details | ${COMPANY_NAME}`;
 export const FAQ_PAGE_TITLE = `FAQ | ${COMPANY_NAME}`;
 export const REVIEWS_PAGE_TITLE = `Reviews | ${COMPANY_NAME}`;
 export const REVIEW_DETAILS_PAGE_TITLE = `Review Details | ${COMPANY_NAME}`;
+export const MATERIALS_PAGE_TITLE = `Materials | ${COMPANY_NAME}`;
+export const MATERIAL_DETAILS_PAGE_TITLE = `Material Details | ${COMPANY_NAME}`;

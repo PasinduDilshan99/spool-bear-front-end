@@ -1,4 +1,3 @@
-// components/design/DesignRequestForm.tsx
 "use client";
 import React, { useState } from "react";
 import { CheckCircle, AlertCircle, Send, Loader2, X } from "lucide-react";
@@ -6,20 +5,8 @@ import { OrderService } from "@/service/orderService";
 import { AddDesignOrderRequest } from "@/types/order-types";
 import { materials } from "@/data/materials-data";
 import { useAuth } from "@/context/AuthContext";
-
-interface DesignFormData {
-  customText: string;
-  description: string;
-  size: string;
-  color: string;
-  quantity: number;
-  materiel: string;
-}
-
-interface SubmitStatus {
-  type: "success" | "error" | "info" | null;
-  message: string;
-}
+import { DesignFormData, SubmitStatus } from "@/types/design-page-types";
+import { LOGIN_PAGE_PATH, SIGNUP_PAGE_PATH } from "@/utils/urls";
 
 const inputClass =
   "w-full px-4 py-3 text-sm text-[#101113] bg-white/80 border border-gray-200 rounded-xl outline-none placeholder:text-gray-400 focus:border-[#FF5000] focus:ring-2 focus:ring-[#FF5000]/10 focus:bg-white transition-all duration-200 font-medium";
@@ -31,7 +18,7 @@ const selectClass =
   "w-full px-4 py-3 text-sm text-[#101113] bg-white/80 border border-gray-200 rounded-xl outline-none focus:border-[#FF5000] focus:ring-2 focus:ring-[#FF5000]/10 focus:bg-white transition-all duration-200 cursor-pointer font-medium";
 
 const DesignRequestForm: React.FC = () => {
-  const { user } = useAuth(); // Get user from auth context
+  const { user } = useAuth();
   const [formData, setFormData] = useState<DesignFormData>({
     customText: "",
     description: "",
@@ -126,16 +113,13 @@ const DesignRequestForm: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    // Check if user is logged in
     if (!user) {
       setShowAuthModal(true);
       return;
     }
 
-    // Reset status
     setStatus({ type: null, message: "" });
 
-    // Validate form
     if (!validateForm()) {
       return;
     }
@@ -144,7 +128,6 @@ const DesignRequestForm: React.FC = () => {
     setStatus({ type: "info", message: "Submitting your design request..." });
 
     try {
-      // Prepare the order data
       const orderData: AddDesignOrderRequest = {
         customText: formData.customText || "Design Request",
         description: formData.description,
@@ -154,7 +137,6 @@ const DesignRequestForm: React.FC = () => {
         materiel: formData.materiel,
       };
 
-      // Submit the order
       const result = await orderService.addDesignOrder(orderData);
 
       setStatus({
@@ -164,7 +146,6 @@ const DesignRequestForm: React.FC = () => {
           "Design request submitted successfully! We'll contact you within 24-48 hours.",
       });
 
-      // Clear form on success
       clearForm();
     } catch (error) {
       console.error("Design order submission error:", error);
@@ -180,7 +161,6 @@ const DesignRequestForm: React.FC = () => {
     }
   };
 
-  // Auth Modal Component
   const AuthModal = () => {
     if (!showAuthModal) return null;
 
@@ -210,8 +190,7 @@ const DesignRequestForm: React.FC = () => {
             <button
               onClick={() => {
                 setShowAuthModal(false);
-                // Navigate to login page or open login modal
-                window.location.href = "/login";
+                window.location.href = LOGIN_PAGE_PATH;
               }}
               className="flex-1 px-4 py-2.5 bg-white border-2 border-[#FF5000] text-[#FF5000] rounded-lg font-bold hover:bg-orange-50 transition-colors"
             >
@@ -220,8 +199,7 @@ const DesignRequestForm: React.FC = () => {
             <button
               onClick={() => {
                 setShowAuthModal(false);
-                // Navigate to signup page or open signup modal
-                window.location.href = "/signup";
+                window.location.href = SIGNUP_PAGE_PATH;
               }}
               className="flex-1 px-4 py-2.5 bg-[#FF5000] text-white rounded-lg font-bold hover:bg-[#e34800] transition-colors"
             >
@@ -239,7 +217,6 @@ const DesignRequestForm: React.FC = () => {
         id="design-form"
         className="bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl border border-gray-100 scroll-mt-8"
       >
-        {/* Header */}
         <div className="bg-[#1A1A1A] relative overflow-hidden">
           <div
             className="absolute inset-0 opacity-[0.05]"
@@ -265,10 +242,8 @@ const DesignRequestForm: React.FC = () => {
           </div>
         </div>
 
-        {/* Form body */}
         <div className="p-6 sm:p-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            {/* Custom Text/Title - Optional */}
             <div className="sm:col-span-2">
               <label className={labelClass}>
                 Design Title{" "}
@@ -284,7 +259,6 @@ const DesignRequestForm: React.FC = () => {
               />
             </div>
 
-            {/* Description */}
             <div className="sm:col-span-2">
               <label className={labelClass}>
                 Design Description <span className="text-[#FF5000]">*</span>
@@ -299,7 +273,6 @@ const DesignRequestForm: React.FC = () => {
               />
             </div>
 
-            {/* Size */}
             <div>
               <label className={labelClass}>
                 Size / Dimensions <span className="text-[#FF5000]">*</span>
@@ -314,7 +287,6 @@ const DesignRequestForm: React.FC = () => {
               />
             </div>
 
-            {/* Color */}
             <div>
               <label className={labelClass}>
                 Color <span className="text-[#FF5000]">*</span>
@@ -329,7 +301,6 @@ const DesignRequestForm: React.FC = () => {
               />
             </div>
 
-            {/* Quantity */}
             <div>
               <label className={labelClass}>
                 Quantity <span className="text-[#FF5000]">*</span>
@@ -344,7 +315,6 @@ const DesignRequestForm: React.FC = () => {
               />
             </div>
 
-            {/* Material */}
             <div>
               <label className={labelClass}>
                 Material <span className="text-[#FF5000]">*</span>
@@ -365,7 +335,6 @@ const DesignRequestForm: React.FC = () => {
             </div>
           </div>
 
-          {/* Status */}
           {status.type && (
             <div
               className={`flex items-start gap-3 p-4 rounded-xl mb-4 border ${
@@ -381,7 +350,9 @@ const DesignRequestForm: React.FC = () => {
               ) : (
                 <AlertCircle size={16} className="flex-shrink-0 mt-0.5" />
               )}
-              <span className="text-sm font-medium flex-1">{status.message}</span>
+              <span className="text-sm font-medium flex-1">
+                {status.message}
+              </span>
               <button
                 onClick={() => setStatus({ type: null, message: "" })}
                 className="opacity-50 hover:opacity-80"
@@ -391,7 +362,6 @@ const DesignRequestForm: React.FC = () => {
             </div>
           )}
 
-          {/* Buttons */}
           <div className="flex flex-wrap items-center gap-3">
             <button
               onClick={handleSubmit}
@@ -434,7 +404,6 @@ const DesignRequestForm: React.FC = () => {
         </div>
       </div>
 
-      {/* Auth Modal */}
       <AuthModal />
     </>
   );

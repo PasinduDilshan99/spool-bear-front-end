@@ -1,16 +1,10 @@
-// components/materials/MaterialListView.tsx
 "use client";
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Material } from "@/types/material-types";
 import { MATERIAL_PAGE_PATH } from "@/utils/urls";
-
-interface MaterialListViewProps {
-  materials: Material[];
-  onQuickView: (material: Material) => void;
-}
+import { MaterialListViewProps } from "@/types/material-types";
 
 export const MaterialListView: React.FC<MaterialListViewProps> = ({
   materials,
@@ -52,7 +46,6 @@ export const MaterialListView: React.FC<MaterialListViewProps> = ({
           className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 p-4"
         >
           <div className="flex gap-4">
-            {/* Image */}
             <div
               className="relative w-24 h-24 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden cursor-pointer"
               onClick={() => onQuickView(material)}
@@ -83,7 +76,6 @@ export const MaterialListView: React.FC<MaterialListViewProps> = ({
               )}
             </div>
 
-            {/* Content */}
             <div className="flex-1">
               <div className="flex items-start justify-between mb-2">
                 <div>
@@ -94,12 +86,6 @@ export const MaterialListView: React.FC<MaterialListViewProps> = ({
                     {material.materialType?.name}
                   </p>
                 </div>
-                {/* <div className="text-right">
-                  <div className="text-xl font-bold text-[#FF5000]">
-                    ${material.pricePerGram.toFixed(3)}
-                  </div>
-                  <div className="text-xs text-gray-500">per gram</div>
-                </div> */}
               </div>
 
               <p className="text-sm text-gray-600 mb-3 line-clamp-2">
@@ -120,7 +106,7 @@ export const MaterialListView: React.FC<MaterialListViewProps> = ({
                   </span>
                 </div>
                 <Link
-                  href={`${MATERIAL_PAGE_PATH}/${material.materialId}`}
+                  href={`${MATERIAL_PAGE_PATH}/${material.materialId}?name=${material.materialName}`}
                   className="text-sm text-[#FF5000] hover:text-[#ff6b2c] font-medium"
                 >
                   View Details →

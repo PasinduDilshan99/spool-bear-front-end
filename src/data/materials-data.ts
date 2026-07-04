@@ -1,8 +1,24 @@
-import { materialsType } from "@/types/materials-types";
+import { materialsType } from "@/types/material-types";
 
 export const materials: materialsType[] = [
-  { id: 1, name: "PLA Red", description: "Red PLA filament, 1kg" },
-  { id: 2, name: "PLA Blue", description: "Blue PLA filament, 1kg" },
-  { id: 3, name: "ABS Black", description: "Black ABS filament, 1kg" },
-  { id: 4, name: "Gray Resin", description: "Standard gray SLA resin, 500g" },
+  {
+    id: 1,
+    name: "PLA",
+    description: "Polylactic Acid, easy to print biodegradable filament",
+  },
+  {
+    id: 2,
+    name: "ABS",
+    description: "Acrylonitrile Butadiene Styrene, strong and heat resistant",
+  },
+  {
+    id: 3,
+    name: "PETG",
+    description: "Polyethylene Terephthalate Glycol, strong and low shrinkage",
+  },
+  {
+    id: 4,
+    name: "TPU",
+    description: "Thermoplastic Polyurethane, flexible and impact resistant",
+  },
 ];

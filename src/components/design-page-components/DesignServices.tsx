@@ -1,14 +1,6 @@
-// components/design/DesignServices.tsx
 "use client";
+import { servicesData } from "@/data/design-page-data";
 import React, { useEffect, useRef, useState } from "react";
-import { PenTool, Palette, Users, Sparkles } from "lucide-react";
-
-const services = [
-  { icon: PenTool,   title: "3D Modeling",          description: "From concept to digital 3D model, ready for printing." },
-  { icon: Palette,   title: "Design Optimization",  description: "Make your designs print-ready with proper tolerances." },
-  { icon: Users,     title: "Collaborative Process", description: "Work with our designers iteratively until it's right." },
-  { icon: Sparkles,  title: "Multiple Revisions",    description: "We refine until you're 100% satisfied." },
-];
 
 const DesignServices: React.FC = () => {
   const ref = useRef<HTMLElement>(null);
@@ -25,7 +17,6 @@ const DesignServices: React.FC = () => {
 
   return (
     <section ref={ref} className="py-14 sm:py-16 md:py-20">
-      {/* Heading */}
       <div
         className="text-center mb-10 sm:mb-12 transition-all duration-700"
         style={{ opacity: visible ? 1 : 0, transform: visible ? "none" : "translateY(20px)" }}
@@ -48,9 +39,8 @@ const DesignServices: React.FC = () => {
         </p>
       </div>
 
-      {/* Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
-        {services.map((s, i) => {
+        {servicesData.map((s, i) => {
           const Icon = s.icon;
           return (
             <div

@@ -1,34 +1,12 @@
-// components/design/DesignHero.tsx
 "use client";
-import React, { useEffect, useRef, useState } from "react";
-
-interface DesignHeroProps {
-  onScrollToForm: () => void;
-}
-
-const steps = [
-  {
-    title: "Share your idea and references.",
-    note: "Sketches, photos, links, dimensions, and use-case help a lot.",
-  },
-  {
-    title: "We design + review with you.",
-    note: "You'll get previews and we'll refine based on feedback.",
-  },
-  {
-    title: "Get print-ready files and a quote.",
-    note: "We can also print and ship the final part.",
-  },
-];
+import { stepsData } from "@/data/design-page-data";
+import { DesignHeroProps } from "@/types/design-page-types";
+import { PRINT_PAGE_HERO_SECTION } from "@/utils/imagesUrl";
+import React, { useRef, useState } from "react";
 
 const DesignHero: React.FC<DesignHeroProps> = ({ onScrollToForm }) => {
   const ref = useRef<HTMLElement>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    // Immediately visible since it's above the fold
-    setVisible(true);
-  }, []);
+  const [visible, setVisible] = useState(true);
 
   return (
     <section
@@ -39,7 +17,6 @@ const DesignHero: React.FC<DesignHeroProps> = ({ onScrollToForm }) => {
         padding: "clamp(48px, 7vw, 100px) 0 clamp(40px, 5vw, 72px)",
       }}
     >
-      {/* Grid texture */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -49,11 +26,10 @@ const DesignHero: React.FC<DesignHeroProps> = ({ onScrollToForm }) => {
         }}
       />
 
-      {/* Background image — right side */}
       <div
         className="absolute inset-0 pointer-events-none hidden md:block"
         style={{
-          backgroundImage: 'url("https://res.cloudinary.com/dkfonkmwr/image/upload/v1773844362/cld-sample-2.jpg")',
+          backgroundImage: `url(${PRINT_PAGE_HERO_SECTION})`,
           backgroundRepeat: "no-repeat",
           backgroundPosition: "right center",
           backgroundSize: "min(1000px, 65vw)",
@@ -61,7 +37,6 @@ const DesignHero: React.FC<DesignHeroProps> = ({ onScrollToForm }) => {
         }}
       />
 
-      {/* Gradient overlay — fades image into bg */}
       <div
         className="absolute inset-0 pointer-events-none hidden md:block"
         style={{
@@ -70,7 +45,6 @@ const DesignHero: React.FC<DesignHeroProps> = ({ onScrollToForm }) => {
         }}
       />
 
-      {/* Corner glow */}
       <div
         className="absolute top-0 right-0 pointer-events-none"
         style={{
@@ -85,7 +59,6 @@ const DesignHero: React.FC<DesignHeroProps> = ({ onScrollToForm }) => {
         className="container mx-auto relative z-10"
         style={{ padding: "0 clamp(16px, 4vw, 64px)", maxWidth: "1300px" }}
       >
-        {/* Eyebrow */}
         <div
           className="inline-flex items-center gap-2 sm:gap-3 mb-5 sm:mb-6"
           style={{
@@ -110,7 +83,6 @@ const DesignHero: React.FC<DesignHeroProps> = ({ onScrollToForm }) => {
           />
         </div>
 
-        {/* Headline */}
         <h1
           className="font-black text-[#101113] tracking-tight leading-[1.04] mb-4 sm:mb-5"
           style={{
@@ -126,7 +98,6 @@ const DesignHero: React.FC<DesignHeroProps> = ({ onScrollToForm }) => {
           Have an idea?
         </h1>
 
-        {/* Lead */}
         <p
           className="font-black text-[#101113] mb-2"
           style={{
@@ -141,7 +112,6 @@ const DesignHero: React.FC<DesignHeroProps> = ({ onScrollToForm }) => {
           We&apos;ll turn it into a 3D model.
         </p>
 
-        {/* Sub */}
         <p
           className="font-semibold text-[#2b2e33] mb-10 sm:mb-12 leading-relaxed"
           style={{
@@ -157,7 +127,6 @@ const DesignHero: React.FC<DesignHeroProps> = ({ onScrollToForm }) => {
           handle the design, revisions, and print-ready files.
         </p>
 
-        {/* How it works */}
         <div
           style={{
             opacity: visible ? 1 : 0,
@@ -181,7 +150,7 @@ const DesignHero: React.FC<DesignHeroProps> = ({ onScrollToForm }) => {
             className="mt-4 space-y-4 sm:space-y-5 mb-10 sm:mb-12"
             style={{ maxWidth: "clamp(280px, 55vw, 760px)" }}
           >
-            {steps.map((step, i) => (
+            {stepsData.map((step, i) => (
               <li key={i} className="flex items-start gap-4">
                 <div
                   className="flex-shrink-0 flex items-center justify-center rounded-xl font-black text-white bg-[#FF5000] shadow-md shadow-orange-200"
@@ -213,7 +182,6 @@ const DesignHero: React.FC<DesignHeroProps> = ({ onScrollToForm }) => {
           </ul>
         </div>
 
-        {/* CTA row */}
         <div
           className="flex flex-wrap items-center gap-4 sm:gap-5"
           style={{

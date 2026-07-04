@@ -1,12 +1,8 @@
-// components/print-page-components/PrintCTA.tsx
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { CONTACT_US_PAGE_PATH } from "@/utils/urls";
-
-interface PrintCTAProps {
-  onScrollToForm: () => void;
-}
+import { PrintCTAProps } from "@/types/print-page-types";
 
 const PrintCTA: React.FC<PrintCTAProps> = ({ onScrollToForm }) => {
   const ref = useRef<HTMLElement>(null);
@@ -39,7 +35,6 @@ const PrintCTA: React.FC<PrintCTAProps> = ({ onScrollToForm }) => {
         className="relative rounded-2xl sm:rounded-3xl overflow-hidden"
         style={{ background: "#1A1A1A" }}
       >
-        {/* Grid */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
@@ -48,7 +43,6 @@ const PrintCTA: React.FC<PrintCTAProps> = ({ onScrollToForm }) => {
             backgroundSize: "32px 32px",
           }}
         />
-        {/* Dots */}
         <div
           className="absolute inset-0 pointer-events-none opacity-[0.08]"
           style={{
@@ -57,9 +51,7 @@ const PrintCTA: React.FC<PrintCTAProps> = ({ onScrollToForm }) => {
             backgroundSize: "28px 28px",
           }}
         />
-        {/* Orange top bar */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-[#FF5000]" />
-        {/* Glow */}
         <div
           className="absolute -top-20 -right-20 w-64 h-64 rounded-full pointer-events-none"
           style={{
@@ -87,7 +79,6 @@ const PrintCTA: React.FC<PrintCTAProps> = ({ onScrollToForm }) => {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
-            {/* Primary */}
             <button
               onClick={onScrollToForm}
               className="cursor-pointer group relative overflow-hidden inline-flex items-center gap-2.5 font-black uppercase tracking-[0.08em] text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-2xl w-full sm:w-auto justify-center"
@@ -123,7 +114,6 @@ const PrintCTA: React.FC<PrintCTAProps> = ({ onScrollToForm }) => {
               <span className="relative z-10">Upload Now</span>
             </button>
 
-            {/* Secondary */}
             <Link
               href={CONTACT_US_PAGE_PATH}
               className="cursor-pointer inline-flex items-center gap-2 font-black uppercase tracking-[0.08em] text-white transition-all duration-300 hover:bg-white/10 hover:-translate-y-0.5 w-full sm:w-auto justify-center"

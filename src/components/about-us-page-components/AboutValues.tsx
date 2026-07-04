@@ -1,49 +1,19 @@
-// components/about/AboutValues.tsx
 "use client";
 import React from "react";
-import { Award, Heart, Cpu, Shield } from "lucide-react";
 import { useScrollReveal } from "./aboutUtils";
-
-const values = [
-  {
-    icon: Award,
-    title: "Quality First",
-    description:
-      "We never compromise on quality. Every print is meticulously checked before delivery.",
-  },
-  {
-    icon: Heart,
-    title: "Customer Focused",
-    description:
-      "Your satisfaction is our priority. We work closely with you to bring your ideas to life.",
-  },
-  {
-    icon: Cpu,
-    title: "Innovation Driven",
-    description:
-      "We stay at the forefront of 3D printing technology to offer you the best solutions.",
-  },
-  {
-    icon: Shield,
-    title: "Reliable Service",
-    description:
-      "On-time delivery and consistent quality you can count on, every single time.",
-  },
-];
+import { valuesData } from "@/data/about-us-page-data";
 
 const AboutValues: React.FC = () => {
   const { ref, visible } = useScrollReveal();
 
   return (
     <section ref={ref} className="py-14 sm:py-16 md:py-20">
-      {/* Dark full-width background stripe */}
       <div className="absolute left-0 right-0 pointer-events-none" />
 
       <div
         className="container mx-auto"
         style={{ maxWidth: "1400px", padding: "0 clamp(16px, 4vw, 64px)" }}
       >
-        {/* Heading */}
         <div
           className="text-center mb-10 sm:mb-12 transition-all duration-700"
           style={{
@@ -88,9 +58,8 @@ const AboutValues: React.FC = () => {
           </p>
         </div>
 
-        {/* Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
-          {values.map((v, i) => {
+          {valuesData.map((v, i) => {
             const Icon = v.icon;
             return (
               <div
@@ -103,7 +72,6 @@ const AboutValues: React.FC = () => {
                   transition: `opacity 0.6s ${0.12 + i * 0.1}s ease-out, transform 0.6s ${0.12 + i * 0.1}s ease-out, box-shadow 0.3s, translate 0.4s`,
                 }}
               >
-                {/* Rotating diamond icon */}
                 <div
                   className="mx-auto mb-5 sm:mb-6 flex items-center justify-center transition-all duration-500 group-hover:rotate-90 group-hover:scale-110"
                   style={{

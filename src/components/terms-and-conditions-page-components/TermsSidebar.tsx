@@ -1,15 +1,13 @@
 "use client";
+import { TermsSideBarProps } from "@/types/terms-and-conditions-types";
+import { CONTACT_US_PAGE_PATH } from "@/utils/urls";
+import { useEffect, useState } from "react";
 
-import React, { useEffect, useState } from "react";
-import { Section } from "./sections";
-
-interface Props {
-  sections: Section[];
-  activeSection: string;
-  onSelect: (id: string) => void;
-}
-
-export const TermsSidebar = ({ sections, activeSection, onSelect }: Props) => {
+export const TermsSidebar = ({
+  sections,
+  activeSection,
+  onSelect,
+}: TermsSideBarProps) => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -26,9 +24,7 @@ export const TermsSidebar = ({ sections, activeSection, onSelect }: Props) => {
       }}
     >
       <div className="sticky top-8">
-        {/* Card */}
         <div className="bg-white rounded-3xl border border-[#EAE4DC] shadow-sm overflow-hidden">
-          {/* Top stripe */}
           <div className="h-1.5 bg-gradient-to-r from-[#FF5000] via-[#FF7A40] to-[#FFB380]" />
 
           <div className="p-5">
@@ -45,7 +41,9 @@ export const TermsSidebar = ({ sections, activeSection, onSelect }: Props) => {
                   <button
                     key={section.id}
                     onClick={() => onSelect(section.id)}
-                    className="group w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl text-left transition-all duration-200 relative overflow-hidden"
+                    className="cursor-pointer border-2 border-orange-50 group w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl text-left relative overflow-hidden 
+transition-all duration-300 ease-in-out 
+hover:scale-[1.02] hover:bg-orange-50 hover:shadow-md"
                     style={{
                       background: isActive
                         ? "linear-gradient(135deg, #FFF4EF 0%, #FFF9F6 100%)"
@@ -53,7 +51,6 @@ export const TermsSidebar = ({ sections, activeSection, onSelect }: Props) => {
                       transitionDelay: `${i * 20}ms`,
                     }}
                   >
-                    {/* Active left bar */}
                     <div
                       className="absolute left-0 top-2 bottom-2 w-0.5 rounded-full transition-all duration-200"
                       style={{
@@ -63,7 +60,6 @@ export const TermsSidebar = ({ sections, activeSection, onSelect }: Props) => {
                       }}
                     />
 
-                    {/* Icon wrapper */}
                     <div
                       className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200"
                       style={{
@@ -100,7 +96,6 @@ export const TermsSidebar = ({ sections, activeSection, onSelect }: Props) => {
             </nav>
           </div>
 
-          {/* Bottom help card */}
           <div className="mx-4 mb-4 p-4 bg-gradient-to-br from-[#FF5000] to-[#FF8C42] rounded-2xl text-white">
             <p className="text-xs font-bold uppercase tracking-widest mb-1 opacity-80">
               Need Help?
@@ -109,7 +104,7 @@ export const TermsSidebar = ({ sections, activeSection, onSelect }: Props) => {
               Questions about our terms?
             </p>
             <a
-              href="/contact"
+              href={CONTACT_US_PAGE_PATH}
               className="inline-flex items-center gap-1.5 text-xs font-bold bg-white text-[#FF5000] px-3 py-1.5 rounded-xl hover:bg-orange-50 transition-colors"
             >
               Contact Support →
