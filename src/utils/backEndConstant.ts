@@ -9,8 +9,8 @@
 // export const BASE_PATH = `${PROTOCOL}://${DOMAIN}:${PORT}/${CONTEXT_ROOT}`;
 
 // Staging (commented out)
-const PROTOCOL = "http";
-const DOMAIN = "staging-api.spoolbear.com";
+const PROTOCOL = "https";
+const DOMAIN = "api-test.spoolbear.com";
 const PORT = "443";
 const CONTEXT_ROOT = "spool-bear";
 const VERSION = "/v0";
