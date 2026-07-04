@@ -9,22 +9,22 @@
 // export const BASE_PATH = `${PROTOCOL}://${DOMAIN}:${PORT}/${CONTEXT_ROOT}`;
 
 // Staging (commented out)
+// const PROTOCOL = "https";
+// const DOMAIN = "api-test.spoolbear.com";
+// const PORT = "443";
+// const CONTEXT_ROOT = "spool-bear";
+// const VERSION = "/v0";
+// const API = "/api";
+// export const BASE_PATH = `${PROTOCOL}://${DOMAIN}/${CONTEXT_ROOT}`;
+
+// Production (commented out)
 const PROTOCOL = "https";
-const DOMAIN = "api-test.spoolbear.com";
+const DOMAIN = "api.spoolbear.com";
 const PORT = "443";
 const CONTEXT_ROOT = "spool-bear";
 const VERSION = "/v0";
 const API = "/api";
 export const BASE_PATH = `${PROTOCOL}://${DOMAIN}/${CONTEXT_ROOT}`;
-
-// Production (commented out)
-// const PROTOCOL = "https";
-// const DOMAIN = "api.felicitatrips.com";
-// const PORT = "443";
-// const CONTEXT_ROOT = "felicita";
-// const VERSION = "/v0";
-// const API = "/api";
-// export const BASE_PATH = `${PROTOCOL}://${DOMAIN}/${CONTEXT_ROOT}`;
 
 const AUTH = "/auth";
 const NAV_BAR = "/nav-bar";
